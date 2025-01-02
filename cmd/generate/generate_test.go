@@ -65,6 +65,32 @@ func TestGenerateReactSuccess(t *testing.T) {
 	compareOutput(t, testFileReact, memoryOutputPath, fs)
 }
 
+func TestGenerateJavaSuccess(t *testing.T) {
+	// Constant paths.
+	const memoryManifestPath = "manifest/path.json"
+	const memoryOutputPath = "example_java/ExperimentFlags.java"
+	const testFileManifest = "testdata/success_manifest.golden"
+	const testFileReact = "testdata/success_java.golden"
+
+	// Prepare in-memory files.
+	fs := afero.NewMemMapFs()
+	viper.Set(flagkeys.FileSystem, fs)
+	readOsFileAndWriteToMemMap(t, testFileManifest, memoryManifestPath, fs)
+
+	// Prepare command.
+	Root.SetArgs([]string{"java",
+		"--flag_manifest_path", memoryManifestPath,
+		"--output_path", memoryOutputPath,
+		"--package_name", "example_java",
+	})
+
+	// Run command.
+	Root.Execute()
+
+	// Compare result.
+	compareOutput(t, testFileReact, memoryOutputPath, fs)
+}
+
 func readOsFileAndWriteToMemMap(t *testing.T, inputPath string, memPath string, memFs afero.Fs) {
 	data, err := os.ReadFile(inputPath)
 	if err != nil {
