@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.10](https://github.com/open-feature/cli/compare/v0.1.9...v0.1.10) (2025-01-02)
+
+
+### ✨ New Features
+
+* update golang output ([#63](https://github.com/open-feature/cli/issues/63)) ([0e7db02](https://github.com/open-feature/cli/commit/0e7db0209e13b672329fc2f4578cdb700db7b826))
+
+
+### 🧹 Chore
+
+* go mod tidy, gitignore dist folder ([1530d38](https://github.com/open-feature/cli/commit/1530d38dd3b127d80457512e8a0da87f4f38f293))
+* switch base image from distroless to alpine ([#67](https://github.com/open-feature/cli/issues/67)) ([60955af](https://github.com/open-feature/cli/commit/60955af1a9fe89b62f8508ecd97284b899b50786))
+
 ## [0.1.9](https://github.com/open-feature/cli/compare/v0.1.8...v0.1.9) (2024-11-27)
 
 
