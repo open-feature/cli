@@ -14,6 +14,10 @@ const (
 	// GoPackageName is the key for the flag that stores the Golang package name.
 	GoPackageName = "package_name"
 
+	// `generate java` flags:
+	// JavaPackageName is the key for the flag that stores the Java package name.
+	JavaPackageName = "package_name"
+
 	//internal keys:
 	// FileSystem is the key for the flag that stores the filesystem interface.
 	FileSystem = "filesystem"

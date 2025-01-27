@@ -2,6 +2,7 @@ package generate
 
 import (
 	"github.com/open-feature/cli/cmd/generate/golang"
+	"github.com/open-feature/cli/cmd/generate/java"
 	"github.com/open-feature/cli/cmd/generate/react"
 	"github.com/open-feature/cli/internal/flagkeys"
 
@@ -20,6 +21,7 @@ func init() {
 	// Add subcommands.
 	Root.AddCommand(golang.Cmd)
 	Root.AddCommand(react.Cmd)
+	Root.AddCommand(java.Cmd)
 
 	// Add flags.
 	Root.PersistentFlags().String(flagkeys.FlagManifestPath, "", "Path to the flag manifest.")
