@@ -1,4 +1,4 @@
-package flagmanifest
+package schema
 
 import (
 	"encoding/json"
@@ -9,18 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/santhosh-tekuri/jsonschema/v5"
+	"github.com/xeipuuv/gojsonschema"
 )
-
-var compiledFlagManifestSchema *jsonschema.Schema
-
-func init() {
-	sch, err := jsonschema.CompileString(SchemaPath, Schema)
-	if err != nil {
-		log.Fatal(fmt.Errorf("error compiling JSON schema: %v", err))
-	}
-	compiledFlagManifestSchema = sch
-}
 
 func TestPositiveFlagManifest(t *testing.T) {
 	if err := walkPath(true, "./tests/positive"); err != nil {
@@ -57,13 +47,18 @@ func walkPath(shouldPass bool, root string) error {
 			log.Fatal(err)
 		}
 
-		err = compiledFlagManifestSchema.Validate(v)
+		schemaLoader := gojsonschema.NewStringLoader(SchemaFile)
+		manifestLoader := gojsonschema.NewGoLoader(v)
+		result, err := gojsonschema.Validate(schemaLoader, manifestLoader)
+		if (err != nil) {
+			return fmt.Errorf("Error validating json schema: %v", err)
+		}
 
-		if (err != nil && shouldPass == true) {
+		if (len(result.Errors()) >= 1 && shouldPass == true) {
 			return fmt.Errorf("file %s should not have failed validation, but did: %s", path, err)
 		}
 
-		if (err == nil && shouldPass == false) {
+		if (len(result.Errors()) == 0 && shouldPass == false) {
 			return fmt.Errorf("file %s should have failed validation, but did not", path)
 		}
 

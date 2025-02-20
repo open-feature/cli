@@ -1,4 +1,5 @@
 {
+  "$schema": "../schema/v0/flag_manifest.json",
   "flags": {
     "enableFeatureA": {
       "flagType": "boolean",
