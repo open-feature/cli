@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 
-	// "reflect"
 	"strings"
 
 	"github.com/invopop/jsonschema"
@@ -16,11 +15,11 @@ import (
 )
 
 func ToJSONSchema() *jsonschema.Schema {
-	reflector := &jsonschema.Reflector{}
-
-	reflector.ExpandedStruct = true
-	reflector.AllowAdditionalProperties = true
-	reflector.BaseSchemaID = "openfeature-cli"
+	reflector := &jsonschema.Reflector{
+		ExpandedStruct: true,
+		AllowAdditionalProperties: true,
+		BaseSchemaID: "openfeature-cli",
+	}
 
 	if err := reflector.AddGoComments("github.com/open-feature/cli", "./internal/manifest"); err != nil {
 		pterm.Error.Printf("Error extracting comments from types.go: %v\n", err)
@@ -28,15 +27,18 @@ func ToJSONSchema() *jsonschema.Schema {
 
 	schema := reflector.Reflect(Manifest{})
 	schema.Version = "http://json-schema.org/draft-07/schema#"
+	schema.Title = "OpenFeature CLI Manifest"
 	flags, ok := schema.Properties.Get("flags")
 	if !ok {
 		log.Fatal("flags not found")
 	}
 	flags.PatternProperties = map[string]*jsonschema.Schema{
-		"^[a-zA-Z0-9_]+$": {
+		"^.{1,}$": {
 			Ref: "#/$defs/flag",
 		},
 	}
+	// We only want flags keys that matches the pattern properties
+	flags.AdditionalProperties = jsonschema.FalseSchema
 
 	schema.Definitions = jsonschema.Definitions{
 		"flag": &jsonschema.Schema{
@@ -47,7 +49,7 @@ func ToJSONSchema() *jsonschema.Schema {
 				{Ref: "#/$defs/floatFlag"},
 				{Ref: "#/$defs/objectFlag"},
 			},
-			Required: []string{"flagType", "codeDefault"},
+			Required: []string{"flagType", "defaultValue"},
 		},
 		"booleanFlag": &jsonschema.Schema{
 			Type:       "object",

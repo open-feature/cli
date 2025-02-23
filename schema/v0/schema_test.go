@@ -55,11 +55,17 @@ func walkPath(shouldPass bool, root string) error {
 		}
 
 		if (len(result.Errors()) >= 1 && shouldPass == true) {
-			return fmt.Errorf("file %s should not have failed validation, but did: %s", path, err)
+			var errorMessage strings.Builder
+
+			errorMessage.WriteString("file " + path + " should be valid, but had the following issues:\n")
+			for _, error := range result.Errors() {
+				errorMessage.WriteString(" - " + error.String() + "\n")
+			}
+			return fmt.Errorf("%s", errorMessage.String())
 		}
 
 		if (len(result.Errors()) == 0 && shouldPass == false) {
-			return fmt.Errorf("file %s should have failed validation, but did not", path)
+			return fmt.Errorf("file %s should be invalid, but no issues were detected", path)
 		}
 
 		return nil

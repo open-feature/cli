@@ -1,0 +1,10 @@
+{
+  "$schema": "../../flag_manifest.json",
+  "flags": {
+    "": {
+      "flagType": "boolean",
+      "defaultValue": true,
+      "description": "A flag that tests the invalid character case in flag keys."
+    }
+  }
+}
