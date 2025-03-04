@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "openfeature-cli/manifest",
+  "$defs": {
+    "booleanFlag": {
+      "properties": {
+        "flagType": {
+          "type": "string",
+          "enum": [
+            "boolean"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "A concise description of this feature flag's purpose."
+        },
+        "defaultValue": {
+          "type": "boolean",
+          "description": "The value returned from an unsuccessful flag evaluation"
+        }
+      },
+      "type": "object"
+    },
+    "flag": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/booleanFlag"
+        },
+        {
+          "$ref": "#/$defs/stringFlag"
+        },
+        {
+          "$ref": "#/$defs/integerFlag"
+        },
+        {
+          "$ref": "#/$defs/floatFlag"
+        },
+        {
+          "$ref": "#/$defs/objectFlag"
+        }
+      ],
+      "required": [
+        "flagType",
+        "defaultValue"
+      ]
+    },
+    "floatFlag": {
+      "properties": {
+        "flagType": {
+          "type": "string",
+          "enum": [
+            "float"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "A concise description of this feature flag's purpose."
+        },
+        "defaultValue": {
+          "type": "number",
+          "description": "The value returned from an unsuccessful flag evaluation"
+        }
+      },
+      "type": "object"
+    },
+    "integerFlag": {
+      "properties": {
+        "flagType": {
+          "type": "string",
+          "enum": [
+            "integer"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "A concise description of this feature flag's purpose."
+        },
+        "defaultValue": {
+          "type": "integer",
+          "description": "The value returned from an unsuccessful flag evaluation"
+        }
+      },
+      "type": "object"
+    },
+    "objectFlag": {
+      "properties": {
+        "flagType": {
+          "type": "string",
+          "enum": [
+            "object"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "A concise description of this feature flag's purpose."
+        },
+        "defaultValue": {
+          "description": "The value returned from an unsuccessful flag evaluation"
+        }
+      },
+      "type": "object"
+    },
+    "stringFlag": {
+      "properties": {
+        "flagType": {
+          "type": "string",
+          "enum": [
+            "string"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "A concise description of this feature flag's purpose."
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "The value returned from an unsuccessful flag evaluation"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "flags": {
+      "patternProperties": {
+        "^.{1,}$": {
+          "$ref": "#/$defs/flag"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Flags",
+      "description": "Collection of feature flag definitions"
+    }
+  },
+  "type": "object",
+  "required": [
+    "flags"
+  ],
+  "title": "OpenFeature CLI Manifest",
+  "description": "Feature flag manifest for the OpenFeature CLI"
+}
