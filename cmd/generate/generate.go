@@ -1,12 +1,10 @@
 package generate
 
 import (
-	"github.com/open-feature/cli/cmd/generate/golang"
+	// "github.com/open-feature/cli/cmd/generate/golang"
 	"github.com/open-feature/cli/cmd/generate/react"
-	"github.com/open-feature/cli/internal/flagkeys"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // Root for `generate“ sub-commands, handling code generation for flag accessors.
@@ -18,14 +16,14 @@ var Root = &cobra.Command{
 
 func init() {
 	// Add subcommands.
-	Root.AddCommand(golang.Cmd)
+	// Root.AddCommand(golang.Cmd)
 	Root.AddCommand(react.Cmd)
 
 	// Add flags.
-	Root.PersistentFlags().String(flagkeys.FlagManifestPath, "", "Path to the flag manifest.")
-	Root.MarkPersistentFlagRequired(flagkeys.FlagManifestPath)
-	viper.BindPFlag(flagkeys.FlagManifestPath, Root.PersistentFlags().Lookup(flagkeys.FlagManifestPath))
-	Root.PersistentFlags().String(flagkeys.OutputPath, "", "Output path for the codegen")
-	viper.BindPFlag(flagkeys.OutputPath, Root.PersistentFlags().Lookup(flagkeys.OutputPath))
-	Root.MarkPersistentFlagRequired(flagkeys.OutputPath)
+	// Root.PersistentFlags().String(flagkeys.FlagManifestPath, "", "Path to the flag manifest.")
+	// Root.MarkPersistentFlagRequired(flagkeys.FlagManifestPath)
+	// viper.BindPFlag(flagkeys.FlagManifestPath, Root.PersistentFlags().Lookup(flagkeys.FlagManifestPath))
+	// Root.PersistentFlags().String(flagkeys.OutputPath, "", "Output path for the codegen")
+	// viper.BindPFlag(flagkeys.OutputPath, Root.PersistentFlags().Lookup(flagkeys.OutputPath))
+	// Root.MarkPersistentFlagRequired(flagkeys.OutputPath)
 }

@@ -33,6 +33,7 @@ var initCmd = &cobra.Command{
 		}
 
 		m := &InitManifest{
+			// TODO: Move to constant
 			Schema: "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
 			Manifest: manifest.Manifest{
 				Flags: map[string]any{},

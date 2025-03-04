@@ -1,5 +1,5 @@
 {
-  "$schema": "../../flag_manifest.json",
+  "$schema": "../../flag-manifest.json",
   "flags": {
     "booleanFlag": {
       "codeDefault": true

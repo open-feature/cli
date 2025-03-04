@@ -5,5 +5,5 @@ import _ "embed"
 
 // Schema contains the embedded flag manifest schema.
 //
-//go:embed flag_manifest.json
+//go:embed flag-manifest.json
 var SchemaFile string

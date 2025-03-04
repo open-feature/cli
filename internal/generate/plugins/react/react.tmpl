@@ -15,7 +15,7 @@ import {
 * - default value: `{{ .DefaultValue }}`
 * - type: `{{TypeString .Type}}`
 */
-export const use{{FlagVarName .Name}} = (options: ReactFlagEvaluationOptions) => {
+export const use{{FlagVarName .Name}} = (options?: ReactFlagEvaluationOptions) => {
   return useFlag({{FlagInitParam .Name}}, {{DefaultValueLiteral .}}, options);
 };
 
@@ -30,7 +30,7 @@ export const use{{FlagVarName .Name}} = (options: ReactFlagEvaluationOptions) =>
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspense{{FlagVarName .Name}} = (options: ReactFlagEvaluationNoSuspenseOptions) => {
+export const useSuspense{{FlagVarName .Name}} = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
   return useSuspenseFlag({{FlagInitParam .Name}}, {{DefaultValueLiteral .}}, options);
 };
 {{ end}}

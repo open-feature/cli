@@ -9,6 +9,8 @@ import (
 	"github.com/open-feature/cli/internal/manifest"
 )
 
+const schemaPath = "schema/v0/flag-manifest.json"
+
 func main() {
 	schema := manifest.ToJSONSchema()
 	data, err := json.MarshalIndent(schema, "", "  ")
@@ -20,7 +22,7 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to create directory: %w", err))
 	}
 
-	file, err := os.Create("schema/v0/flag_manifest.json")
+	file, err := os.Create(schemaPath)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to create file: %w", err))
 	}
@@ -30,5 +32,5 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to write JSON schema to file: %w", err));
 	}
 
-	fmt.Println("JSON schema generated successfully at schema/v0/flag_manifest.json")
+	fmt.Println("JSON schema generated successfully at " + schemaPath)
 }

@@ -4,161 +4,104 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"log"
 
-	"strings"
-
-	"github.com/invopop/jsonschema"
-	"github.com/open-feature/cli/schema/v0"
-	"github.com/pterm/pterm"
-	"github.com/xeipuuv/gojsonschema"
+	"github.com/open-feature/cli/internal/filesystem"
+	"github.com/spf13/afero"
 )
 
-func ToJSONSchema() *jsonschema.Schema {
-	reflector := &jsonschema.Reflector{
-		ExpandedStruct: true,
-		AllowAdditionalProperties: true,
-		BaseSchemaID: "openfeature-cli",
+func Load(manifestPath string) (*Manifest, error) {
+	fs := filesystem.FileSystem()
+	data, err := afero.ReadFile(fs, manifestPath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading contents from file %q", manifestPath)
 	}
 
-	if err := reflector.AddGoComments("github.com/open-feature/cli", "./internal/manifest"); err != nil {
-		pterm.Error.Printf("Error extracting comments from types.go: %v\n", err)
+	var raw interface{}
+	err = json.Unmarshal(data, &raw)
+	validationErrors, err := Validate(raw)
+	if err != nil {
+		return nil, err
+	} else if len(validationErrors) > 0 {
+		// TODO tease running manifest validate command
+		return nil, fmt.Errorf("validation failed: %v", validationErrors)
 	}
 
-	schema := reflector.Reflect(Manifest{})
-	schema.Version = "http://json-schema.org/draft-07/schema#"
-	schema.Title = "OpenFeature CLI Manifest"
-	flags, ok := schema.Properties.Get("flags")
-	if !ok {
-		log.Fatal("flags not found")
-	}
-	flags.PatternProperties = map[string]*jsonschema.Schema{
-		"^.{1,}$": {
-			Ref: "#/$defs/flag",
-		},
-	}
-	// We only want flags keys that matches the pattern properties
-	flags.AdditionalProperties = jsonschema.FalseSchema
-
-	schema.Definitions = jsonschema.Definitions{
-		"flag": &jsonschema.Schema{
-			OneOf: []*jsonschema.Schema{
-				{Ref: "#/$defs/booleanFlag"},
-				{Ref: "#/$defs/stringFlag"},
-				{Ref: "#/$defs/integerFlag"},
-				{Ref: "#/$defs/floatFlag"},
-				{Ref: "#/$defs/objectFlag"},
-			},
-			Required: []string{"flagType", "defaultValue"},
-		},
-		"booleanFlag": &jsonschema.Schema{
-			Type:       "object",
-			Properties: reflector.Reflect(BooleanFlag{}).Properties,
-		},
-		"stringFlag": &jsonschema.Schema{
-			Type:       "object",
-			Properties: reflector.Reflect(StringFlag{}).Properties,
-		},
-		"integerFlag": &jsonschema.Schema{
-			Type:       "object",
-			Properties: reflector.Reflect(IntegerFlag{}).Properties,
-		},
-		"floatFlag": &jsonschema.Schema{
-			Type:       "object",
-			Properties: reflector.Reflect(FloatFlag{}).Properties,
-		},
-		"objectFlag": &jsonschema.Schema{
-			Type:       "object",
-			Properties: reflector.Reflect(ObjectFlag{}).Properties,
-		},
-	}
-
-	return schema
+	return Unmarshal(data)
 }
 
-func (m *Manifest) Unmarshal(data []byte) error {
-	return json.Unmarshal(data, m)
+func Unmarshal(data []byte) (*Manifest, error) {
+	// var raw Manifest;
+	// err := json.Unmarshal(data, &raw)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to unmarshal manifest: %w", err)
+	// }
+	// return &raw, nil
+
+	var rawManifest struct {
+		Flags map[string]json.RawMessage `json:"flags"`
+	}
+	err := json.Unmarshal(data, &rawManifest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal manifest: %w", err)
+	}
+
+	manifest := &Manifest{
+		Flags: make(map[string]any),
+	}
+
+	for key, rawFlag := range rawManifest.Flags {
+		var flagType struct {
+			Type string `json:"flagType"`
+		}
+		err := json.Unmarshal(rawFlag, &flagType)
+		if err != nil {
+			return nil, err
+		}
+
+		switch flagType.Type {
+		case "boolean":
+			var booleanFlag BooleanFlag
+			err := json.Unmarshal(rawFlag, &booleanFlag)
+			if err != nil {
+				return nil, err
+			}
+			manifest.Flags[key] = booleanFlag
+		case "string":
+			var stringFlag StringFlag
+			err := json.Unmarshal(rawFlag, &stringFlag)
+			if err != nil {
+				return nil, err
+			}
+			manifest.Flags[key] = stringFlag
+		case "integer":
+			var integerFlag IntegerFlag
+			err := json.Unmarshal(rawFlag, &integerFlag)
+			if err != nil {
+				return nil, err
+			}
+			manifest.Flags[key] = integerFlag
+		case "float":
+			var floatFlag FloatFlag
+			err := json.Unmarshal(rawFlag, &floatFlag)
+			if err != nil {
+				return nil, err
+			}
+			manifest.Flags[key] = floatFlag
+		case "object":
+			var objectFlag ObjectFlag
+			err := json.Unmarshal(rawFlag, &objectFlag)
+			if err != nil {
+				return nil, err
+			}
+			manifest.Flags[key] = objectFlag
+		default:
+			return nil, fmt.Errorf("unknown flag type: %s", flagType.Type)
+		}
+	}
+
+	return manifest, nil
 }
 
 func (m *Manifest) Marshal() ([]byte, error) {
 	return json.MarshalIndent(m, "", "  ")
 }
-
-type ValidationError struct {
-	Type    string `json:"type"`
-	Path    string `json:"path"`
-	Message string `json:"message"`
-}
-
-func (m *Manifest) Validate() ([]ValidationError, error) {
-	schemaLoader := gojsonschema.NewStringLoader(schema.SchemaFile)
-	manifestLoader := gojsonschema.NewGoLoader(m)
-
-	result, err := gojsonschema.Validate(schemaLoader, manifestLoader)
-	if err != nil {
-		return nil, fmt.Errorf("failed to validate manifest: %w", err)
-	}
-
-	var issues []ValidationError
-	for _, err := range result.Errors() {
-		if strings.HasPrefix(err.Field(), "flags") && err.Type() == "number_one_of" {
-			issues = append(issues, ValidationError{
-				Type:    err.Type(),
-				Path:    err.Field(),
-				Message: "flagType must be 'boolean', 'string', 'integer', 'float', or 'object'",
-			})
-		} else {
-			issues = append(issues, ValidationError{
-				Type:    err.Type(),
-				Path:    err.Field(),
-				Message: err.Description(),
-			})
-		}
-	}
-
-	return issues, nil
-}
-
-// type Change struct {
-// 	Type     string `json:"type"`
-// 	Path     string `json:"path"`
-// 	OldValue any    `json:"oldValue,omitempty"`
-// 	NewValue any    `json:"newValue,omitempty"`
-// }
-
-// func Compare(oldManifest, newManifest *Manifest) ([]Change, error) {
-// 	var changes []Change
-// 	oldFlags := oldManifest.Flags
-// 	newFlags := newManifest.Flags
-
-// 	for key, newFlag := range newFlags {
-// 		if oldFlag, exists := oldFlags[key]; exists {
-// 			if !reflect.DeepEqual(oldFlag, newFlag) {
-// 				changes = append(changes, Change{
-// 					Type:     "change",
-// 					Path:     fmt.Sprintf("flags.%s", key),
-// 					OldValue: oldFlag,
-// 					NewValue: newFlag,
-// 				})
-// 			}
-// 		} else {
-// 			changes = append(changes, Change{
-// 				Type:     "add",
-// 				Path:     fmt.Sprintf("flags.%s", key),
-// 				NewValue: newFlag,
-// 			})
-// 		}
-// 	}
-
-// 	for key, oldFlag := range oldFlags {
-// 		if _, exists := newFlags[key]; !exists {
-// 			changes = append(changes, Change{
-// 				Type:     "remove",
-// 				Path:     fmt.Sprintf("flags.%s", key),
-// 				OldValue: oldFlag,
-// 			})
-// 		}
-// 	}
-
-// 	return changes, nil
-// }

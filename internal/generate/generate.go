@@ -11,7 +11,8 @@ import (
 
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagkeys"
-	"github.com/open-feature/cli/internal/generate/manifestutils"
+
+	// "github.com/open-feature/cli/internal/generate/manifestutils"
 	"github.com/open-feature/cli/internal/generate/types"
 
 	"github.com/spf13/viper"

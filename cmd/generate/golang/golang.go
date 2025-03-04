@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Cmd for `generate“ command, handling code generation for flag accessors
+// Cmd for 'generate' command, handling code generation for flag accessors
 var Cmd = &cobra.Command{
 	Use:   "go",
 	Short: "Generate Golang flag accessors for OpenFeature.",
