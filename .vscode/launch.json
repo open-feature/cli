@@ -14,7 +14,7 @@
         "generate",
         "go",
         "--package_name",
-        "blah"
+        "flags"
       ]
     }
   ]
