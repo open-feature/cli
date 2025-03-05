@@ -2,8 +2,8 @@ package golang
 
 import (
 	"github.com/open-feature/cli/internal/flagkeys"
-	"github.com/open-feature/cli/internal/generate"
-	"github.com/open-feature/cli/internal/generate/plugins/golang"
+	"github.com/open-feature/cli/internal/flagset"
+	"github.com/open-feature/cli/internal/generators/golang"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,9 +18,13 @@ var Cmd = &cobra.Command{
 		params := golang.Params{
 			GoPackage: viper.GetString(flagkeys.GoPackageName),
 		}
-		gen := golang.NewGenerator(params)
-		err := generate.CreateFlagAccessors(gen)
-		return err
+		flagset, err := flagset.Load("sample/sample_manifest.json")
+		if err != nil {
+			return err
+		}
+
+		generator := golang.NewGenerator(flagset)
+		return generator.Generate(&params)
 	},
 }
 

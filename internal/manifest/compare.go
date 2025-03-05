@@ -1,45 +1,50 @@
 package manifest
 
-// type Change struct {
-// 	Type     string `json:"type"`
-// 	Path     string `json:"path"`
-// 	OldValue any    `json:"oldValue,omitempty"`
-// 	NewValue any    `json:"newValue,omitempty"`
-// }
+import (
+	"fmt"
+	"reflect"
+)
 
-// func Compare(oldManifest, newManifest *Manifest) ([]Change, error) {
-// 	var changes []Change
-// 	oldFlags := oldManifest.Flags
-// 	newFlags := newManifest.Flags
+type Change struct {
+	Type     string `json:"type"`
+	Path     string `json:"path"`
+	OldValue any    `json:"oldValue,omitempty"`
+	NewValue any    `json:"newValue,omitempty"`
+}
 
-// 	for key, newFlag := range newFlags {
-// 		if oldFlag, exists := oldFlags[key]; exists {
-// 			if !reflect.DeepEqual(oldFlag, newFlag) {
-// 				changes = append(changes, Change{
-// 					Type:     "change",
-// 					Path:     fmt.Sprintf("flags.%s", key),
-// 					OldValue: oldFlag,
-// 					NewValue: newFlag,
-// 				})
-// 			}
-// 		} else {
-// 			changes = append(changes, Change{
-// 				Type:     "add",
-// 				Path:     fmt.Sprintf("flags.%s", key),
-// 				NewValue: newFlag,
-// 			})
-// 		}
-// 	}
+func Compare(oldManifest, newManifest *Manifest) ([]Change, error) {
+	var changes []Change
+	oldFlags := oldManifest.Flags
+	newFlags := newManifest.Flags
 
-// 	for key, oldFlag := range oldFlags {
-// 		if _, exists := newFlags[key]; !exists {
-// 			changes = append(changes, Change{
-// 				Type:     "remove",
-// 				Path:     fmt.Sprintf("flags.%s", key),
-// 				OldValue: oldFlag,
-// 			})
-// 		}
-// 	}
+	for key, newFlag := range newFlags {
+		if oldFlag, exists := oldFlags[key]; exists {
+			if !reflect.DeepEqual(oldFlag, newFlag) {
+				changes = append(changes, Change{
+					Type:     "change",
+					Path:     fmt.Sprintf("flags.%s", key),
+					OldValue: oldFlag,
+					NewValue: newFlag,
+				})
+			}
+		} else {
+			changes = append(changes, Change{
+				Type:     "add",
+				Path:     fmt.Sprintf("flags.%s", key),
+				NewValue: newFlag,
+			})
+		}
+	}
 
-// 	return changes, nil
-// }
+	for key, oldFlag := range oldFlags {
+		if _, exists := newFlags[key]; !exists {
+			changes = append(changes, Change{
+				Type:     "remove",
+				Path:     fmt.Sprintf("flags.%s", key),
+				OldValue: oldFlag,
+			})
+		}
+	}
+
+	return changes, nil
+}

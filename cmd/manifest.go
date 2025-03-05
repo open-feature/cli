@@ -15,6 +15,8 @@ var manifestCmd = &cobra.Command{
 	Long:  `Manage OpenFeature manifests with subcommands to init, validate, and compare manifests`,
 }
 
+const schemaUrl = "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json"
+
 type InitManifest struct {
 	Schema string `json:"$schema,omitempty"`
 	manifest.Manifest
@@ -33,8 +35,7 @@ var initCmd = &cobra.Command{
 		}
 
 		m := &InitManifest{
-			// TODO: Move to constant
-			Schema: "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
+			Schema: schemaUrl,
 			Manifest: manifest.Manifest{
 				Flags: map[string]any{},
 			},

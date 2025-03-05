@@ -62,7 +62,7 @@ func getDefaultValue(defaultValue interface{}, flagType types.FlagType) string {
 		//the conversion to float64 instead of integer typically occurs
 		//due to how JSON is parsed in Go. In Go's encoding/json package,
 		//all JSON numbers are unmarshaled into float64 by default when decoding into an interface{}.
-		return strconv.FormatFloat(defaultValue.(float64), 'g', -1, 64)
+		fallthrough
 	case types.FloatType:
 		return strconv.FormatFloat(defaultValue.(float64), 'g', -1, 64)
 	case types.StringType:

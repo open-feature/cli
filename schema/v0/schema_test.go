@@ -13,19 +13,18 @@ import (
 )
 
 func TestPositiveFlagManifest(t *testing.T) {
-	if err := walkPath(true, "./tests/positive"); err != nil {
+	if err := walkPath(true, "./testdata/positive"); err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 }
 
 func TestNegativeFlagManifest(t *testing.T) {
-	if err := walkPath(false, "./tests/negative"); err != nil {
+	if err := walkPath(false, "./testdata/negative"); err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 }
-
 
 func walkPath(shouldPass bool, root string) error {
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -42,7 +41,7 @@ func walkPath(shouldPass bool, root string) error {
 			return err
 		}
 
-		var v interface{}
+		var v any
 		if err := json.Unmarshal([]byte(file), &v); err != nil {
 			log.Fatal(err)
 		}

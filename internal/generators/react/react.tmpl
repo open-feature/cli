@@ -6,7 +6,7 @@ import {
   useFlag,
   useSuspenseFlag,
 } from "@openfeature/react-sdk";
-{{ range .Flags }}
+{{ range .Flagset.Flags }}
 /**
 * {{ .Description }}
 * 
@@ -15,8 +15,8 @@ import {
 * - default value: `{{ .DefaultValue }}`
 * - type: `{{ .Type }}`
 */
-export const use{{FlagVarName .Key}} = (options?: ReactFlagEvaluationOptions) => {
-  return useFlag({{FlagInitParam .Key}}, {{DefaultValueLiteral .}}, options);
+export const use{{ .Key | ToCamel }} = (options?: ReactFlagEvaluationOptions) => {
+  return useFlag({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, options);
 };
 
 /**
@@ -30,7 +30,7 @@ export const use{{FlagVarName .Key}} = (options?: ReactFlagEvaluationOptions) =>
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspense{{FlagVarName .Key}} = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
-  return useSuspenseFlag({{FlagInitParam .Key}}, {{DefaultValueLiteral .}}, options);
+export const useSuspense{{ .Key | ToCamel }} = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
+  return useSuspenseFlag({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, options);
 };
 {{ end}}

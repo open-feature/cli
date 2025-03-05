@@ -14,9 +14,9 @@ type ValidationError struct {
 	Message string `json:"message"`
 }
 
-func Validate(data any) ([]ValidationError, error) {
+func Validate(data []byte) ([]ValidationError, error) {
 	schemaLoader := gojsonschema.NewStringLoader(schema.SchemaFile)
-	manifestLoader := gojsonschema.NewGoLoader(data)
+	manifestLoader := gojsonschema.NewBytesLoader(data)
 
 	result, err := gojsonschema.Validate(schemaLoader, manifestLoader)
 	if err != nil {

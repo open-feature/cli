@@ -2,21 +2,11 @@ package react
 
 import (
 	_ "embed"
-	"fmt"
-	"strconv"
 	"text/template"
 
+	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
-	"github.com/open-feature/cli/internal/manifest"
-
-	"github.com/iancoleman/strcase"
 )
-
-// Params are parameters for creating a Generator
-type Params struct {
-	generators.CommonParams
-	// Test string
-}
 
 type ReactGenerator struct {
 	generators.CommonGenerator
@@ -25,44 +15,21 @@ type ReactGenerator struct {
 //go:embed react.tmpl
 var reactTmpl string
 
-func flagVarName(flagName string) string {
-	return strcase.ToCamel(flagName)
-}
+func (g *ReactGenerator) Generate() error {
+	funcs := template.FuncMap{}
 
-func flagInitParam(flagName string) string {
-	return strconv.Quote(flagName)
-}
-
-func defaultValueLiteral(flag *generators.Flag) string {
-	switch manifest.FlagType(flag.Type) {
-	case manifest.StringType:
-		return strconv.Quote(flag.DefaultValue.(string))
-	default:
-		// TODO fix this
-		return fmt.Sprintf("%v", flag.DefaultValue)
-	}
-}
-
-func (g *ReactGenerator) Generate(params Params) error {
-	funcs := template.FuncMap{
-		"FlagVarName":         flagVarName,
-		"FlagInitParam":       flagInitParam,
-		"DefaultValueLiteral": defaultValueLiteral,
-		// "TypeString":          typeString,
-	}
-
-	return g.GenerateFile(funcs, reactTmpl, generators.CommonParams{
-		OutputPath: params.OutputPath,
-		Params:     params.Params,
+	return g.GenerateFile(funcs, reactTmpl, &generators.Params{
+		OutputPath: "test.ts",
 	})
 }
 
 // NewGenerator creates a generator for React.
-func NewGenerator(manifest *manifest.Manifest) *ReactGenerator {
+func NewGenerator(fs *flagset.Flagset) *ReactGenerator {
 	return &ReactGenerator{
 		CommonGenerator: *generators.NewCommonGenerator(
-			manifest,
+			fs,
 			generators.WithStability(generators.Alpha),
+			generators.WithUnsupportedFlagType(flagset.ObjectType),
 		),
 	}
 }

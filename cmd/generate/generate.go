@@ -1,7 +1,7 @@
 package generate
 
 import (
-	// "github.com/open-feature/cli/cmd/generate/golang"
+	"github.com/open-feature/cli/cmd/generate/golang"
 	"github.com/open-feature/cli/cmd/generate/react"
 
 	"github.com/spf13/cobra"
@@ -16,7 +16,7 @@ var Root = &cobra.Command{
 
 func init() {
 	// Add subcommands.
-	// Root.AddCommand(golang.Cmd)
+	Root.AddCommand(golang.Cmd)
 	Root.AddCommand(react.Cmd)
 
 	// Add flags.

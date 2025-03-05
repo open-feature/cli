@@ -10,7 +10,12 @@
       "request": "launch",
       "mode": "auto",
       "program": "main.go",
-      "args": ["generate", "react"]
+      "args": [
+        "generate",
+        "go",
+        "--package_name",
+        "blah"
+      ]
     }
   ]
 }
