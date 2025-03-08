@@ -50,7 +50,6 @@ func typeString(flagType flagset.FlagType) string {
 	}
 }
 
-
 func supportImports(flags []flagset.Flag) []string {
 	var res []string
 	if len(flags) > 0 {

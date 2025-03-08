@@ -57,7 +57,7 @@ type BaseFlag struct {
 // Feature flag manifest for the OpenFeature CLI
 type Manifest struct {
 	// Collection of feature flag definitions
-	Flags map[string]any `json:"flags,omitempty" jsonschema:"title=Flags,required"`
+	Flags map[string]any `json:"flags" jsonschema:"title=Flags,required"`
 }
 
 // Converts the Manifest struct to a JSON schema.

@@ -20,12 +20,12 @@ var client openfeature.IClient = nil
 
 {{- range .Flagset.Flags }}
 // {{.Description}}
-var {{ .Key | ToCamel }} = struct {
-    // Value returns the value of the flag {{ .Key | ToCamel }},
+var {{ .Key | ToPascal }} = struct {
+    // Value returns the value of the flag {{ .Key | ToPascal }},
     // as well as the evaluation error, if present.
     Value {{ .Type | OpenFeatureType }}Provider
 
-    // ValueWithDetails returns the value of the flag {{ .Key | ToCamel }},
+    // ValueWithDetails returns the value of the flag {{ .Key | ToPascal }},
     // the evaluation error, if any, and the evaluation details.
     ValueWithDetails {{ .Type | OpenFeatureType }}ProviderDetails
 }{

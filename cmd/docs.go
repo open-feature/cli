@@ -16,7 +16,7 @@ func GenerateDoc(path string) error {
 		return "<!-- markdownlint-disable-file -->\n<!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->\n"
 	}
 
-	if err := doc.GenMarkdownTreeCustom(rootCmd, path, filePrepender, linkHandler); err != nil {
+	if err := doc.GenMarkdownTreeCustom(GetRootCmd(), path, filePrepender, linkHandler); err != nil {
 		return fmt.Errorf("error generating docs: %w", err)
 	}
 	return nil

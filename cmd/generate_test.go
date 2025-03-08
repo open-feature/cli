@@ -1,19 +1,20 @@
-package generate
+package cmd
 
 import (
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/open-feature/cli/internal/flagkeys"
-
 	"github.com/google/go-cmp/cmp"
+	"github.com/open-feature/cli/internal/flagkeys"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 )
 
 func TestGenerateGoSuccess(t *testing.T) {
+	cmd := GetGenerateCmd()
+
 	// Constant paths.
 	const memoryManifestPath = "manifest/path.json"
 	const memoryOutputPath = "output/path.go"
@@ -27,20 +28,21 @@ func TestGenerateGoSuccess(t *testing.T) {
 	readOsFileAndWriteToMemMap(t, testFileManifest, memoryManifestPath, fs)
 
 	// Prepare command.
-	Root.SetArgs([]string{"go",
-		"--flag_manifest_path", memoryManifestPath,
-		"--output_path", memoryOutputPath,
-		"--package_name", packageName,
+	cmd.SetArgs([]string{"go",
+		"--manifest", memoryManifestPath,
+		"--output", memoryOutputPath,
+		"--package-name", packageName,
 	})
 
 	// Run command.
-	Root.Execute()
+	cmd.Execute()
 
 	// Compare result.
 	compareOutput(t, testFileGo, memoryOutputPath, fs)
 }
 
 func TestGenerateReactSuccess(t *testing.T) {
+	cmd := GetGenerateCmd()
 	// Constant paths.
 	const memoryManifestPath = "manifest/path.json"
 	const memoryOutputPath = "output/path.ts"
@@ -53,13 +55,13 @@ func TestGenerateReactSuccess(t *testing.T) {
 	readOsFileAndWriteToMemMap(t, testFileManifest, memoryManifestPath, fs)
 
 	// Prepare command.
-	Root.SetArgs([]string{"react",
-		"--flag_manifest_path", memoryManifestPath,
-		"--output_path", memoryOutputPath,
+	cmd.SetArgs([]string{"react",
+		"--manifest", memoryManifestPath,
+		"--output", memoryOutputPath,
 	})
 
 	// Run command.
-	Root.Execute()
+	cmd.Execute()
 
 	// Compare result.
 	compareOutput(t, testFileReact, memoryOutputPath, fs)

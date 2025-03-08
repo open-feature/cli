@@ -75,7 +75,7 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 		Flags map[string]struct {
 			FlagType     string      `json:"flagType"`
 			Description  string      `json:"description"`
-			DefaultValue interface{} `json:"defaultValue"`
+			DefaultValue any         `json:"defaultValue"`
 		} `json:"flags"`
 	}
 
@@ -107,6 +107,8 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 			DefaultValue: flag.DefaultValue,
 		})
 	}
+
+	// TODO see if this list needs to be ordered
 
 	return nil
 }

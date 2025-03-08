@@ -12,10 +12,12 @@ import (
 func defaultFuncs() template.FuncMap {
 	// Update the contributing doc when adding a new function
 	return template.FuncMap{
-		// TODO rename to ToPascal
-		"ToCamel": strcase.ToCamel,
-		// TODO rename to ToCamel
-		"ToLowerCamel": strcase.ToLowerCamel,
+		// Remapping ToCamel to ToPascal to match the expected behavior
+		// Ref: https://github.com/iancoleman/strcase/issues/53
+		"ToPascal": strcase.ToCamel,
+		// Remapping ToLowerCamel to ToCamel to match the expected behavior
+		// Ref: See above
+		"ToCamel": strcase.ToLowerCamel,
 		"ToKebab": strcase.ToKebab,
 		"ToScreamingKebab": strcase.ToScreamingKebab,
 		"ToSnake": strcase.ToSnake,

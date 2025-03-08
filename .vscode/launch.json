@@ -11,10 +11,7 @@
       "mode": "auto",
       "program": "main.go",
       "args": [
-        "generate",
-        "go",
-        "--package_name",
-        "flags"
+        "init"
       ]
     }
   ]

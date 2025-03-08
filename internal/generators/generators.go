@@ -3,9 +3,6 @@ package generators
 import (
 	"bytes"
 	"fmt"
-	"os"
-	"path"
-	"path/filepath"
 	"text/template"
 
 	"github.com/open-feature/cli/internal/filesystem"
@@ -91,23 +88,5 @@ func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, t string, pa
 		return fmt.Errorf("error executing template: %v", err)
 	}
 
-	outputPath := params.OutputPath
-	fs := filesystem.FileSystem()
-	if err := fs.MkdirAll(filepath.Dir(outputPath), os.ModePerm); err != nil {
-		return err
-	}
-	f, err := fs.Create(path.Join(outputPath))
-	if err != nil {
-		return fmt.Errorf("error creating file %q: %v", outputPath, err)
-	}
-	defer f.Close()
-	writtenBytes, err := f.Write(buf.Bytes())
-	if err != nil {
-		return fmt.Errorf("error writing contents to file %q: %v", outputPath, err)
-	}
-	if writtenBytes != buf.Len() {
-		return fmt.Errorf("error writing entire file %v: writtenBytes != expectedWrittenBytes", outputPath)
-	}
-
-	return nil
+	return filesystem.WriteFile(params.OutputPath, buf.Bytes())
 }
