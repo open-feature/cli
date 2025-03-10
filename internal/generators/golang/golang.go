@@ -60,19 +60,21 @@ func supportImports(flags []flagset.Flag) []string {
 	return res
 }
 
-func (g *GolangGenerator) Generate(params *Params) error {
+func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
-		"SupportImports": supportImports,
+		"SupportImports":  supportImports,
 		"OpenFeatureType": openFeatureType,
-		"TypeString": typeString,
+		"TypeString":      typeString,
 	}
 
-	return g.GenerateFile(funcs, golangTmpl, &generators.Params{
-		OutputPath: "test.go",
-		Custom: map[string]any{
-			"GoPackage": params.GoPackage,
+	newParams := &generators.Params[any]{
+		OutputPath: params.OutputPath,
+		Custom: Params{
+			GoPackage: params.Custom.GoPackage,
 		},
-	})
+	}
+
+	return g.GenerateFile(funcs, golangTmpl, newParams, params.Custom.GoPackage + ".go")
 }
 
 // NewGenerator creates a generator for Go.

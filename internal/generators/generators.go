@@ -3,7 +3,10 @@ package generators
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
 	"text/template"
+
+	"maps"
 
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
@@ -25,14 +28,14 @@ type CommonGenerator struct {
 	Flagset              *flagset.Flagset
 }
 
-type Params struct {
+type Params[T any] struct {
 	OutputPath string
-	Custom map[string]any
+	Custom     T
 }
 
 type TemplateData struct {
 	CommonGenerator
-	Params
+	Params[any]
 }
 
 type Options func(*CommonGenerator)
@@ -68,13 +71,11 @@ func (g *CommonGenerator) GetStability() Stability {
 	return g.Stability
 }
 
-func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, t string, params *Params) error {
+func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, tmpl string, params *Params[any], name string) error {
 	funcs := defaultFuncs()
-	for k, v := range customFunc {
-		funcs[k] = v
-	}
+	maps.Copy(funcs, customFunc)
 
-	generatorTemplate, err := template.New("generator").Funcs(funcs).Parse(t)
+	generatorTemplate, err := template.New("generator").Funcs(funcs).Parse(tmpl)
 	if err != nil {
 		return fmt.Errorf("error initializing template: %v", err)
 	}
@@ -88,5 +89,5 @@ func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, t string, pa
 		return fmt.Errorf("error executing template: %v", err)
 	}
 
-	return filesystem.WriteFile(params.OutputPath, buf.Bytes())
+	return filesystem.WriteFile(filepath.Join(params.OutputPath, name), buf.Bytes())
 }

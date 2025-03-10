@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/manifest"
@@ -22,6 +23,23 @@ const (
 	StringType
 	ObjectType
 )
+
+func (f FlagType) String() string {
+	switch f {
+	case IntType:
+			return "int"
+	case FloatType:
+			return "float"
+	case BoolType:
+			return "bool"
+	case StringType:
+			return "string"
+	case ObjectType:
+			return "object"
+	default:
+			return "unknown"
+	}
+}
 
 type Flag struct {
 	Key string
@@ -108,7 +126,10 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 		})
 	}
 
-	// TODO see if this list needs to be ordered
+	// Ensure consistency of order of flag generation.
+	sort.Slice(fs.Flags, func(i, j int) bool {
+		return fs.Flags[i].Key < fs.Flags[j].Key
+	})
 
 	return nil
 }

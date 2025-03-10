@@ -14,6 +14,13 @@ openfeature version [flags]
   -h, --help   help for version
 ```
 
+### Options inherited from parent commands
+
+```
+  -m, --manifest string   Path to the flag manifest (default "flags.json")
+      --no-input          Disable interactive prompts
+```
+
 ### SEE ALSO
 
 * [openfeature](openfeature.md)	 - CLI for OpenFeature.

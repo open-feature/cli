@@ -1,21 +1,22 @@
 <!-- markdownlint-disable-file -->
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
-## openfeature generate react
+## openfeature init
 
-Generate typesafe React Hooks.
+Initialize a new project
 
 ### Synopsis
 
-Generate typesafe React Hooks compatible with the OpenFeature React SDK.
+Initialize a new project for OpenFeature CLI.
 
 ```
-openfeature generate react [flags]
+openfeature init [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help   help for react
+  -h, --help       help for init
+  -f, --override   Override existing configuration
 ```
 
 ### Options inherited from parent commands
@@ -27,5 +28,5 @@ openfeature generate react [flags]
 
 ### SEE ALSO
 
-* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
+* [openfeature](openfeature.md)	 - CLI for OpenFeature.
 

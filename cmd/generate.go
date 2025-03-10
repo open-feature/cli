@@ -1,13 +1,10 @@
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/flagset"
+	"github.com/open-feature/cli/internal/generators"
 	"github.com/open-feature/cli/internal/generators/golang"
 	"github.com/open-feature/cli/internal/generators/react"
-	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -16,24 +13,30 @@ func GetGenerateReactCmd() *cobra.Command {
 		Use:   "react",
 		Short: "Generate typesafe React Hooks.",
 		Long:  `Generate typesafe React Hooks compatible with the OpenFeature React SDK.`,
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate.react")
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			manifestPath := config.GetString(config.ManifestFlag)
+			manifestPath, _ := cmd.Flags().GetString("manifest")
+			outputPath, _ := cmd.Flags().GetString("output")
+
+			params := generators.Params[react.Params]{
+				OutputPath: outputPath,
+				Custom: react.Params{},
+			}
 			flagset, err := flagset.Load(manifestPath)
 			if err != nil {
 				return err
 			}
-	
+
 			generator := react.NewGenerator(flagset)
-			err = generator.Generate()
+			err = generator.Generate(&params)
 			if err != nil {
 				return err
 			}
-
-			pterm.Success.Println("Generated React Hooks.")
 			return nil
 		},
 	}
-	
 
 	return reactCmd
 }
@@ -43,19 +46,27 @@ func GetGenerateGoCmd() *cobra.Command {
 		Use:   "go",
 		Short: "Generate typesafe accessors for OpenFeature.",
 		Long:  `Generate typesafe accessors compatible with the OpenFeature Go SDK.`,
-		// PreRun executes before flags are validated
-		PreRun: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Generating Golang flag accessors...")
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate.go")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			params := golang.Params{
-				GoPackage: config.GetString("package-name"),
+			// TODO valid it's a valid package name
+			goPackageName, _ := cmd.Flags().GetString("package-name")
+			manifestPath, _ := cmd.Flags().GetString("manifest")
+			outputPath, _ := cmd.Flags().GetString("output")
+
+			params := generators.Params[golang.Params]{
+				OutputPath: outputPath,
+				Custom: golang.Params{
+					GoPackage: goPackageName,
+				},
 			}
-			flagset, err := flagset.Load("sample/sample_manifest.json")
+
+			flagset, err := flagset.Load(manifestPath)
 			if err != nil {
 				return err
 			}
-	
+
 			generator := golang.NewGenerator(flagset)
 			err = generator.Generate(&params)
 			if err != nil {
@@ -65,8 +76,7 @@ func GetGenerateGoCmd() *cobra.Command {
 		},
 	}
 
-	goCmd.Flags().String("package-name", "", "Name of the Go package to be generated.")
-	goCmd.MarkFlagRequired("package-name")
+	goCmd.Flags().String("package-name", "openfeature", "Name of the Go package to be generated.")
 
 	return goCmd
 }
@@ -75,12 +85,27 @@ func GetGenerateCmd() *cobra.Command {
 	generateCmd := &cobra.Command{
 		Use:   "generate",
 		Short: "Generate typesafe OpenFeature accessors.",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// If this command has a parent with PersistentPreRunE, call it
+			if cmd.Parent() != nil && cmd.Parent().PersistentPreRunE != nil {
+				err := cmd.Parent().PersistentPreRunE(cmd.Parent(), args)
+				if err != nil {
+					return err
+				}
+			}
+
+			return initializeConfig(cmd, "generate")
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// TODO print overview of help message
 			return nil
 		},
 	}
 
+	// Add generate flags
+	generateCmd.PersistentFlags().StringP("output", "o", "", "Path to where the generated files should be saved.")
+
+	// Add generate subcommands
 	generateCmd.AddCommand(GetGenerateReactCmd())
 	generateCmd.AddCommand(GetGenerateGoCmd())
 

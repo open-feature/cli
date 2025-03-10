@@ -2,11 +2,11 @@
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
 ## openfeature generate go
 
-Generate Golang flag accessors for OpenFeature.
+Generate typesafe accessors for OpenFeature.
 
 ### Synopsis
 
-Generate Golang flag accessors for OpenFeature.
+Generate typesafe accessors compatible with the OpenFeature Go SDK.
 
 ```
 openfeature generate go [flags]
@@ -16,17 +16,17 @@ openfeature generate go [flags]
 
 ```
   -h, --help                  help for go
-      --package_name string   Name of the Go package to be generated.
+      --package-name string   Name of the Go package to be generated.
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --flag_manifest_path string   Path to the flag manifest.
-      --output_path string          Output path for the codegen
+  -m, --manifest string   Path to the flag manifest (default "flags.json")
+      --no-input          Disable interactive prompts
 ```
 
 ### SEE ALSO
 
-* [openfeature generate](openfeature_generate.md)	 - Code generation for flag accessors for OpenFeature.
+* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
 

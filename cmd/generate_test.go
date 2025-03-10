@@ -6,29 +6,31 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/open-feature/cli/internal/flagkeys"
+	"github.com/open-feature/cli/internal/filesystem"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 )
 
 func TestGenerateGoSuccess(t *testing.T) {
-	cmd := GetGenerateCmd()
+	cmd := GetRootCmd()
 
 	// Constant paths.
 	const memoryManifestPath = "manifest/path.json"
-	const memoryOutputPath = "output/path.go"
+	const memoryOutputPath = "output"
 	const packageName = "testpackage"
 	const testFileManifest = "testdata/success_manifest.golden"
 	const testFileGo = "testdata/success_go.golden"
 
 	// Prepare in-memory files.
 	fs := afero.NewMemMapFs()
-	viper.Set(flagkeys.FileSystem, fs)
+	viper.Set(filesystem.ViperKey, fs)
 	readOsFileAndWriteToMemMap(t, testFileManifest, memoryManifestPath, fs)
 
 	// Prepare command.
-	cmd.SetArgs([]string{"go",
+	cmd.SetArgs([]string{
+		"generate",
+		"go",
 		"--manifest", memoryManifestPath,
 		"--output", memoryOutputPath,
 		"--package-name", packageName,
@@ -38,24 +40,27 @@ func TestGenerateGoSuccess(t *testing.T) {
 	cmd.Execute()
 
 	// Compare result.
-	compareOutput(t, testFileGo, memoryOutputPath, fs)
+	compareOutput(t, testFileGo, filepath.Join(memoryOutputPath, packageName + ".go"), fs)
 }
 
 func TestGenerateReactSuccess(t *testing.T) {
-	cmd := GetGenerateCmd()
+	cmd := GetRootCmd()
+
 	// Constant paths.
 	const memoryManifestPath = "manifest/path.json"
-	const memoryOutputPath = "output/path.ts"
+	const memoryOutputPath = "output"
 	const testFileManifest = "testdata/success_manifest.golden"
 	const testFileReact = "testdata/success_react.golden"
 
 	// Prepare in-memory files.
 	fs := afero.NewMemMapFs()
-	viper.Set(flagkeys.FileSystem, fs)
+	viper.Set(filesystem.ViperKey, fs)
 	readOsFileAndWriteToMemMap(t, testFileManifest, memoryManifestPath, fs)
 
 	// Prepare command.
-	cmd.SetArgs([]string{"react",
+	cmd.SetArgs([]string{
+		"generate",
+		"react",
 		"--manifest", memoryManifestPath,
 		"--output", memoryOutputPath,
 	})
@@ -64,7 +69,7 @@ func TestGenerateReactSuccess(t *testing.T) {
 	cmd.Execute()
 
 	// Compare result.
-	compareOutput(t, testFileReact, memoryOutputPath, fs)
+	compareOutput(t, testFileReact, filepath.Join(memoryOutputPath, "openfeature.ts"), fs)
 }
 
 func readOsFileAndWriteToMemMap(t *testing.T, inputPath string, memPath string, memFs afero.Fs) {

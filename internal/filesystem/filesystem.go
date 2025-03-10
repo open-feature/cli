@@ -6,16 +6,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/open-feature/cli/internal/flagkeys"
-
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 )
 
+var ViperKey = "filesystem"
+
 // Get the filesystem interface from the viper configuration.
 // If the filesystem interface is not set, the default filesystem interface is returned.
 func FileSystem() afero.Fs {
-	return viper.Get(flagkeys.FileSystem).(afero.Fs)
+	return viper.Get(ViperKey).(afero.Fs)
 }
 
 // Writes data to a file at the given path using the filesystem interface.
@@ -56,5 +56,5 @@ func Exists(path string) (bool, error) {
 }
 
 func init() {
-	viper.SetDefault(flagkeys.FileSystem, afero.NewOsFs())
+	viper.SetDefault(ViperKey, afero.NewOsFs())
 }
