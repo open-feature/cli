@@ -111,7 +111,10 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper, bindPrefix string) {
 		// Apply the viper config value to the flag when the flag is not set and viper has a value
 		if !f.Changed && v.IsSet(configName) {
 			val := v.Get(configName)
-			cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
+			err := cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
+			if err != nil {
+				pterm.Error.Println(err)
+			}
 		}
 	})
 }

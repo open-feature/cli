@@ -79,7 +79,10 @@ func TestGenerate(t *testing.T) {
 			cmd.SetArgs(args)
 
 			// Run command
-			cmd.Execute()
+			err := cmd.Execute()
+			if err != nil {
+				t.Error(err)
+			}
 
 			// Compare result
 			compareOutput(t, tc.outputGolden, filepath.Join(outputPath, tc.outputFile), fs)

@@ -141,8 +141,7 @@ func GetGenerateCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmd.Println("Available generators:")
-			generators.DefaultManager.PrintGeneratorsTable()
-			return nil
+			return generators.DefaultManager.PrintGeneratorsTable()
 		},
 	}
 

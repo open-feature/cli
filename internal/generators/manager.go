@@ -58,7 +58,7 @@ func (m *GeneratorManager) GetCommands() []*cobra.Command {
 }
 
 // PrintGeneratorsTable prints a table of all available generators with their stability
-func (m *GeneratorManager) PrintGeneratorsTable() {
+func (m *GeneratorManager) PrintGeneratorsTable() error {
 	tableData := [][]string{
 		{"Generator", "Description", "Stability"},
 	}
@@ -79,7 +79,7 @@ func (m *GeneratorManager) PrintGeneratorsTable() {
 		})
 	}
 	
-	pterm.DefaultTable.WithHasHeader().WithData(tableData).Render()
+	return pterm.DefaultTable.WithHasHeader().WithData(tableData).Render()
 }
 
 // DefaultManager is the default instance of the generator manager
