@@ -80,10 +80,11 @@ func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
 // NewGenerator creates a generator for Go.
 func NewGenerator(fs *flagset.Flagset) *GolangGenerator {
 	return &GolangGenerator{
-		CommonGenerator: *generators.NewCommonGenerator(
-			fs,
-			generators.WithStability(generators.Alpha),
-			generators.WithUnsupportedFlagType(flagset.ObjectType),
-		),
+		CommonGenerator: generators.CommonGenerator{
+			Flagset: fs,
+			UnsupportedFlagTypes: map[flagset.FlagType]bool{
+				flagset.ObjectType: true,
+			},
+		},
 	}
 }

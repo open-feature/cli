@@ -12,7 +12,6 @@ func GetVersionCmd() *cobra.Command {
 		Use:   "version",
 		Short: "Print the version number of the OpenFeature CLI",
 		Long:  ``,
-		// TODO check on accepting a JSON output or "machine readable" flag
 		Run: func(cmd *cobra.Command, args []string) {
 			if Version == "dev" {
 				details, ok := debug.ReadBuildInfo()

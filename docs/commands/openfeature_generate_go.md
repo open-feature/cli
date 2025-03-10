@@ -16,7 +16,7 @@ openfeature generate go [flags]
 
 ```
   -h, --help                  help for go
-      --package-name string   Name of the generated Go package. (default "openfeature")
+      --package-name string   Name of the generated Go package (default "openfeature")
 ```
 
 ### Options inherited from parent commands
@@ -24,7 +24,7 @@ openfeature generate go [flags]
 ```
   -m, --manifest string   Path to the flag manifest (default "flags.json")
       --no-input          Disable interactive prompts
-  -o, --output string     Path to where the generated files should be saved.
+  -o, --output string     Path to where the generated files should be saved
 ```
 
 ### SEE ALSO

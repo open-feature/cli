@@ -12,7 +12,7 @@ openfeature generate [flags]
 
 ```
   -h, --help            help for generate
-  -o, --output string   Path to where the generated files should be saved.
+  -o, --output string   Path to where the generated files should be saved
 ```
 
 ### Options inherited from parent commands
