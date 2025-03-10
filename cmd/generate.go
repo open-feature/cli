@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
 	"github.com/open-feature/cli/internal/generators/golang"
@@ -17,8 +18,8 @@ func GetGenerateReactCmd() *cobra.Command {
 			return initializeConfig(cmd, "generate.react")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			manifestPath, _ := cmd.Flags().GetString("manifest")
-			outputPath, _ := cmd.Flags().GetString("output")
+			manifestPath := config.GetManifestPath(cmd)
+			outputPath := config.GetOutputPath(cmd)
 
 			params := generators.Params[react.Params]{
 				OutputPath: outputPath,
@@ -50,10 +51,10 @@ func GetGenerateGoCmd() *cobra.Command {
 			return initializeConfig(cmd, "generate.go")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO valid it's a valid package name
-			goPackageName, _ := cmd.Flags().GetString("package-name")
-			manifestPath, _ := cmd.Flags().GetString("manifest")
-			outputPath, _ := cmd.Flags().GetString("output")
+				// Use the helper functions to get flag values
+			goPackageName := config.GetGoPackageName(cmd)
+			manifestPath := config.GetManifestPath(cmd)
+			outputPath := config.GetOutputPath(cmd)
 
 			params := generators.Params[golang.Params]{
 				OutputPath: outputPath,
@@ -76,7 +77,8 @@ func GetGenerateGoCmd() *cobra.Command {
 		},
 	}
 
-	goCmd.Flags().String("package-name", "openfeature", "Name of the generated Go package.")
+	// Add Go-specific flags
+	config.AddGoGenerateFlags(goCmd)
 
 	return goCmd
 }
@@ -102,8 +104,8 @@ func GetGenerateCmd() *cobra.Command {
 		},
 	}
 
-	// Add generate flags
-	generateCmd.PersistentFlags().StringP("output", "o", "", "Path to where the generated files should be saved.")
+	// Add generate flags using the config package
+	config.AddGenerateFlags(generateCmd)
 
 	// Add generate subcommands
 	generateCmd.AddCommand(GetGenerateReactCmd())

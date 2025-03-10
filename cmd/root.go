@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/open-feature/cli/internal/config"
 	"github.com/pterm/pterm"
 
 	"github.com/spf13/cobra"
@@ -54,16 +55,8 @@ func GetRootCmd() *cobra.Command {
 		DisableAutoGenTag:          true,
 	}
 
-	// Add global flags
-	rootCmd.PersistentFlags().StringP("manifest", "m", "flags.json", "Path to the flag manifest")
-	rootCmd.PersistentFlags().Bool("no-input", false, "Disable interactive prompts")
-
-	// Shell completion
-	if err := rootCmd.RegisterFlagCompletionFunc("manifest", cobra.FixedCompletions(
-		[]string{"json"}, cobra.ShellCompDirectiveFilterFileExt,
-	)); err != nil {
-		panic(err)
-	}
+	// Add global flags using the config package
+	config.AddRootFlags(rootCmd)
 
 	// Add subcommands
 	rootCmd.AddCommand(GetVersionCmd())

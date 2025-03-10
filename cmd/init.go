@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/pterm/pterm"
@@ -18,8 +19,8 @@ func GetInitCmd() *cobra.Command {
 			return initializeConfig(cmd, "init")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			manifestPath, _ := cmd.Flags().GetString("manifest")
-			override, _ := cmd.Flags().GetBool("override")
+			manifestPath := config.GetManifestPath(cmd)
+			override := config.GetOverride(cmd)
 
 			manifestExists, _ := filesystem.Exists(manifestPath)
 			if (manifestExists && !override) {
@@ -44,7 +45,7 @@ func GetInitCmd() *cobra.Command {
 		},
 	}
 
-	initCmd.Flags().Bool("override", false, "Override an existing configuration")
+	config.AddInitFlags(initCmd)
 
 	return initCmd
 }
