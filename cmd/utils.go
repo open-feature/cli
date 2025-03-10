@@ -13,16 +13,6 @@ func printBanner() {
                                                     CLI    
 `
 
-	// 	big := `
-	//    ____                   ______         _
-	//   / __ \                 |  ____|       | |
-	//  | |  | |_ __   ___ _ __ | |__ ___  __ _| |_ _   _ _ __ ___
-	//  | |  | | '_ \ / _ \ '_ \|  __/ _ \/ _` + "`" + ` | __| | | | '__/ _ \
-	//  | |__| | |_) |  __/ | | | | |  __/ (_| | |_| |_| | | |  __/
-	//   \____/| .__/ \___|_| |_|_|  \___|\__,_|\__|\__,_|_|  \___|
-	//         | |
-	//         |_|
-	// `
 	pterm.Println(ivrit)
 	pterm.Println()
 	pterm.Printf("version: %s | compiled: %s\n", pterm.LightGreen(Version), pterm.LightGreen(Date))

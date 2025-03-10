@@ -76,7 +76,7 @@ func GetGenerateGoCmd() *cobra.Command {
 		},
 	}
 
-	goCmd.Flags().String("package-name", "openfeature", "Name of the Go package to be generated.")
+	goCmd.Flags().String("package-name", "openfeature", "Name of the generated Go package.")
 
 	return goCmd
 }

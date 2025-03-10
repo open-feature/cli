@@ -16,7 +16,7 @@ openfeature init [flags]
 
 ```
   -h, --help       help for init
-  -f, --override   Override existing configuration
+      --override   Override an existing configuration
 ```
 
 ### Options inherited from parent commands

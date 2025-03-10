@@ -10,12 +10,18 @@ import (
 	"github.com/spf13/viper"
 )
 
-var ViperKey = "filesystem"
+var viperKey = "filesystem"
 
 // Get the filesystem interface from the viper configuration.
 // If the filesystem interface is not set, the default filesystem interface is returned.
 func FileSystem() afero.Fs {
-	return viper.Get(ViperKey).(afero.Fs)
+	return viper.Get(viperKey).(afero.Fs)
+}
+
+// Set the filesystem interface in the viper configuration.
+// This is useful for testing purposes.
+func SetFileSystem(fs afero.Fs) {
+	viper.Set(viperKey, fs)
 }
 
 // Writes data to a file at the given path using the filesystem interface.
@@ -56,5 +62,5 @@ func Exists(path string) (bool, error) {
 }
 
 func init() {
-	viper.SetDefault(ViperKey, afero.NewOsFs())
+	viper.SetDefault(viperKey, afero.NewOsFs())
 }

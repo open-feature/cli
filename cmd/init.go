@@ -3,10 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/charmbracelet/huh"
-	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/manifest"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -15,42 +14,37 @@ func GetInitCmd() *cobra.Command {
 		Use:   "init",
 		Short: "Initialize a new project",
 		Long:  "Initialize a new project for OpenFeature CLI.",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "init")
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			manifestPath := config.GetString(config.ManifestFlag)
+			manifestPath, _ := cmd.Flags().GetString("manifest")
+			override, _ := cmd.Flags().GetBool("override")
 
 			manifestExists, _ := filesystem.Exists(manifestPath)
-			fmt.Println("Manifest exists:", manifestExists)
-
-			override, _ := cmd.Flags().GetBool(config.OverrideFlag)
-			if !noInput && manifestExists && !override {
-				prompt := huh.
-					NewConfirm().
-					Title("An existing configuration was found. Would you like to override it?").
-					Value(&override)
-				
-				if err := prompt.Run(); err != nil {
-					fmt.Println("Error:", err)
-					return err
-				}
-
-				if !override {
-					fmt.Println("Exiting.")
+			if (manifestExists && !override) {
+				confirmMessage := fmt.Sprintf("An existing manifest was found at %s. Would you like to override it?", manifestPath)
+				shouldOverride, _ := pterm.DefaultInteractiveConfirm.Show(confirmMessage)
+				// Print a blank line for better readability.
+				pterm.Println()
+				if (!shouldOverride) {
+					pterm.Info.Println("No changes were made.")
 					return nil
 				}
 			}
-			fmt.Println("Initializing project...")
 
-
+			pterm.Info.Println("Initializing project...")
 			err := manifest.Create(manifestPath)
 			if err != nil {
 				return err
 			}
-			fmt.Println("Project initialized.")
+			pterm.Info.Printfln("Manifest created at %s", pterm.LightWhite(manifestPath))
+			pterm.Success.Println("Project initialized.")
 			return nil
 		},
 	}
 
-	initCmd.Flags().BoolP(config.OverrideFlag, "f", false, "Override existing configuration")
+	initCmd.Flags().Bool("override", false, "Override an existing configuration")
 
 	return initCmd
 }

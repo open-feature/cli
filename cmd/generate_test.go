@@ -9,7 +9,6 @@ import (
 	"github.com/open-feature/cli/internal/filesystem"
 
 	"github.com/spf13/afero"
-	"github.com/spf13/viper"
 )
 
 func TestGenerateGoSuccess(t *testing.T) {
@@ -24,7 +23,7 @@ func TestGenerateGoSuccess(t *testing.T) {
 
 	// Prepare in-memory files.
 	fs := afero.NewMemMapFs()
-	viper.Set(filesystem.ViperKey, fs)
+	filesystem.SetFileSystem(fs)
 	readOsFileAndWriteToMemMap(t, testFileManifest, memoryManifestPath, fs)
 
 	// Prepare command.
@@ -54,7 +53,7 @@ func TestGenerateReactSuccess(t *testing.T) {
 
 	// Prepare in-memory files.
 	fs := afero.NewMemMapFs()
-	viper.Set(filesystem.ViperKey, fs)
+	filesystem.SetFileSystem(fs)
 	readOsFileAndWriteToMemMap(t, testFileManifest, memoryManifestPath, fs)
 
 	// Prepare command.
