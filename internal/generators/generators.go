@@ -16,14 +16,13 @@ import (
 type Stability string
 
 const (
-	Alpha   Stability = "alpha"
-	Beta    Stability = "beta"
-	Stable  Stability = "stable"
+	Alpha  Stability = "alpha"
+	Beta   Stability = "beta"
+	Stable Stability = "stable"
 )
 
 type CommonGenerator struct {
-	UnsupportedFlagTypes map[flagset.FlagType]bool
-	Flagset              *flagset.Flagset
+	Flagset *flagset.Flagset
 }
 
 type Params[T any] struct {
@@ -34,6 +33,13 @@ type Params[T any] struct {
 type TemplateData struct {
 	CommonGenerator
 	Params[any]
+}
+
+// NewGenerator creates a new generator
+func NewGenerator(flagset *flagset.Flagset, UnsupportedFlagTypes map[flagset.FlagType]bool) *CommonGenerator {
+	return &CommonGenerator{
+		Flagset: flagset.Filter(UnsupportedFlagTypes),
+	}
 }
 
 func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, tmpl string, params *Params[any], name string) error {
