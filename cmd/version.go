@@ -27,7 +27,7 @@ func GetVersionCmd() *cobra.Command {
 					}
 				}
 			}
-			// TODO banner on using the shared banner
+
 			fmt.Printf("OpenFeature CLI: %s (%s), built at: %s\n", Version, Commit, Date)
 		},
 	}

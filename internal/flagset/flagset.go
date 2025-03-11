@@ -64,7 +64,6 @@ func Load(manifestPath string) (*Flagset, error) {
 	if err != nil {
 		return nil, err
 	} else if len(validationErrors) > 0 {
-		// TODO tease running manifest validate command
 		return nil, fmt.Errorf("validation failed: %v", validationErrors)
 	}
 

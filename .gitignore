@@ -24,3 +24,6 @@ go.work.sum
 # env file
 .env
 dist
+
+# openfeature cli config
+.openfeature.yaml
