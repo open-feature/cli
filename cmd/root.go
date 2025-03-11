@@ -69,10 +69,11 @@ func GetRootCmd() *cobra.Command {
 	rootCmd.AddCommand(GetVersionCmd())
 	rootCmd.AddCommand(GetInitCmd())
 	rootCmd.AddCommand(GetGenerateCmd())
+	rootCmd.AddCommand(GetPullCmd())
 
 	// Add a custom error handler after the command is created
 	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
-		pterm.Error.Printf("Invalid flag: %s", err)
+		pterm.Error.Println("Invalid flag: %s", err)
 		pterm.Println("Run 'openfeature --help' for usage information")
 		return err
 	})

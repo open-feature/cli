@@ -7,6 +7,7 @@
 *.dll
 *.so
 *.dylib
+cli
 
 # Test binary, built with `go test -c`
 *.test
@@ -24,3 +25,7 @@ go.work.sum
 # env file
 .env
 dist
+
+# generated files from running the CLI
+.openfeature.yaml
+flags.json

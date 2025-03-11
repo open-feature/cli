@@ -20,6 +20,7 @@ func GetInitCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			manifestPath, _ := cmd.Flags().GetString("manifest")
 			override, _ := cmd.Flags().GetBool("override")
+			flagSourceUrl, _ := cmd.Flags().GetString("flagSourceUrl")
 
 			manifestExists, _ := filesystem.Exists(manifestPath)
 			if (manifestExists && !override) {
@@ -38,6 +39,23 @@ func GetInitCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			configFileExists, _ := filesystem.Exists(".openfeature.yaml")
+			if !configFileExists {
+				err = filesystem.WriteFile(".openfeature.yaml", []byte(""))
+				if err != nil {
+					return err
+				}
+			}
+
+			if flagSourceUrl != "" {
+				pterm.Info.Println("Writing flag source URL to .openfeature.yaml", pterm.LightWhite(flagSourceUrl))
+				err = filesystem.WriteFile(".openfeature.yaml", []byte("flagSourceUrl: " + flagSourceUrl))
+				if err != nil {
+					return err
+				}
+			}
+			
 			pterm.Info.Printfln("Manifest created at %s", pterm.LightWhite(manifestPath))
 			pterm.Success.Println("Project initialized.")
 			return nil
@@ -45,6 +63,7 @@ func GetInitCmd() *cobra.Command {
 	}
 
 	initCmd.Flags().Bool("override", false, "Override an existing configuration")
+	initCmd.Flags().String("flagSourceUrl", "", "The URL of the flag source")
 
 	return initCmd
 }
