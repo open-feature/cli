@@ -7,6 +7,7 @@
 *.dll
 *.so
 *.dylib
+cli
 
 # Test binary, built with `go test -c`
 *.test
@@ -27,3 +28,6 @@ dist
 
 # openfeature cli config
 .openfeature.yaml
+
+# generated files from running the CLI
+flags.json
