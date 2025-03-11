@@ -26,5 +26,6 @@ openfeature [flags]
 * [openfeature compare](openfeature_compare.md)	 - Compare two feature flag manifests
 * [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
 * [openfeature init](openfeature_init.md)	 - Initialize a new project
+* [openfeature pull](openfeature_pull.md)	 - Pull a flag manifest from a remote source
 * [openfeature version](openfeature_version.md)	 - Print the version number of the OpenFeature CLI
 

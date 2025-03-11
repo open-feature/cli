@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/open-feature/cli/internal/config"
-	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
 	"github.com/open-feature/cli/internal/generators/csharp"
 	"github.com/open-feature/cli/internal/generators/golang"
@@ -14,6 +13,7 @@ import (
 	"github.com/open-feature/cli/internal/generators/python"
 	"github.com/open-feature/cli/internal/generators/react"
 	"github.com/open-feature/cli/internal/logger"
+	"github.com/open-feature/cli/internal/manifest"
 	"github.com/spf13/cobra"
 )
 
@@ -87,7 +87,7 @@ func getGenerateNodeJSCmd() *cobra.Command {
 				OutputPath: outputPath,
 				Custom:     nodejs.Params{},
 			}
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}
@@ -131,7 +131,7 @@ func getGenerateReactCmd() *cobra.Command {
 				OutputPath: outputPath,
 				Custom:     react.Params{},
 			}
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}
@@ -171,7 +171,7 @@ func GetGenerateNestJsCmd() *cobra.Command {
 
 			logger.Default.GenerationStarted("NestJS")
 
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}
@@ -232,7 +232,7 @@ func getGenerateCSharpCmd() *cobra.Command {
 					Namespace: namespace,
 				},
 			}
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}
@@ -283,7 +283,7 @@ func getGenerateJavaCmd() *cobra.Command {
 				},
 			}
 
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}
@@ -335,7 +335,7 @@ func getGenerateGoCmd() *cobra.Command {
 				},
 			}
 
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}
@@ -379,7 +379,7 @@ func getGeneratePythonCmd() *cobra.Command {
 				OutputPath: outputPath,
 				Custom:     python.Params{},
 			}
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}
