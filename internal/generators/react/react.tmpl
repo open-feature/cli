@@ -3,6 +3,7 @@
 import {
   type ReactFlagEvaluationOptions,
   type ReactFlagEvaluationNoSuspenseOptions,
+  type FlagQuery,
   useFlag,
   useSuspenseFlag,
   JsonValue
@@ -16,7 +17,7 @@ import {
 * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
 * - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
 */
-export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions) => {
+export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions): FlagQuery<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> => {
   return useFlag({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, options);
 };
 
@@ -31,7 +32,7 @@ export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions) =
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspense{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
+export const useSuspense{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> => {
   return useSuspenseFlag({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, options);
 };
 {{ end}}

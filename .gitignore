@@ -7,6 +7,7 @@
 *.dll
 *.so
 *.dylib
+cli
 
 # Test binary, built with `go test -c`
 *.test
@@ -34,3 +35,7 @@ node_modules/
 npm-debug.log*
 generated/
 *.log
+
+# generated files from running the CLI
+flags.json
+generated/

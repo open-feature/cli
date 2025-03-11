@@ -2,10 +2,17 @@ package manifest
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/open-feature/cli/internal/filesystem"
+	"github.com/open-feature/cli/internal/flagset"
 	"github.com/spf13/afero"
 )
+
+const flagManifestSchemaURL = "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json"
 
 type initManifest struct {
 	Schema string `json:"$schema,omitempty"`
@@ -15,7 +22,7 @@ type initManifest struct {
 // Create creates a new manifest file at the given path.
 func Create(path string) error {
 	m := &initManifest{
-		Schema: "https://raw.githubusercontent.com/open-feature/cli/main/schema/v0/flag-manifest.json",
+		Schema: flagManifestSchemaURL,
 		Manifest: Manifest{
 			Flags: map[string]any{},
 		},
@@ -27,18 +34,111 @@ func Create(path string) error {
 	return filesystem.WriteFile(path, formattedInitManifest)
 }
 
-// Load loads a manifest from a JSON file, unmarshals it, and returns a Manifest object.
-func Load(path string) (*Manifest, error) {
+// Loads, validates, and unmarshals the manifest file at the given path into a flagset
+func LoadFlagSet(manifestPath string) (*flagset.Flagset, error) {
 	fs := filesystem.FileSystem()
-	data, err := afero.ReadFile(fs, path)
+	data, err := afero.ReadFile(fs, manifestPath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading contents from file %q", manifestPath)
+	}
+
+	validationErrors, err := Validate(data)
 	if err != nil {
 		return nil, err
+	} else if len(validationErrors) > 0 {
+		// TODO tease running manifest validate command
+		return nil, errors.New(FormatValidationError(validationErrors))
 	}
 
-	var m Manifest
-	if err := json.Unmarshal(data, &m); err != nil {
-		return nil, err
+	var flagset flagset.Flagset
+	if err := json.Unmarshal(data, &flagset); err != nil {
+		return nil, fmt.Errorf("error unmarshaling JSON: %v", validationErrors)
 	}
 
-	return &m, nil
+	return &flagset, nil
+}
+
+func Write(path string, flagset flagset.Flagset) error {
+	m := &initManifest{
+		Schema: flagManifestSchemaURL,
+		Manifest: Manifest{
+			Flags: map[string]any{},
+		},
+	}
+	for _, flag := range flagset.Flags {
+		m.Manifest.Flags[flag.Key] = map[string]any{
+			"flagType":     flag.Type.String(),
+			"description":  flag.Description,
+			"defaultValue": flag.DefaultValue,
+		}
+	}
+	formattedInitManifest, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return err
+	}
+	return filesystem.WriteFile(path, formattedInitManifest)
+}
+
+// LoadFromLocal loads flags from a local file path
+func LoadFromLocal(filePath string) (*flagset.Flagset, error) {
+	data, err := filesystem.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading local flags file: %w", err)
+	}
+
+	// Try the standard manifest format first (with flags as object keys)
+	var flags flagset.Flagset
+	if err := json.Unmarshal(data, &flags); err == nil {
+		return &flags, nil
+	}
+
+	// Fallback to source flags format (array-based)
+	loadedFlags, err := flagset.LoadFromSourceFlags(data)
+	if err != nil {
+		return nil, fmt.Errorf("error loading flags from local file: %w", err)
+	}
+
+	return &flagset.Flagset{Flags: *loadedFlags}, nil
+}
+
+// LoadFromRemote loads flags from a remote URL
+func LoadFromRemote(url string, authToken string) (*flagset.Flagset, error) {
+	flags := &flagset.Flagset{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return flags, err
+	}
+
+	if authToken != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", authToken))
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return flags, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return flags, err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return flags, fmt.Errorf("Received error response from flag source: %s", string(body))
+	}
+
+	// Try the standard manifest format first (with flags as object keys)
+	if err := json.Unmarshal(body, flags); err == nil {
+		return flags, nil
+	}
+
+	// Fallback to source flags format (array-based)
+	loadedFlags, err := flagset.LoadFromSourceFlags(body)
+	if err != nil {
+		return flags, err
+	}
+	flags.Flags = *loadedFlags
+
+	return flags, nil
 }

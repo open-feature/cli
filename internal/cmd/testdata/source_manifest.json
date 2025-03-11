@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
+  "$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
   "flags": {
     "darkMode": {
       "flagType": "boolean",
