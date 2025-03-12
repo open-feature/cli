@@ -3,6 +3,7 @@
 import {
   type ReactFlagEvaluationOptions,
   type ReactFlagEvaluationNoSuspenseOptions,
+  type FlagQuery,
   useFlag,
   useSuspenseFlag,
 } from "@openfeature/react-sdk";
@@ -15,7 +16,7 @@ import {
 * - default value: `{{ .DefaultValue }}`
 * - type: `{{ .Type | OpenFeatureType }}`
 */
-export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions) => {
+export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions): FlagQuery<{{ .Type | OpenFeatureType }}> => {
   return useFlag({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, options);
 };
 
@@ -30,7 +31,7 @@ export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions) =
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspense{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
+export const useSuspense{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<{{ .Type | OpenFeatureType }}> => {
   return useSuspenseFlag({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, options);
 };
 {{ end}}

@@ -22,7 +22,7 @@ func GetInitCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			manifestPath := config.GetManifestPath(cmd)
 			override := config.GetOverride(cmd)
-			flagSourceUrl, _ := cmd.Flags().GetString("flagSourceUrl")
+			flagSourceUrl := config.GetFlagSourceUrl(cmd)
 
 			manifestExists, _ := filesystem.Exists(manifestPath)
 			if manifestExists && !override {
