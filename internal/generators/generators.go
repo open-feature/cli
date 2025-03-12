@@ -16,16 +16,13 @@ import (
 type Stability string
 
 const (
-	Unknown Stability = "unknown"
-	Alpha   Stability = "alpha"
-	Beta    Stability = "beta"
-	Stable  Stability = "stable"
+	Alpha  Stability = "alpha"
+	Beta   Stability = "beta"
+	Stable Stability = "stable"
 )
 
 type CommonGenerator struct {
-	Stability            Stability
-	UnsupportedFlagTypes map[flagset.FlagType]bool
-	Flagset              *flagset.Flagset
+	Flagset *flagset.Flagset
 }
 
 type Params[T any] struct {
@@ -38,37 +35,11 @@ type TemplateData struct {
 	Params[any]
 }
 
-type Options func(*CommonGenerator)
-
-func WithStability(stability Stability) Options {
-	return func(g *CommonGenerator) {
-		g.Stability = stability
+// NewGenerator creates a new generator
+func NewGenerator(flagset *flagset.Flagset, UnsupportedFlagTypes map[flagset.FlagType]bool) *CommonGenerator {
+	return &CommonGenerator{
+		Flagset: flagset.Filter(UnsupportedFlagTypes),
 	}
-}
-
-func WithUnsupportedFlagType(flagType flagset.FlagType) Options {
-	return func(g *CommonGenerator) {
-		if g.UnsupportedFlagTypes == nil {
-			g.UnsupportedFlagTypes = make(map[flagset.FlagType]bool)
-		}
-		g.UnsupportedFlagTypes[flagType] = true
-	}
-}
-
-func NewCommonGenerator(flagset *flagset.Flagset, options ...Options) *CommonGenerator {
-	commonGenerator := &CommonGenerator{}
-	for _, option := range options {
-		option(commonGenerator)
-	}
-	commonGenerator.Flagset = flagset.Filter(commonGenerator.UnsupportedFlagTypes)
-	return commonGenerator
-}
-
-func (g *CommonGenerator) GetStability() Stability {
-	if g.Stability == "" {
-		return Unknown
-	}
-	return g.Stability
 }
 
 func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, tmpl string, params *Params[any], name string) error {

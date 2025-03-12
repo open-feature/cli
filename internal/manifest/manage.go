@@ -29,8 +29,29 @@ func Create(path string) error {
 	return filesystem.WriteFile(path, formattedInitManifest)
 }
 
+func Write(path string, flagset flagset.Flagset) error {
+	m := &initManifest{
+		Schema:  "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
+		Manifest: Manifest{
+			Flags: map[string]any{},
+		},
+	}
+	for _, flag := range flagset.Flags {
+		m.Manifest.Flags[flag.Key] = map[string]any{
+			"flagType": flag.Type.String(),
+			"description": flag.Description,
+			"defaultValue": flag.DefaultValue,
+		}
+	}
+	formattedInitManifest, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return err
+	}
+	return filesystem.WriteFile(path, formattedInitManifest)
+}
+
 // Loads, validates, and unmarshals the manifest file at the given path into a flagset
-func Load(manifestPath string) (*flagset.Flagset, error) {
+func LoadFlagSet(manifestPath string) (*flagset.Flagset, error) {
 	fs := filesystem.FileSystem()
 	data, err := afero.ReadFile(fs, manifestPath)
 	if err != nil {
@@ -51,25 +72,4 @@ func Load(manifestPath string) (*flagset.Flagset, error) {
 	}
 
 	return &flagset, nil
-}
-
-func Write(path string, flagset flagset.Flagset) error {
-	m := &initManifest{
-		Schema:  "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
-		Manifest: Manifest{
-			Flags: map[string]any{},
-		},
-	}
-	for _, flag := range flagset.Flags {
-		m.Manifest.Flags[flag.Key] = map[string]any{
-			"flagType": flag.Type.String(),
-			"description": flag.Description,
-			"defaultValue": flag.DefaultValue,
-		}
-	}
-	formattedInitManifest, err := json.MarshalIndent(m, "", "  ")
-	if err != nil {
-		return err
-	}
-	return filesystem.WriteFile(path, formattedInitManifest)
 }

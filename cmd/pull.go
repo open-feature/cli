@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/manifest"
@@ -64,15 +65,16 @@ func GetPullCmd() *cobra.Command {
 			return initializeConfig(cmd, "pull")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			flagSourceUrl, err := cmd.Flags().GetString("flagSourceUrl")
-			authToken, err := cmd.Flags().GetString("authToken")
-			manifestPath, err := cmd.Flags().GetString("manifest")
+			flagSourceUrl := config.GetFlagSourceUrl(cmd)
+			manifestPath := config.GetManifestPath(cmd)
+			authToken := config.GetAuthToken(cmd)
 
-			if err != nil {
-				flagSourceUrl, err = filesystem.GetFromYaml("flagSourceUrl")
+			if flagSourceUrl == "" {
+				url, err := filesystem.GetFromYaml("flagSourceUrl")
 				if err != nil {
 					return fmt.Errorf("error getting flagSourceUrl from config: %w", err)
 				}
+				flagSourceUrl = url
 			}
 
 			// fetch the flags from the remote source
@@ -99,7 +101,6 @@ func GetPullCmd() *cobra.Command {
 		},
 	}
 
-	pullCmd.Flags().String("flagSourceUrl", "", "The URL of the flag source")
-	pullCmd.Flags().String("authToken", "", "The auth token to use to fetch the flags")
+	config.AddPullFlags(pullCmd)
 	return pullCmd
 }

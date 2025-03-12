@@ -74,16 +74,14 @@ func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
 		},
 	}
 
-	return g.GenerateFile(funcs, golangTmpl, newParams, params.Custom.GoPackage + ".go")
+	return g.GenerateFile(funcs, golangTmpl, newParams, params.Custom.GoPackage+".go")
 }
 
 // NewGenerator creates a generator for Go.
 func NewGenerator(fs *flagset.Flagset) *GolangGenerator {
 	return &GolangGenerator{
-		CommonGenerator: *generators.NewCommonGenerator(
-			fs,
-			generators.WithStability(generators.Alpha),
-			generators.WithUnsupportedFlagType(flagset.ObjectType),
-		),
+		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{
+			flagset.ObjectType: true,
+		}),
 	}
 }

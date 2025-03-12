@@ -59,7 +59,7 @@ func ReadFile(path string) ([]byte, error) {
 }
 
 func GetFromYaml(key string) (string, error) {
-	var config Config
+	var config map[string]string
 	fs, err := ReadFile(".openfeature.yaml")
 	if err != nil {
 		return "", err
@@ -70,12 +70,12 @@ func GetFromYaml(key string) (string, error) {
 		return "", err
 	}
 
-	switch key {
-	case "flagSourceUrl":
-		return config.FlagSourceUrl, nil
-	default:
+	value, exists := config[key]
+	if !exists {
 		return "", fmt.Errorf("unknown key: %s", key)
 	}
+
+	return value, nil
 }
 
 // Checks if a file exists at the given path using the filesystem interface.

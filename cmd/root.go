@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/open-feature/cli/internal/config"
 	"github.com/pterm/pterm"
 
 	"github.com/spf13/cobra"
@@ -54,16 +55,8 @@ func GetRootCmd() *cobra.Command {
 		DisableAutoGenTag:          true,
 	}
 
-	// Add global flags
-	rootCmd.PersistentFlags().StringP("manifest", "m", "flags.json", "Path to the flag manifest")
-	rootCmd.PersistentFlags().Bool("no-input", false, "Disable interactive prompts")
-
-	// Shell completion
-	if err := rootCmd.RegisterFlagCompletionFunc("manifest", cobra.FixedCompletions(
-		[]string{"json"}, cobra.ShellCompDirectiveFilterFileExt,
-	)); err != nil {
-		panic(err)
-	}
+	// Add global flags using the config package
+	config.AddRootFlags(rootCmd)
 
 	// Add subcommands
 	rootCmd.AddCommand(GetVersionCmd())
@@ -73,7 +66,7 @@ func GetRootCmd() *cobra.Command {
 
 	// Add a custom error handler after the command is created
 	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
-		pterm.Error.Println("Invalid flag: %s", err)
+		pterm.Error.Printf("Invalid flag: %s\n", err)
 		pterm.Println("Run 'openfeature --help' for usage information")
 		return err
 	})
@@ -119,7 +112,10 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper, bindPrefix string) {
 		// Apply the viper config value to the flag when the flag is not set and viper has a value
 		if !f.Changed && v.IsSet(configName) {
 			val := v.Get(configName)
-			cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
+			err := cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
+			if err != nil {
+				pterm.Error.Println(err)
+			}
 		}
 	})
 }

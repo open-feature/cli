@@ -23,7 +23,7 @@ openfeature generate react [flags]
 ```
   -m, --manifest string   Path to the flag manifest (default "flags.json")
       --no-input          Disable interactive prompts
-  -o, --output string     Path to where the generated files should be saved.
+  -o, --output string     Path to where the generated files should be saved
 ```
 
 ### SEE ALSO

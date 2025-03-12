@@ -26,6 +26,6 @@ go.work.sum
 .env
 dist
 
-# generated files from running the CLI
-.openfeature.yaml
 flags.json
+# openfeature cli config
+.openfeature.yaml

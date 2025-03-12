@@ -49,10 +49,8 @@ func (g *ReactGenerator) Generate(params *generators.Params[Params]) error {
 // NewGenerator creates a generator for React.
 func NewGenerator(fs *flagset.Flagset) *ReactGenerator {
 	return &ReactGenerator{
-		CommonGenerator: *generators.NewCommonGenerator(
-			fs,
-			generators.WithStability(generators.Alpha),
-			generators.WithUnsupportedFlagType(flagset.ObjectType),
-		),
+		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{
+			flagset.ObjectType: true,
+		}),
 	}
 }

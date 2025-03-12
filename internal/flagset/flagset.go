@@ -27,7 +27,7 @@ func (f FlagType) String() string {
 	case FloatType:
 			return "float"
 	case BoolType:
-			return "bool"
+			return "boolean"
 	case StringType:
 			return "string"
 	case ObjectType:
