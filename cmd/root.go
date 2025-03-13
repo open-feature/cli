@@ -29,7 +29,7 @@ func Execute(version string, commit string, date string) {
 
 func GetRootCmd() *cobra.Command {
 	// Execute all parent's persistent hooks
-	cobra.EnableTraverseRunHooks =true
+	cobra.EnableTraverseRunHooks = true
 
 	rootCmd := &cobra.Command{
 		Use:   "openfeature",
@@ -46,8 +46,8 @@ func GetRootCmd() *cobra.Command {
 
 			return nil
 		},
-		SilenceErrors: true,
-		SilenceUsage:  true,
+		SilenceErrors:              true,
+		SilenceUsage:               true,
 		DisableSuggestions:         false,
 		SuggestionsMinimumDistance: 2,
 		DisableAutoGenTag:          true,
@@ -60,6 +60,7 @@ func GetRootCmd() *cobra.Command {
 	rootCmd.AddCommand(GetVersionCmd())
 	rootCmd.AddCommand(GetInitCmd())
 	rootCmd.AddCommand(GetGenerateCmd())
+	rootCmd.AddCommand(GetCompareCmd())
 
 	// Add a custom error handler after the command is created
 	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
