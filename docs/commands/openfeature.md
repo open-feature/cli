@@ -23,6 +23,7 @@ openfeature [flags]
 
 ### SEE ALSO
 
+* [openfeature compare](openfeature_compare.md)	 - Compare two manifest files
 * [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
 * [openfeature init](openfeature_init.md)	 - Initialize a new project
 * [openfeature version](openfeature_version.md)	 - Print the version number of the OpenFeature CLI
