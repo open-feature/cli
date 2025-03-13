@@ -1,15 +1,12 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/open-feature/cli/internal/config"
 	"github.com/pterm/pterm"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -31,6 +28,9 @@ func Execute(version string, commit string, date string) {
 }
 
 func GetRootCmd() *cobra.Command {
+	// Execute all parent's persistent hooks
+	cobra.EnableTraverseRunHooks =true
+
 	rootCmd := &cobra.Command{
 		Use:   "openfeature",
 		Short: "CLI for OpenFeature.",
@@ -46,10 +46,8 @@ func GetRootCmd() *cobra.Command {
 
 			return nil
 		},
-		// Custom error handling for invalid commands
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		// Handle unknown commands
 		DisableSuggestions:         false,
 		SuggestionsMinimumDistance: 2,
 		DisableAutoGenTag:          true,
@@ -71,50 +69,4 @@ func GetRootCmd() *cobra.Command {
 	})
 
 	return rootCmd
-}
-
-func initializeConfig(cmd *cobra.Command, bindPrefix string) error {
-	v := viper.New()
-
-	// Set the base name of the config file, without the file extension.
-	v.SetConfigName(".openfeature")
-
-	// Set as many paths as you like where viper should look for the
-	// config file. We are only looking in the current working directory.
-	v.AddConfigPath(".")
-
-	// Attempt to read the config file, gracefully ignoring errors
-	// caused by a config file not being found. Return an error
-	// if we cannot parse the config file.
-	if err := v.ReadInConfig(); err != nil {
-		// It's okay if there isn't a config file
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return err
-		}
-	}
-
-	// Bind the current command's flags to viper
-	bindFlags(cmd, v, bindPrefix)
-
-	return nil
-}
-
-// Bind each cobra flag to its associated viper configuration
-func bindFlags(cmd *cobra.Command, v *viper.Viper, bindPrefix string) {
-	cmd.Flags().VisitAll(func(f *pflag.Flag) {
-		// Determine the naming convention of the flags when represented in the config file
-		configName := f.Name
-		if bindPrefix != "" {
-			configName = bindPrefix + "." + f.Name
-		}
-
-		// Apply the viper config value to the flag when the flag is not set and viper has a value
-		if !f.Changed && v.IsSet(configName) {
-			val := v.Get(configName)
-			err := cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
-			if err != nil {
-				pterm.Error.Println(err)
-			}
-		}
-	})
 }

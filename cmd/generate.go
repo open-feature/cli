@@ -84,7 +84,6 @@ func GetGenerateGoCmd() *cobra.Command {
 			return initializeConfig(cmd, "generate.go")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-				// Use the helper functions to get flag values
 			goPackageName := config.GetGoPackageName(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
@@ -129,14 +128,6 @@ func GetGenerateCmd() *cobra.Command {
 		Use:   "generate",
 		Short: "Generate typesafe OpenFeature accessors.",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// If this command has a parent with PersistentPreRunE, call it
-			if cmd.Parent() != nil && cmd.Parent().PersistentPreRunE != nil {
-				err := cmd.Parent().PersistentPreRunE(cmd.Parent(), args)
-				if err != nil {
-					return err
-				}
-			}
-
 			return initializeConfig(cmd, "generate")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
