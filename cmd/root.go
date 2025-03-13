@@ -62,6 +62,7 @@ func GetRootCmd() *cobra.Command {
 	rootCmd.AddCommand(GetVersionCmd())
 	rootCmd.AddCommand(GetInitCmd())
 	rootCmd.AddCommand(GetGenerateCmd())
+	rootCmd.AddCommand(GetCompareCmd())
 
 	// Add a custom error handler after the command is created
 	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
