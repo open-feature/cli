@@ -42,11 +42,11 @@ func initializeConfig(cmd *cobra.Command, bindPrefix string) error {
 		// Build configuration paths from most specific to least specific
 		configPaths := []string{}
 		
-		// 1. First check the most specific path (e.g., generate.go.package-name)
+		// Check the most specific path (e.g., generate.go.package-name)
 		if bindPrefix != "" {
 			configPaths = append(configPaths, bindPrefix + "." + f.Name)
 			
-			// 2. Then check parent paths (e.g., generate.package-name)
+			// Check parent paths (e.g., generate.package-name)
 			parts := strings.Split(bindPrefix, ".")
 			for i := len(parts) - 1; i > 0; i-- {
 				parentPath := strings.Join(parts[:i], ".") + "." + f.Name
@@ -54,14 +54,14 @@ func initializeConfig(cmd *cobra.Command, bindPrefix string) error {
 			}
 		}
 		
-		// 3. Finally check the base path (e.g., package-name)
+		// Check the base path (e.g., package-name)
 		configPaths = append(configPaths, f.Name)
 		
 		// Try each path in order until we find a match
 		for _, path := range configPaths {
 			if v.IsSet(path) {
 				val := v.Get(path)
-				f.Value.Set(fmt.Sprintf("%v", val))
+				_ = f.Value.Set(fmt.Sprintf("%v", val))
 				break
 			}
 		}
