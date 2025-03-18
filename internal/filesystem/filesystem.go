@@ -8,7 +8,6 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
 )
 
 var viperKey = "filesystem"
@@ -56,26 +55,6 @@ func WriteFile(path string, data []byte) error {
 func ReadFile(path string) ([]byte, error) {
 	fs := FileSystem()
 	return afero.ReadFile(fs, path)
-}
-
-func GetFromYaml(key string) (string, error) {
-	var config Config
-	fs, err := ReadFile(".openfeature.yaml")
-	if err != nil {
-		return "", err
-	}
-
-	err = yaml.Unmarshal(fs, &config)
-	if err != nil {
-		return "", err
-	}
-
-	switch key {
-	case "flagSourceUrl":
-		return config.FlagSourceUrl, nil
-	default:
-		return "", fmt.Errorf("unknown key: %s", key)
-	}
 }
 
 // Checks if a file exists at the given path using the filesystem interface.
