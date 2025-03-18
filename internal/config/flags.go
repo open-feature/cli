@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // Flag name constants to avoid duplication
@@ -98,6 +99,17 @@ func GetOverride(cmd *cobra.Command) bool {
 // GetFlagSourceUrl gets the flag source URL from the given command
 func GetFlagSourceUrl(cmd *cobra.Command) string {
 	flagSourceUrl, _ := cmd.Flags().GetString(FlagSourceUrlFlagName)
+	if flagSourceUrl == "" {
+		viper.SetConfigName(".openfeature")
+		viper.AddConfigPath(".")
+		if err := viper.ReadInConfig(); err != nil {
+			return ""
+		}
+		if !viper.IsSet("flagSourceUrl") {
+			return ""
+		}
+		flagSourceUrl = viper.GetString("flagSourceUrl")
+	}
 	return flagSourceUrl
 }
 

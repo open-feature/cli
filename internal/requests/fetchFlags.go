@@ -15,7 +15,9 @@ func FetchFlags(flagSourceUrl string, authToken string) (flagset.Flagset, error)
 		return flags, err
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", authToken))
+	if authToken != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", authToken))
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

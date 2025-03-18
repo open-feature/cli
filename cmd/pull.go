@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/open-feature/cli/internal/config"
-	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/open-feature/cli/internal/requests"
@@ -71,10 +70,7 @@ func GetPullCmd() *cobra.Command {
 
 			var err error
 			if flagSourceUrl == "" {
-				flagSourceUrl, err = filesystem.GetFromYaml("flagSourceUrl")
-				if err != nil {
-					return fmt.Errorf("error getting flagSourceUrl from config: %w", err)
-				}
+				return fmt.Errorf("flagSourceUrl not set in config")
 			}
 
 			// fetch the flags from the remote source
