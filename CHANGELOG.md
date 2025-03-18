@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/open-feature/cli/compare/v0.2.0...v0.3.0) (2025-03-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* change binary name ([#82](https://github.com/open-feature/cli/issues/82))
+
+### 🧹 Chore
+
+* change binary name ([#82](https://github.com/open-feature/cli/issues/82)) ([fdfe561](https://github.com/open-feature/cli/commit/fdfe561d49e17017af5165dfe0eec359387935e4))
+
 ## [0.2.0](https://github.com/open-feature/cli/compare/v0.1.10...v0.2.0) (2025-03-18)
 
 
