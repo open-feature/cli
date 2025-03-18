@@ -3,6 +3,7 @@
 import {
   type ReactFlagEvaluationOptions,
   type ReactFlagEvaluationNoSuspenseOptions,
+  type FlagQuery,
   useFlag,
   useSuspenseFlag,
 } from "@openfeature/react-sdk";
@@ -15,7 +16,7 @@ import {
 * - default value: `0.15`
 * - type: `number`
 */
-export const useDiscountPercentage = (options?: ReactFlagEvaluationOptions) => {
+export const useDiscountPercentage = (options?: ReactFlagEvaluationOptions): FlagQuery<number> => {
   return useFlag("discountPercentage", 0.15, options);
 };
 
@@ -30,7 +31,7 @@ export const useDiscountPercentage = (options?: ReactFlagEvaluationOptions) => {
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspenseDiscountPercentage = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
+export const useSuspenseDiscountPercentage = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<number> => {
   return useSuspenseFlag("discountPercentage", 0.15, options);
 };
 
@@ -42,7 +43,7 @@ export const useSuspenseDiscountPercentage = (options?: ReactFlagEvaluationNoSus
 * - default value: `false`
 * - type: `boolean`
 */
-export const useEnableFeatureA = (options?: ReactFlagEvaluationOptions) => {
+export const useEnableFeatureA = (options?: ReactFlagEvaluationOptions): FlagQuery<boolean> => {
   return useFlag("enableFeatureA", false, options);
 };
 
@@ -57,7 +58,7 @@ export const useEnableFeatureA = (options?: ReactFlagEvaluationOptions) => {
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspenseEnableFeatureA = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
+export const useSuspenseEnableFeatureA = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<boolean> => {
   return useSuspenseFlag("enableFeatureA", false, options);
 };
 
@@ -69,7 +70,7 @@ export const useSuspenseEnableFeatureA = (options?: ReactFlagEvaluationNoSuspens
 * - default value: `Hello there!`
 * - type: `string`
 */
-export const useGreetingMessage = (options?: ReactFlagEvaluationOptions) => {
+export const useGreetingMessage = (options?: ReactFlagEvaluationOptions): FlagQuery<string> => {
   return useFlag("greetingMessage", "Hello there!", options);
 };
 
@@ -84,7 +85,7 @@ export const useGreetingMessage = (options?: ReactFlagEvaluationOptions) => {
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspenseGreetingMessage = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
+export const useSuspenseGreetingMessage = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<string> => {
   return useSuspenseFlag("greetingMessage", "Hello there!", options);
 };
 
@@ -96,7 +97,7 @@ export const useSuspenseGreetingMessage = (options?: ReactFlagEvaluationNoSuspen
 * - default value: `50`
 * - type: `number`
 */
-export const useUsernameMaxLength = (options?: ReactFlagEvaluationOptions) => {
+export const useUsernameMaxLength = (options?: ReactFlagEvaluationOptions): FlagQuery<number> => {
   return useFlag("usernameMaxLength", 50, options);
 };
 
@@ -111,6 +112,6 @@ export const useUsernameMaxLength = (options?: ReactFlagEvaluationOptions) => {
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspenseUsernameMaxLength = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
+export const useSuspenseUsernameMaxLength = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<number> => {
   return useSuspenseFlag("usernameMaxLength", 50, options);
 };
