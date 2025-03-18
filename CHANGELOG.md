@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/open-feature/cli/compare/v0.3.0...v0.3.1) (2025-03-18)
+
+
+### 🐛 Bug Fixes
+
+* binary name referenced in the dockerfile ([0e28e8e](https://github.com/open-feature/cli/commit/0e28e8ec3b4108eee6ae43f587201ff7cbf18020))
+
 ## [0.3.0](https://github.com/open-feature/cli/compare/v0.2.0...v0.3.0) (2025-03-18)
 
 
