@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.2.0](https://github.com/open-feature/cli/compare/v0.1.10...v0.2.0) (2025-03-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* add init command, update cli flags, support a config file ([#71](https://github.com/open-feature/cli/issues/71))
+
+### 🧹 Chore
+
+* rename the checksum file ([34afca6](https://github.com/open-feature/cli/commit/34afca62ab6cf229f38b0cc81d6f6443cf1ac8ea))
+* upgrade viper to 1.20 ([#78](https://github.com/open-feature/cli/issues/78)) ([6c36ee9](https://github.com/open-feature/cli/commit/6c36ee90f796cdabe318ef59aec9de3d93c3ffd5))
+
+
+### 🔄 Refactoring
+
+* add init command, update cli flags, support a config file ([#71](https://github.com/open-feature/cli/issues/71)) ([106bf9d](https://github.com/open-feature/cli/commit/106bf9ddfe93673d956487bcf84667d550543aa0))
+
 ## [0.1.10](https://github.com/open-feature/cli/compare/v0.1.9...v0.1.10) (2025-01-27)
 
 
