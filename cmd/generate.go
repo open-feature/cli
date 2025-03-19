@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/open-feature/cli/internal/config"
-	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
 	"github.com/open-feature/cli/internal/generators/golang"
 	"github.com/open-feature/cli/internal/generators/react"
+	"github.com/open-feature/cli/internal/manifest"
 	"github.com/spf13/cobra"
 )
 
@@ -53,7 +53,7 @@ func GetGenerateReactCmd() *cobra.Command {
 				OutputPath: outputPath,
 				Custom: react.Params{},
 			}
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}
@@ -95,7 +95,7 @@ func GetGenerateGoCmd() *cobra.Command {
 				},
 			}
 
-			flagset, err := flagset.Load(manifestPath)
+			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
 				return err
 			}

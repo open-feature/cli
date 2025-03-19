@@ -5,10 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-
-	"github.com/open-feature/cli/internal/filesystem"
-	"github.com/open-feature/cli/internal/manifest"
-	"github.com/spf13/afero"
 )
 
 // FlagType are the primitive types of flags.
@@ -31,7 +27,7 @@ func (f FlagType) String() string {
 	case FloatType:
 			return "float"
 	case BoolType:
-			return "bool"
+			return "boolean"
 	case StringType:
 			return "string"
 	case ObjectType:
@@ -50,29 +46,6 @@ type Flag struct {
 
 type Flagset struct {
 	Flags []Flag
-}
-
-// Loads, validates, and unmarshals the manifest file at the given path into a flagset
-func Load(manifestPath string) (*Flagset, error) {
-	fs := filesystem.FileSystem()
-	data, err := afero.ReadFile(fs, manifestPath)
-	if err != nil {
-		return nil, fmt.Errorf("error reading contents from file %q", manifestPath)
-	}
-
-	validationErrors, err := manifest.Validate(data)
-	if err != nil {
-		return nil, err
-	} else if len(validationErrors) > 0 {
-		return nil, fmt.Errorf("validation failed: %v", validationErrors)
-	}
-
-	var flagset Flagset
-	if err := json.Unmarshal(data, &flagset); err != nil {
-		return nil, fmt.Errorf("error unmarshaling JSON: %v", validationErrors)
-	}
-
-	return &flagset, nil
 }
 
 // Filter removes flags from the Flagset that are of unsupported types.
@@ -131,4 +104,46 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 	})
 
 	return nil
+}
+
+func LoadFromSourceFlags(data []byte) (*[]Flag, error) {
+	type SourceFlag struct {
+		Key string `json:"key"`
+		Type string `json:"type"`
+		Description string `json:"description"`
+		DefaultValue any `json:"defaultValue"`
+	}
+
+	var sourceFlags []SourceFlag
+	if err := json.Unmarshal(data, &sourceFlags); err != nil {
+		return nil, err
+	}
+
+	var flags []Flag
+	for _, sf := range sourceFlags {
+		var flagType FlagType
+		switch sf.Type {
+		case "integer", "Integer":
+			flagType = IntType
+		case "float", "Float", "Number":
+			flagType = FloatType
+		case "boolean", "bool", "Boolean":
+			flagType = BoolType
+		case "string", "String":
+			flagType = StringType
+		case "object", "Object", "JSON":
+			flagType = ObjectType
+		default:
+			return nil, fmt.Errorf("unknown flag type: %s", sf.Type)
+		}
+
+		flags = append(flags, Flag{
+			Key:          sf.Key,
+			Type:         flagType,
+			Description:  sf.Description,
+			DefaultValue: sf.DefaultValue,
+		})
+	}
+
+	return &flags, nil
 }
