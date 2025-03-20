@@ -4,6 +4,9 @@
 
 Generate typesafe accessors for OpenFeature.
 
+
+> **Stability**: alpha
+
 ### Synopsis
 
 Generate typesafe accessors compatible with the OpenFeature Go SDK.
