@@ -4,6 +4,9 @@
 
 Generate typesafe React Hooks.
 
+
+> **Stability**: alpha
+
 ### Synopsis
 
 Generate typesafe React Hooks compatible with the OpenFeature React SDK.
