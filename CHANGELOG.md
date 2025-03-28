@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.2](https://github.com/open-feature/cli/compare/v0.3.1...v0.3.2) (2025-03-28)
+
+
+### ✨ New Features
+
+* add contributing guide and generator readme ([#80](https://github.com/open-feature/cli/issues/80)) ([05e094d](https://github.com/open-feature/cli/commit/05e094db68c210271205f6a043fc885d1a3c23b8)), closes [#69](https://github.com/open-feature/cli/issues/69)
+* add script to install the latest binary ([#85](https://github.com/open-feature/cli/issues/85)) ([afa46d0](https://github.com/open-feature/cli/commit/afa46d00b303de8bf34197369fe34fd6022c34b9))
+* **cli:** add stability annotations to generated Markdown documentation ([#88](https://github.com/open-feature/cli/issues/88)) ([9102d13](https://github.com/open-feature/cli/commit/9102d1390ace7e3b285ae4ce38208b229de59cbf))
+
+
+### 📚 Documentation
+
+* add install, quick start, commands, and more to readme ([#90](https://github.com/open-feature/cli/issues/90)) ([9244276](https://github.com/open-feature/cli/commit/9244276fc47128a7a304ef22732ad5dcde38c3e8))
+
 ## [0.3.1](https://github.com/open-feature/cli/compare/v0.3.0...v0.3.1) (2025-03-18)
 
 
