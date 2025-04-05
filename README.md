@@ -220,6 +220,53 @@ flowchart LR
   config --> args
 ```
 
+## Setting Up Lefthook
+
+To automate the setup of Git hooks for this project, we use [Lefthook](https://github.com/evilmartians/lefthook). Lefthook ensures that pre-push checks, such as formatting, documentation generation, and tests, are consistently applied across the team.
+
+### Installation
+
+1. Install Lefthook using Homebrew:
+
+   ```bash
+   brew install lefthook
+   ```
+
+2. Install the Lefthook configuration into your Git repository:
+
+   ```bash
+   lefthook install
+   ```
+
+### Pre-Commit Hook
+
+The pre-commit hook is configured to run the following check:
+
+1. **Code Formatting**: Ensures all files are properly formatted using `go fmt`. Any changes made by `go fmt` will be automatically staged.
+
+### Pre-Push Hook
+
+The pre-push hook is configured to run the following checks:
+
+1. **Documentation Generation**: Runs `make generate-docs` to ensure documentation is up-to-date. If any changes are detected, the push will be blocked until the changes are committed.
+2. **Tests**: Executes `make test` to verify that all tests pass. If any tests fail, the push will be blocked.
+
+### Running Hooks Manually
+
+You can manually run the hooks using the following commands:
+
+- Pre-commit hook:
+
+  ```bash
+  lefthook run pre-commit
+  ```
+
+- Pre-push hook:
+
+  ```bash
+  lefthook run pre-push
+  ```
+
 ### Get Involved
 
 - **CNCF Slack**: Join the conversation in the [#openfeature](https://cloud-native.slack.com/archives/C0344AANLA1) and [#openfeature-cli](https://cloud-native.slack.com/archives/C07DY4TUDK6) channel
