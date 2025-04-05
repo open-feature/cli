@@ -1,4 +1,3 @@
-
 .PHONY: test
 test: 
 	@echo "Running tests..."
@@ -19,3 +18,9 @@ generate-schema:
 	@echo "Generating schema..."
 	@go run ./schema/generate-schema.go
 	@echo "Schema generated successfully!"
+
+.PHONY: fmt
+fmt:
+	@echo "Running go fmt..."
+	@go fmt ./...
+	@echo "Code formatted successfully!"
