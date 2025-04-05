@@ -63,9 +63,9 @@ type Manifest struct {
 // Converts the Manifest struct to a JSON schema.
 func ToJSONSchema() *jsonschema.Schema {
 	reflector := &jsonschema.Reflector{
-		ExpandedStruct: true,
+		ExpandedStruct:            true,
 		AllowAdditionalProperties: true,
-		BaseSchemaID: "openfeature-cli",
+		BaseSchemaID:              "openfeature-cli",
 	}
 
 	if err := reflector.AddGoComments("github.com/open-feature/cli", "./internal/manifest"); err != nil {

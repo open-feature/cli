@@ -48,7 +48,7 @@ func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, tmpl string,
 	maps.Copy(funcs, customFunc)
 
 	logger.Default.Debug(fmt.Sprintf("Generating file: %s", name))
-	
+
 	generatorTemplate, err := template.New("generator").Funcs(funcs).Parse(tmpl)
 	if err != nil {
 		return fmt.Errorf("error initializing template: %v", err)
@@ -68,9 +68,9 @@ func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, tmpl string,
 		logger.Default.FileFailed(fullPath, err)
 		return err
 	}
-	
+
 	// Log successful file creation
 	logger.Default.FileCreated(fullPath)
-	
+
 	return nil
 }

@@ -34,7 +34,7 @@ func GetInitCmd() *cobra.Command {
 					logger.Default.Info("No changes were made.")
 					return nil
 				}
-				
+
 				logger.Default.Debug("User confirmed override of existing manifest")
 			}
 
@@ -44,7 +44,7 @@ func GetInitCmd() *cobra.Command {
 				logger.Default.Error(fmt.Sprintf("Failed to create manifest: %v", err))
 				return err
 			}
-			
+
 			logger.Default.FileCreated(manifestPath)
 			logger.Default.Success("Project initialized.")
 			return nil
