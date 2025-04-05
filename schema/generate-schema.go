@@ -29,7 +29,7 @@ func main() {
 	defer file.Close()
 
 	if _, err := file.Write(data); err != nil {
-		log.Fatal(fmt.Errorf("failed to write JSON schema to file: %w", err));
+		log.Fatal(fmt.Errorf("failed to write JSON schema to file: %w", err))
 	}
 
 	fmt.Println("JSON schema generated successfully at " + schemaPath)

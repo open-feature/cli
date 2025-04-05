@@ -17,16 +17,16 @@ func defaultFuncs() template.FuncMap {
 		"ToPascal": strcase.ToCamel,
 		// Remapping ToLowerCamel to ToCamel to match the expected behavior
 		// Ref: See above
-		"ToCamel": strcase.ToLowerCamel,
-		"ToKebab": strcase.ToKebab,
+		"ToCamel":          strcase.ToLowerCamel,
+		"ToKebab":          strcase.ToKebab,
 		"ToScreamingKebab": strcase.ToScreamingKebab,
-		"ToSnake": strcase.ToSnake,
+		"ToSnake":          strcase.ToSnake,
 		"ToScreamingSnake": strcase.ToScreamingSnake,
-		"ToUpper": strings.ToUpper,
-		"ToLower": strings.ToLower,
-		"Title": cases.Title,
-		"Quote": strconv.Quote,
-		"QuoteString": func (input any) any {
+		"ToUpper":          strings.ToUpper,
+		"ToLower":          strings.ToLower,
+		"Title":            cases.Title,
+		"Quote":            strconv.Quote,
+		"QuoteString": func(input any) any {
 			if str, ok := input.(string); ok {
 				return strconv.Quote(str)
 			}

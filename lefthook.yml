@@ -1,0 +1,18 @@
+pre-commit:
+  commands:
+    go-fmt:
+      run: go fmt ./...
+      stage_fixed: true
+pre-push:
+  commands:
+    generate-docs:
+      run: |
+        make generate-docs
+        if ! git diff --quiet; then
+          echo "Documentation is outdated. Please run 'make generate-docs' and commit the changes."
+          exit 1
+        fi
+      skip: false
+    tests:
+      run: make test
+      skip: false
