@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/open-feature/cli/internal/filesystem"
+	"github.com/spf13/afero"
 )
 
 type initManifest struct {
@@ -14,7 +15,7 @@ type initManifest struct {
 // Create creates a new manifest file at the given path.
 func Create(path string) error {
 	m := &initManifest{
-		Schema:  "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
+		Schema: "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
 		Manifest: Manifest{
 			Flags: map[string]any{},
 		},
@@ -24,4 +25,20 @@ func Create(path string) error {
 		return err
 	}
 	return filesystem.WriteFile(path, formattedInitManifest)
+}
+
+// Load loads a manifest from a JSON file, unmarshals it, and returns a Manifest object.
+func Load(path string) (*Manifest, error) {
+	fs := filesystem.FileSystem()
+	data, err := afero.ReadFile(fs, path)
+	if err != nil {
+		return nil, err
+	}
+
+	var m Manifest
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, err
+	}
+
+	return &m, nil
 }
