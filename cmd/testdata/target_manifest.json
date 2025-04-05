@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
+  "flags": {
+    "darkMode": {
+      "flagType": "boolean",
+      "description": "Enable dark mode for the application",
+      "defaultValue": true
+    },
+    "backgroundColor": {
+      "flagType": "string",
+      "description": "Background color for the application",
+      "defaultValue": "black"
+    },
+    "welcomeMessage": {
+      "flagType": "string",
+      "description": "Welcome message to display",
+      "defaultValue": "Hello, Welcome to OpenFeature!"
+    }
+  }
+}

@@ -2,11 +2,11 @@
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
 ## openfeature compare
 
-Compare two manifest files
+Compare two feature flag manifests
 
 ### Synopsis
 
-Compare two manifest files and list the changes
+Compare two OpenFeature flag manifests and display the differences in a structured format.
 
 ```
 openfeature compare [flags]
@@ -15,7 +15,10 @@ openfeature compare [flags]
 ### Options
 
 ```
-  -h, --help   help for compare
+      --flat            Display differences in a flat format
+  -h, --help            help for compare
+      --source string   Path to the source manifest file
+      --target string   Path to the target manifest file
 ```
 
 ### Options inherited from parent commands
