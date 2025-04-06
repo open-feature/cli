@@ -32,6 +32,23 @@ We welcome contributions for new generators to extend the functionality of the O
 
 11. **Address Feedback**: Be responsive to feedback from the maintainers. Make any necessary changes and update your pull request as needed.
 
+### Integration Testing
+
+To verify that generated code compiles correctly, the project includes integration tests, for example, for c#:
+
+```bash
+# Test the C# generator output
+make test-csharp
+```
+
+This will:
+1. Build the CLI
+2. Generate a C# client
+3. Compile the C# code in a Docker container
+4. Validate that the code compiles correctly
+
+Consider adding more integration tests for new generators.
+
 ## Templates
 
 ### Data

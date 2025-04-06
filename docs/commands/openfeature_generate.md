@@ -26,6 +26,7 @@ openfeature generate [flags]
 ### SEE ALSO
 
 * [openfeature](openfeature.md)	 - CLI for OpenFeature.
+* [openfeature generate csharp](openfeature_generate_csharp.md)	 - Generate typesafe C# client.
 * [openfeature generate go](openfeature_generate_go.md)	 - Generate typesafe accessors for OpenFeature.
 * [openfeature generate nodejs](openfeature_generate_nodejs.md)	 - Generate typesafe Node.js client.
 * [openfeature generate python](openfeature_generate_python.md)	 - Generate typesafe Python client.

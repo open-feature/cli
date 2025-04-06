@@ -120,6 +120,38 @@ namespace TestNamespace
         }
         
         /// <summary>
+        /// Allows customization of theme colors.
+        /// </summary>
+        /// <remarks>
+        /// <para>Flag key: themeCustomization</para>
+        /// <para>Default value: map[primaryColor:#007bff secondaryColor:#6c757d]</para>
+        /// <para>Type: Value</para>
+        /// </remarks>
+        /// <param name="evaluationContext">Optional context for the flag evaluation</param>
+        /// <param name="options">Options for flag evaluation</param>
+        /// <returns>The flag value</returns>
+        public async Task<Value> ThemeCustomizationAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        {
+            throw new NotSupportedException("Unsupported flag type");
+        }
+
+        /// <summary>
+        /// Allows customization of theme colors.
+        /// </summary>
+        /// <remarks>
+        /// <para>Flag key: themeCustomization</para>
+        /// <para>Default value: map[primaryColor:#007bff secondaryColor:#6c757d]</para>
+        /// <para>Type: Value</para>
+        /// </remarks>
+        /// <param name="evaluationContext">Optional context for the flag evaluation</param>
+        /// <param name="options">Options for flag evaluation</param>
+        /// <returns>The evaluation details containing the flag value and metadata</returns>
+        public async Task<FlagEvaluationDetails<Value>> ThemeCustomizationDetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        {
+            throw new NotSupportedException("Unsupported flag type");
+        }
+        
+        /// <summary>
         /// Maximum allowed length for usernames.
         /// </summary>
         /// <remarks>

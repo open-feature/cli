@@ -5,6 +5,11 @@ test:
 	@go test -v ./...
 	@echo "Tests passed successfully!"
 
+.PHONY: test-csharp
+test-csharp:
+	@echo "Running C# integration test..."
+	@./test/csharp-integration/test-compilation.sh
+
 generate-docs:
 	@echo "Generating documentation..."
 	@go run ./docs/generate-commands.go
