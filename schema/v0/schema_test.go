@@ -49,11 +49,11 @@ func walkPath(shouldPass bool, root string) error {
 		schemaLoader := gojsonschema.NewStringLoader(SchemaFile)
 		manifestLoader := gojsonschema.NewGoLoader(v)
 		result, err := gojsonschema.Validate(schemaLoader, manifestLoader)
-		if (err != nil) {
+		if err != nil {
 			return fmt.Errorf("Error validating json schema: %v", err)
 		}
 
-		if (len(result.Errors()) >= 1 && shouldPass == true) {
+		if len(result.Errors()) >= 1 && shouldPass == true {
 			var errorMessage strings.Builder
 
 			errorMessage.WriteString("file " + path + " should be valid, but had the following issues:\n")
@@ -63,7 +63,7 @@ func walkPath(shouldPass bool, root string) error {
 			return fmt.Errorf("%s", errorMessage.String())
 		}
 
-		if (len(result.Errors()) == 0 && shouldPass == false) {
+		if len(result.Errors()) == 0 && shouldPass == false {
 			return fmt.Errorf("file %s should be invalid, but no issues were detected", path)
 		}
 
