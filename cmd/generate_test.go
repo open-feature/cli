@@ -48,6 +48,13 @@ func TestGenerate(t *testing.T) {
 			outputGolden:   "testdata/success_nodejs.golden",
 			outputFile:     "openfeature.ts",
 		},
+		{
+			name:           "Python generation success",
+			command:        "python",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/success_python.golden",
+			outputFile:     "openfeature.py",
+		},
 		// Add more test cases here as needed
 	}
 

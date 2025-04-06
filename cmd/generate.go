@@ -8,6 +8,7 @@ import (
 	"github.com/open-feature/cli/internal/generators"
 	"github.com/open-feature/cli/internal/generators/golang"
 	"github.com/open-feature/cli/internal/generators/nodejs"
+	"github.com/open-feature/cli/internal/generators/python"
 	"github.com/open-feature/cli/internal/generators/react"
 	"github.com/open-feature/cli/internal/logger"
 	"github.com/spf13/cobra"
@@ -175,11 +176,53 @@ func GetGenerateGoCmd() *cobra.Command {
 	return goCmd
 }
 
+func getGeneatePythonCmd() *cobra.Command {
+	pythonCmd := &cobra.Command{
+		Use:   "python",
+		Short: "Generate typesafe Python client.",
+		Long:  `Generate typesafe Python client compatible with the OpenFeature Python SDK.`,
+		Annotations: map[string]string{
+			"stability": string(generators.Alpha),
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			manifestPath := config.GetManifestPath(cmd)
+			outputPath := config.GetOutputPath(cmd)
+
+			logger.Default.GenerationStarted("Python")
+
+			params := generators.Params[python.Params]{
+				OutputPath: outputPath,
+				Custom:     python.Params{},
+			}
+			flagset, err := flagset.Load(manifestPath)
+			if err != nil {
+				return err
+			}
+
+			generator := python.NewGenerator(flagset)
+			logger.Default.Debug("Executing Python generator")
+			err = generator.Generate(&params)
+			if err != nil {
+				return err
+			}
+
+			logger.Default.GenerationComplete("Python")
+
+			return nil
+		},
+	}
+
+	addStabilityInfo(pythonCmd)
+
+	return pythonCmd
+}
+
 func init() {
 	// Register generators with the manager
 	generators.DefaultManager.Register(GetGenerateReactCmd)
 	generators.DefaultManager.Register(GetGenerateGoCmd)
 	generators.DefaultManager.Register(GetGenerateNodeJSCmd)
+	generators.DefaultManager.Register(getGeneatePythonCmd)
 }
 
 func GetGenerateCmd() *cobra.Command {
