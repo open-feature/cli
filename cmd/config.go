@@ -18,7 +18,7 @@ func initializeConfig(cmd *cobra.Command, bindPrefix string) error {
 	// Set the config file name and path
 	v.SetConfigName(".openfeature")
 	v.AddConfigPath(".")
-	
+
 	logger.Default.Debug("Looking for .openfeature config file in current directory")
 
 	// Read the config file
@@ -31,7 +31,6 @@ func initializeConfig(cmd *cobra.Command, bindPrefix string) error {
 	} else {
 		logger.Default.Debug(fmt.Sprintf("Using config file: %s", v.ConfigFileUsed()))
 	}
-	
 
 	// Track which flags were set directly via command line
 	cmdLineFlags := make(map[string]bool)
@@ -50,11 +49,11 @@ func initializeConfig(cmd *cobra.Command, bindPrefix string) error {
 
 		// Build configuration paths from most specific to least specific
 		configPaths := []string{}
-		
+
 		// Check the most specific path (e.g., generate.go.package-name)
 		if bindPrefix != "" {
-			configPaths = append(configPaths, bindPrefix + "." + f.Name)
-			
+			configPaths = append(configPaths, bindPrefix+"."+f.Name)
+
 			// Check parent paths (e.g., generate.package-name)
 			parts := strings.Split(bindPrefix, ".")
 			for i := len(parts) - 1; i > 0; i-- {
@@ -62,12 +61,12 @@ func initializeConfig(cmd *cobra.Command, bindPrefix string) error {
 				configPaths = append(configPaths, parentPath)
 			}
 		}
-		
+
 		// Check the base path (e.g., package-name)
 		configPaths = append(configPaths, f.Name)
-		
+
 		logger.Default.Debug(fmt.Sprintf("Looking for config value for flag %s in paths: %s", f.Name, strings.Join(configPaths, ", ")))
-		
+
 		// Try each path in order until we find a match
 		for _, path := range configPaths {
 			if v.IsSet(path) {
@@ -81,7 +80,7 @@ func initializeConfig(cmd *cobra.Command, bindPrefix string) error {
 				}
 			}
 		}
-		
+
 		// Log the final value for the flag
 		logger.Default.Debug(fmt.Sprintf("Final flag value: %s=%s", f.Name, f.Value.String()))
 	})
