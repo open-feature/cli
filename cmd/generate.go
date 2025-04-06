@@ -6,6 +6,7 @@ import (
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
+	"github.com/open-feature/cli/internal/generators/csharp"
 	"github.com/open-feature/cli/internal/generators/golang"
 	"github.com/open-feature/cli/internal/generators/nodejs"
 	"github.com/open-feature/cli/internal/generators/react"
@@ -68,9 +69,9 @@ func GetGenerateNodeJSCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-	
+
 			logger.Default.GenerationComplete("Node.js")
-			
+
 			return nil
 		},
 	}
@@ -94,7 +95,7 @@ func GetGenerateReactCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
-			
+
 			logger.Default.GenerationStarted("React")
 
 			params := generators.Params[react.Params]{
@@ -112,9 +113,9 @@ func GetGenerateReactCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			logger.Default.GenerationComplete("React")
-			
+
 			return nil
 		},
 	}
@@ -122,6 +123,56 @@ func GetGenerateReactCmd() *cobra.Command {
 	addStabilityInfo(reactCmd)
 
 	return reactCmd
+}
+
+func GetGenerateCSharpCmd() *cobra.Command {
+	csharpCmd := &cobra.Command{
+		Use:   "csharp",
+		Short: "Generate typesafe C# client.",
+		Long:  `Generate typesafe C# client compatible with the OpenFeature .NET SDK.`,
+		Annotations: map[string]string{
+			"stability": string(generators.Alpha),
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate.csharp")
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			namespace := config.GetCSharpNamespace(cmd)
+			manifestPath := config.GetManifestPath(cmd)
+			outputPath := config.GetOutputPath(cmd)
+
+			logger.Default.GenerationStarted("C#")
+
+			params := generators.Params[csharp.Params]{
+				OutputPath: outputPath,
+				Custom: csharp.Params{
+					Namespace: namespace,
+				},
+			}
+			flagset, err := flagset.Load(manifestPath)
+			if err != nil {
+				return err
+			}
+
+			generator := csharp.NewGenerator(flagset)
+			logger.Default.Debug("Executing C# generator")
+			err = generator.Generate(&params)
+			if err != nil {
+				return err
+			}
+
+			logger.Default.GenerationComplete("C#")
+
+			return nil
+		},
+	}
+
+	// Add C#-specific flags
+	config.AddCSharpGenerateFlags(csharpCmd)
+
+	addStabilityInfo(csharpCmd)
+
+	return csharpCmd
 }
 
 func GetGenerateGoCmd() *cobra.Command {
@@ -139,7 +190,7 @@ func GetGenerateGoCmd() *cobra.Command {
 			goPackageName := config.GetGoPackageName(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
-			
+
 			logger.Default.GenerationStarted("Go")
 
 			params := generators.Params[golang.Params]{
@@ -160,9 +211,9 @@ func GetGenerateGoCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			logger.Default.GenerationComplete("Go")
-			
+
 			return nil
 		},
 	}
@@ -180,6 +231,7 @@ func init() {
 	generators.DefaultManager.Register(GetGenerateReactCmd)
 	generators.DefaultManager.Register(GetGenerateGoCmd)
 	generators.DefaultManager.Register(GetGenerateNodeJSCmd)
+	generators.DefaultManager.Register(GetGenerateCSharpCmd)
 }
 
 func GetGenerateCmd() *cobra.Command {
@@ -202,7 +254,7 @@ func GetGenerateCmd() *cobra.Command {
 	for _, subCmd := range generators.DefaultManager.GetCommands() {
 		generateCmd.AddCommand(subCmd)
 	}
-	
+
 	addStabilityInfo(generateCmd)
 
 	return generateCmd
