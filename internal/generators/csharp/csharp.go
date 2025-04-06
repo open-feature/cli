@@ -26,7 +26,7 @@ func openFeatureType(t flagset.FlagType) string {
 	case flagset.IntType:
 		return "int"
 	case flagset.FloatType:
-		return "double"  // .NET uses double, not float
+		return "double" // .NET uses double, not float
 	case flagset.BoolType:
 		return "bool"
 	case flagset.StringType:

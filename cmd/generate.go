@@ -69,9 +69,9 @@ func GetGenerateNodeJSCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-	
+
 			logger.Default.GenerationComplete("Node.js")
-			
+
 			return nil
 		},
 	}
@@ -95,7 +95,7 @@ func GetGenerateReactCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
-			
+
 			logger.Default.GenerationStarted("React")
 
 			params := generators.Params[react.Params]{
@@ -113,9 +113,9 @@ func GetGenerateReactCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			logger.Default.GenerationComplete("React")
-			
+
 			return nil
 		},
 	}
@@ -140,7 +140,7 @@ func GetGenerateCSharpCmd() *cobra.Command {
 			namespace := config.GetCSharpNamespace(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
-			
+
 			logger.Default.GenerationStarted("C#")
 
 			params := generators.Params[csharp.Params]{
@@ -160,9 +160,9 @@ func GetGenerateCSharpCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-		
+
 			logger.Default.GenerationComplete("C#")
-			
+
 			return nil
 		},
 	}
@@ -190,7 +190,7 @@ func GetGenerateGoCmd() *cobra.Command {
 			goPackageName := config.GetGoPackageName(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
-			
+
 			logger.Default.GenerationStarted("Go")
 
 			params := generators.Params[golang.Params]{
@@ -211,9 +211,9 @@ func GetGenerateGoCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			logger.Default.GenerationComplete("Go")
-			
+
 			return nil
 		},
 	}
@@ -254,7 +254,7 @@ func GetGenerateCmd() *cobra.Command {
 	for _, subCmd := range generators.DefaultManager.GetCommands() {
 		generateCmd.AddCommand(subCmd)
 	}
-	
+
 	addStabilityInfo(generateCmd)
 
 	return generateCmd

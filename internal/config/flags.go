@@ -6,20 +6,20 @@ import (
 
 // Flag name constants to avoid duplication
 const (
-	DebugFlagName        = "debug"
-	ManifestFlagName     = "manifest"
-	OutputFlagName       = "output"
-	NoInputFlagName      = "no-input"
-	GoPackageFlagName    = "package-name"
-	CSharpNamespaceName  = "namespace"
-	OverrideFlagName     = "override"
+	DebugFlagName       = "debug"
+	ManifestFlagName    = "manifest"
+	OutputFlagName      = "output"
+	NoInputFlagName     = "no-input"
+	GoPackageFlagName   = "package-name"
+	CSharpNamespaceName = "namespace"
+	OverrideFlagName    = "override"
 )
 
 // Default values for flags
 const (
-	DefaultManifestPath   = "flags.json"
-	DefaultOutputPath     = ""
-	DefaultGoPackageName  = "openfeature"
+	DefaultManifestPath    = "flags.json"
+	DefaultOutputPath      = ""
+	DefaultGoPackageName   = "openfeature"
 	DefaultCSharpNamespace = "OpenFeature"
 )
 

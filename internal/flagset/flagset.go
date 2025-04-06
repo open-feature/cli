@@ -27,24 +27,24 @@ const (
 func (f FlagType) String() string {
 	switch f {
 	case IntType:
-			return "int"
+		return "int"
 	case FloatType:
-			return "float"
+		return "float"
 	case BoolType:
-			return "bool"
+		return "bool"
 	case StringType:
-			return "string"
+		return "string"
 	case ObjectType:
-			return "object"
+		return "object"
 	default:
-			return "unknown"
+		return "unknown"
 	}
 }
 
 type Flag struct {
-	Key string
-	Type FlagType
-	Description string
+	Key          string
+	Type         FlagType
+	Description  string
 	DefaultValue any
 }
 
@@ -90,9 +90,9 @@ func (fs *Flagset) Filter(unsupportedFlagTypes map[FlagType]bool) *Flagset {
 func (fs *Flagset) UnmarshalJSON(data []byte) error {
 	var manifest struct {
 		Flags map[string]struct {
-			FlagType     string      `json:"flagType"`
-			Description  string      `json:"description"`
-			DefaultValue any         `json:"defaultValue"`
+			FlagType     string `json:"flagType"`
+			Description  string `json:"description"`
+			DefaultValue any    `json:"defaultValue"`
 		} `json:"flags"`
 	}
 
