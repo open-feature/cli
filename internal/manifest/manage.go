@@ -14,7 +14,7 @@ type initManifest struct {
 // Create creates a new manifest file at the given path.
 func Create(path string) error {
 	m := &initManifest{
-		Schema:  "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
+		Schema: "https://raw.githubusercontent.com/open-feature/cli/main/schema/v0/flag-manifest.json",
 		Manifest: Manifest{
 			Flags: map[string]any{},
 		},
