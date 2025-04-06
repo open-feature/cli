@@ -12,10 +12,10 @@ type GeneratorCreator func() *cobra.Command
 
 // GeneratorInfo contains metadata about a generator
 type GeneratorInfo struct {
-	Name             string
-	Description      string
-	Stability        Stability
-	Creator          GeneratorCreator
+	Name        string
+	Description string
+	Stability   Stability
+	Creator     GeneratorCreator
 }
 
 // GeneratorManager maintains a registry of available generators
@@ -34,10 +34,10 @@ func NewGeneratorManager() *GeneratorManager {
 func (m *GeneratorManager) Register(cmdCreator func() *cobra.Command) {
 	cmd := cmdCreator()
 	m.generators[cmd.Use] = GeneratorInfo{
-		Name:             cmd.Use,
-		Description:      cmd.Short,
-		Stability:        Stability(cmd.Annotations["stability"]),
-		Creator:          cmdCreator,
+		Name:        cmd.Use,
+		Description: cmd.Short,
+		Stability:   Stability(cmd.Annotations["stability"]),
+		Creator:     cmdCreator,
 	}
 }
 
@@ -49,11 +49,11 @@ func (m *GeneratorManager) GetAll() map[string]GeneratorInfo {
 // GetCommands returns cobra commands for all registered generators
 func (m *GeneratorManager) GetCommands() []*cobra.Command {
 	var commands []*cobra.Command
-	
+
 	for _, info := range m.generators {
 		commands = append(commands, info.Creator())
 	}
-	
+
 	return commands
 }
 
@@ -62,14 +62,14 @@ func (m *GeneratorManager) PrintGeneratorsTable() error {
 	tableData := [][]string{
 		{"Generator", "Description", "Stability"},
 	}
-	
+
 	// Get generator names for consistent ordering
 	var names []string
 	for name := range m.generators {
 		names = append(names, name)
 	}
 	sort.Strings(names)
-	
+
 	for _, name := range names {
 		info := m.generators[name]
 		tableData = append(tableData, []string{
@@ -78,7 +78,7 @@ func (m *GeneratorManager) PrintGeneratorsTable() error {
 			string(info.Stability),
 		})
 	}
-	
+
 	return pterm.DefaultTable.WithHasHeader().WithData(tableData).Render()
 }
 
