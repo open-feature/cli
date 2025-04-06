@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Threading;
 using OpenFeature;
 using OpenFeature.Model;
 
-namespace TestNamespace
+namespace OpenFeature
 {
     /// <summary>
     /// Generated OpenFeature client for typesafe flag access
@@ -29,14 +28,13 @@ namespace TestNamespace
         /// <remarks>
         /// <para>Flag key: discountPercentage</para>
         /// <para>Default value: 0.15</para>
-        /// <para>Type: double</para>
+        /// <para>Type: float</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
-        /// <param name="options">Options for flag evaluation</param>
         /// <returns>The flag value</returns>
-        public async Task<double> DiscountPercentageAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<float> DiscountPercentageAsync(EvaluationContext evaluationContext = null)
         {
-            return await _client.GetDoubleValueAsync("discountPercentage", 0.15, evaluationContext, options);
+            return await _client.GetFloatValueAsync("discountPercentage", 0.15, evaluationContext);
         }
 
         /// <summary>
@@ -45,14 +43,13 @@ namespace TestNamespace
         /// <remarks>
         /// <para>Flag key: discountPercentage</para>
         /// <para>Default value: 0.15</para>
-        /// <para>Type: double</para>
+        /// <para>Type: float</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
-        /// <param name="options">Options for flag evaluation</param>
         /// <returns>The evaluation details containing the flag value and metadata</returns>
-        public async Task<FlagEvaluationDetails<double>> DiscountPercentageDetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<EvaluationDetails<float>> DiscountPercentageDetailsAsync(EvaluationContext evaluationContext = null)
         {
-            return await _client.GetDoubleDetailsAsync("discountPercentage", 0.15, evaluationContext, options);
+            return await _client.GetFloatDetailsAsync("discountPercentage", 0.15, evaluationContext);
         }
         
         /// <summary>
@@ -64,11 +61,10 @@ namespace TestNamespace
         /// <para>Type: bool</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
-        /// <param name="options">Options for flag evaluation</param>
         /// <returns>The flag value</returns>
-        public async Task<bool> EnableFeatureAAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<bool> EnableFeatureAAsync(EvaluationContext evaluationContext = null)
         {
-            return await _client.GetBooleanValueAsync("enableFeatureA", false, evaluationContext, options);
+            return await _client.GetBoolValueAsync("enableFeatureA", false, evaluationContext);
         }
 
         /// <summary>
@@ -80,11 +76,10 @@ namespace TestNamespace
         /// <para>Type: bool</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
-        /// <param name="options">Options for flag evaluation</param>
         /// <returns>The evaluation details containing the flag value and metadata</returns>
-        public async Task<FlagEvaluationDetails<bool>> EnableFeatureADetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<EvaluationDetails<bool>> EnableFeatureADetailsAsync(EvaluationContext evaluationContext = null)
         {
-            return await _client.GetBooleanDetailsAsync("enableFeatureA", false, evaluationContext, options);
+            return await _client.GetBoolDetailsAsync("enableFeatureA", false, evaluationContext);
         }
         
         /// <summary>
@@ -96,11 +91,10 @@ namespace TestNamespace
         /// <para>Type: string</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
-        /// <param name="options">Options for flag evaluation</param>
         /// <returns>The flag value</returns>
-        public async Task<string> GreetingMessageAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<string> GreetingMessageAsync(EvaluationContext evaluationContext = null)
         {
-            return await _client.GetStringValueAsync("greetingMessage", "Hello there!", evaluationContext, options);
+            return await _client.GetStringValueAsync("greetingMessage", "Hello there!", evaluationContext);
         }
 
         /// <summary>
@@ -112,11 +106,10 @@ namespace TestNamespace
         /// <para>Type: string</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
-        /// <param name="options">Options for flag evaluation</param>
         /// <returns>The evaluation details containing the flag value and metadata</returns>
-        public async Task<FlagEvaluationDetails<string>> GreetingMessageDetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<EvaluationDetails<string>> GreetingMessageDetailsAsync(EvaluationContext evaluationContext = null)
         {
-            return await _client.GetStringDetailsAsync("greetingMessage", "Hello there!", evaluationContext, options);
+            return await _client.GetStringDetailsAsync("greetingMessage", "Hello there!", evaluationContext);
         }
         
         /// <summary>
@@ -128,11 +121,10 @@ namespace TestNamespace
         /// <para>Type: int</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
-        /// <param name="options">Options for flag evaluation</param>
         /// <returns>The flag value</returns>
-        public async Task<int> UsernameMaxLengthAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<int> UsernameMaxLengthAsync(EvaluationContext evaluationContext = null)
         {
-            return await _client.GetIntegerValueAsync("usernameMaxLength", 50, evaluationContext, options);
+            return await _client.GetIntValueAsync("usernameMaxLength", 50, evaluationContext);
         }
 
         /// <summary>
@@ -144,11 +136,10 @@ namespace TestNamespace
         /// <para>Type: int</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
-        /// <param name="options">Options for flag evaluation</param>
         /// <returns>The evaluation details containing the flag value and metadata</returns>
-        public async Task<FlagEvaluationDetails<int>> UsernameMaxLengthDetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<EvaluationDetails<int>> UsernameMaxLengthDetailsAsync(EvaluationContext evaluationContext = null)
         {
-            return await _client.GetIntegerDetailsAsync("usernameMaxLength", 50, evaluationContext, options);
+            return await _client.GetIntDetailsAsync("usernameMaxLength", 50, evaluationContext);
         }
         
 
@@ -158,7 +149,7 @@ namespace TestNamespace
         /// <returns>A new GeneratedClient instance</returns>
         public static GeneratedClient CreateClient()
         {
-            return new GeneratedClient(Api.Instance.GetClient());
+            return new GeneratedClient(Api.GetClient());
         }
 
         /// <summary>
@@ -168,7 +159,7 @@ namespace TestNamespace
         /// <returns>A new GeneratedClient instance</returns>
         public static GeneratedClient CreateClient(string domain)
         {
-            return new GeneratedClient(Api.Instance.GetClient(domain));
+            return new GeneratedClient(Api.GetClient(domain));
         }
 
         /// <summary>
@@ -177,9 +168,9 @@ namespace TestNamespace
         /// <param name="domain">The domain to get the client for</param>
         /// <param name="evaluationContext">Default context to use for evaluations</param>
         /// <returns>A new GeneratedClient instance</returns>
-        public static GeneratedClient CreateClient(string domain, EvaluationContext? evaluationContext = null)
+        public static GeneratedClient CreateClient(string domain, EvaluationContext evaluationContext)
         {
-            return new GeneratedClient(Api.Instance.GetClient(domain));
+            return new GeneratedClient(Api.GetClient(domain, evaluationContext));
         }
     }
 }
