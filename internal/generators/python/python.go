@@ -64,6 +64,16 @@ func typedDetailsMethodAsync(flagType flagset.FlagType) string {
 	return "get_" + methodType(flagType) + "_details_async"
 }
 
+func pythonBoolLiteral(value interface{}) interface{} {
+	if v, ok := value.(bool); ok {
+		if v {
+			return "True"
+		}
+		return "False"
+	}
+	return value
+}
+
 func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
 		"OpenFeatureType":         openFeatureType,
@@ -71,6 +81,7 @@ func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
 		"TypedGetMethodAsync":     typedGetMethodAsync,
 		"TypedDetailsMethodSync":  typedDetailsMethodSync,
 		"TypedDetailsMethodAsync": typedDetailsMethodAsync,
+		"PythonBoolLiteral":       pythonBoolLiteral,
 	}
 
 	newParams := &generators.Params[any]{

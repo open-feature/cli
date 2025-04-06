@@ -112,14 +112,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `enableFeatureA`
-        - default value: `false`
+        - default value: `False`
         - type: `bool`
         
         Performs a flag evaluation that returns a `bool`.
         """
         return self.client.get_boolean_value(
             flag_key="enableFeatureA",
-            default_value=false,
+            default_value=False,
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -134,14 +134,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `enableFeatureA`
-        - default value: `false`
+        - default value: `False`
         - type: `bool`
         
         Performs a flag evaluation that returns a `FlagEvaluationDetails` instance.
         """
         return self.client.get_boolean_details(
             flag_key="enableFeatureA",
-            default_value=false,
+            default_value=False,
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -156,14 +156,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `enableFeatureA`
-        - default value: `false`
+        - default value: `False`
         - type: `bool`
         
         Performs a flag evaluation asynchronously and returns a `bool`.
         """
         return await self.client.get_boolean_value_async(
             flag_key="enableFeatureA",
-            default_value=false,
+            default_value=False,
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -178,14 +178,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `enableFeatureA`
-        - default value: `false`
+        - default value: `False`
         - type: `bool`
         
         Performs a flag evaluation asynchronously and returns a `FlagEvaluationDetails` instance.
         """
         return await self.client.get_boolean_details_async(
             flag_key="enableFeatureA",
-            default_value=false,
+            default_value=False,
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )

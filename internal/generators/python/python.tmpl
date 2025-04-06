@@ -25,14 +25,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `{{ .Key }}`
-        - default value: `{{ .DefaultValue }}`
+        - default value: `{{ .DefaultValue | PythonBoolLiteral }}`
         - type: `{{ .Type | OpenFeatureType }}`
         
         Performs a flag evaluation that returns a `{{ .Type | OpenFeatureType }}`.
         """
         return self.client.{{ .Type | TypedGetMethodSync }}(
             flag_key={{ .Key | Quote }},
-            default_value={{ .DefaultValue | QuoteString }},
+            default_value={{ .DefaultValue | QuoteString | PythonBoolLiteral }},
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -47,14 +47,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `{{ .Key }}`
-        - default value: `{{ .DefaultValue }}`
+        - default value: `{{ .DefaultValue | PythonBoolLiteral }}`
         - type: `{{ .Type | OpenFeatureType }}`
         
         Performs a flag evaluation that returns a `FlagEvaluationDetails` instance.
         """
         return self.client.{{ .Type | TypedDetailsMethodSync }}(
             flag_key={{ .Key | Quote }},
-            default_value={{ .DefaultValue | QuoteString }},
+            default_value={{ .DefaultValue | QuoteString | PythonBoolLiteral }},
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -69,14 +69,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `{{ .Key }}`
-        - default value: `{{ .DefaultValue }}`
+        - default value: `{{ .DefaultValue | PythonBoolLiteral }}`
         - type: `{{ .Type | OpenFeatureType }}`
         
         Performs a flag evaluation asynchronously and returns a `{{ .Type | OpenFeatureType }}`.
         """
         return await self.client.{{ .Type | TypedGetMethodAsync }}(
             flag_key={{ .Key | Quote }},
-            default_value={{ .DefaultValue | QuoteString }},
+            default_value={{ .DefaultValue | QuoteString | PythonBoolLiteral }},
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -91,14 +91,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `{{ .Key }}`
-        - default value: `{{ .DefaultValue }}`
+        - default value: `{{ .DefaultValue | PythonBoolLiteral }}`
         - type: `{{ .Type | OpenFeatureType }}`
         
         Performs a flag evaluation asynchronously and returns a `FlagEvaluationDetails` instance.
         """
         return await self.client.{{ .Type | TypedDetailsMethodAsync }}(
             flag_key={{ .Key | Quote }},
-            default_value={{ .DefaultValue | QuoteString }},
+            default_value={{ .DefaultValue | QuoteString | PythonBoolLiteral }},
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
