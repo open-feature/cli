@@ -176,7 +176,7 @@ func GetGenerateGoCmd() *cobra.Command {
 	return goCmd
 }
 
-func getGeneatePythonCmd() *cobra.Command {
+func getGeneratePythonCmd() *cobra.Command {
 	pythonCmd := &cobra.Command{
 		Use:   "python",
 		Short: "Generate typesafe Python client.",
@@ -222,7 +222,7 @@ func init() {
 	generators.DefaultManager.Register(GetGenerateReactCmd)
 	generators.DefaultManager.Register(GetGenerateGoCmd)
 	generators.DefaultManager.Register(GetGenerateNodeJSCmd)
-	generators.DefaultManager.Register(getGeneatePythonCmd)
+	generators.DefaultManager.Register(getGeneratePythonCmd)
 }
 
 func GetGenerateCmd() *cobra.Command {
