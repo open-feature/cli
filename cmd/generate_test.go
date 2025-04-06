@@ -21,7 +21,7 @@ type generateTestCase struct {
 	outputGolden   string // path to the golden output file
 	outputPath     string // output directory (optional, defaults to "output")
 	outputFile     string // output file name
-	packageName    string // optional, only used for Go
+	packageName    string // optional, used for Go (package-name) and C# (namespace)
 }
 
 func TestGenerate(t *testing.T) {
@@ -47,6 +47,14 @@ func TestGenerate(t *testing.T) {
 			manifestGolden: "testdata/success_manifest.golden",
 			outputGolden:   "testdata/success_nodejs.golden",
 			outputFile:     "openfeature.ts",
+		},
+		{
+			name:           "CSharp generation success",
+			command:        "csharp",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/success_csharp.golden",
+			outputFile:     "OpenFeature.cs",
+			packageName:    "TestNamespace", // Using packageName field for namespace
 		},
 		// Add more test cases here as needed
 	}
@@ -79,9 +87,13 @@ func TestGenerate(t *testing.T) {
 				"--output", outputPath,
 			}
 
-			// Add package name if provided (for Go)
+			// Add parameters specific to each generator
 			if tc.packageName != "" {
-				args = append(args, "--package-name", tc.packageName)
+				if tc.command == "csharp" {
+					args = append(args, "--namespace", tc.packageName)
+				} else if tc.command == "go" {
+					args = append(args, "--package-name", tc.packageName)
+				}
 			}
 
 			cmd.SetArgs(args)
