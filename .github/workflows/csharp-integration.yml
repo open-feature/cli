@@ -1,4 +1,4 @@
-name: C# Generator Integration Test
+name: csharp Generator Integration Test
 
 on:
   push:
