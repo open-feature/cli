@@ -32,7 +32,7 @@ We welcome contributions for new generators to extend the functionality of the O
 
 11. **Address Feedback**: Be responsive to feedback from the maintainers. Make any necessary changes and update your pull request as needed.
 
-### Integration Testing
+### Integration Tests
 
 To verify that generated code compiles correctly, the project includes integration tests, for example, for c#:
 
