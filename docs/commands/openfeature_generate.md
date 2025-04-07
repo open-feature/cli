@@ -28,5 +28,6 @@ openfeature generate [flags]
 * [openfeature](openfeature.md)	 - CLI for OpenFeature.
 * [openfeature generate go](openfeature_generate_go.md)	 - Generate typesafe accessors for OpenFeature.
 * [openfeature generate nodejs](openfeature_generate_nodejs.md)	 - Generate typesafe Node.js client.
+* [openfeature generate python](openfeature_generate_python.md)	 - Generate typesafe Python client.
 * [openfeature generate react](openfeature_generate_react.md)	 - Generate typesafe React Hooks.
 
