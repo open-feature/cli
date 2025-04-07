@@ -61,7 +61,7 @@ func (g *CsharpGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:     params.Custom,
 	}
 
-	return g.GenerateFile(funcs, csharpTmpl, newParams, "OpenFeature.cs")
+	return g.GenerateFile(funcs, csharpTmpl, newParams, "OpenFeature.g.cs")
 }
 
 // NewGenerator creates a generator for C#.
