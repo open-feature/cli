@@ -114,13 +114,16 @@ func LoadFromSourceFlags(data []byte) (*[]Flag, error) {
 		DefaultValue any `json:"defaultValue"`
 	}
 
-	var sourceFlags []SourceFlag
+	var sourceFlags struct {
+		Flags []SourceFlag `json:"flags"`
+	}
+
 	if err := json.Unmarshal(data, &sourceFlags); err != nil {
 		return nil, err
 	}
 
 	var flags []Flag
-	for _, sf := range sourceFlags {
+	for _, sf := range sourceFlags.Flags {
 		var flagType FlagType
 		switch sf.Type {
 		case "integer", "Integer":

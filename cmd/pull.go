@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/open-feature/cli/internal/config"
+	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/open-feature/cli/internal/requests"
@@ -73,8 +75,28 @@ func GetPullCmd() *cobra.Command {
 				return fmt.Errorf("flagSourceUrl not set in config")
 			}
 
+			flags := flagset.Flagset{}
 			// fetch the flags from the remote source
-			flags, err := requests.FetchFlags(flagSourceUrl, authToken)
+			// Check if the URL is a local file path
+			if strings.HasPrefix(flagSourceUrl, "file://") {
+				localPath := strings.TrimPrefix(flagSourceUrl, "file://")
+				var data, err = filesystem.ReadFile(localPath)
+				if err != nil {
+					return fmt.Errorf("error reading local flags file: %w", err)
+				}
+				loadedFlags, err := flagset.LoadFromSourceFlags(data)
+				if err != nil {
+					return fmt.Errorf("error loading flags from local file: %w", err)
+				}
+				flags.Flags = *loadedFlags
+			} else if strings.HasPrefix(flagSourceUrl, "http://") && !strings.HasPrefix(flagSourceUrl, "https://") {
+				flags, err = requests.FetchFlags(flagSourceUrl, authToken)
+				if err != nil {
+					return fmt.Errorf("error reading local flags file: %w", err) 
+				}
+				return nil
+			}
+
 			if err != nil {
 				return fmt.Errorf("error fetching flags: %w", err)
 			}
