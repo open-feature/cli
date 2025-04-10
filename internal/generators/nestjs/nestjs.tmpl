@@ -1,0 +1,120 @@
+import type { DynamicModule, FactoryProvider as NestFactoryProvider } from "@nestjs/common";
+import { Inject, Module } from "@nestjs/common";
+import type { Observable } from "rxjs";
+
+import type {
+  OpenFeature,
+  Client,
+  EvaluationContext,
+  EvaluationDetails,
+  OpenFeatureModuleOptions,
+} from "@openfeature/nestjs-sdk";
+import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag } from "@openfeature/nestjs-sdk";
+
+import type { GeneratedClient } from "./openfeature";
+import { getGeneratedClient } from "./openfeature";
+
+/**
+ * Returns an injection token for a (domain scoped) generated OpenFeature client.
+ * @param {string} domain The domain of the generated OpenFeature client.
+ * @returns {string} The injection token.
+ */
+export function getOpenFeatureGeneratedClientToken(domain?: string): string {
+  return domain ? `OpenFeatureGeneratedClient_${domain}` : "OpenFeatureGeneratedClient_default";
+}
+
+/**
+ * Options for injecting an OpenFeature client into a constructor.
+ */
+interface FeatureClientProps {
+  /**
+   * The domain of the OpenFeature client, if a domain scoped client should be used.
+   * @see {@link Client.getBooleanDetails}
+   */
+  domain?: string;
+}
+
+/**
+ * Injects a generated typesafe feature client into a constructor or property of a class.
+ * @param {FeatureClientProps} [props] The options for injecting the client.
+ * @returns {PropertyDecorator & ParameterDecorator} The decorator function.
+ */
+export const GeneratedOpenFeatureClient = (props?: FeatureClientProps): PropertyDecorator & ParameterDecorator =>
+  Inject(getOpenFeatureGeneratedClientToken(props?.domain));
+
+/**
+ * GeneratedOpenFeatureModule is a generated typesafe NestJS wrapper for OpenFeature Server-SDK.
+ */
+@Module({})
+export class GeneratedOpenFeatureModule extends OpenFeatureModule {
+  static override forRoot({ useGlobalInterceptor = true, ...options }: OpenFeatureModuleOptions): DynamicModule {
+    const module = super.forRoot({ useGlobalInterceptor, ...options });
+
+    const clientValueProviders: NestFactoryProvider<GeneratedClient>[] = [
+      {
+        provide: getOpenFeatureGeneratedClientToken(),
+        useFactory: () => getGeneratedClient(),
+      },
+    ];
+
+    if (options?.providers) {
+      const domainClientProviders: NestFactoryProvider<GeneratedClient>[] = Object.keys(options.providers).map(
+        (domain) => ({
+          provide: getOpenFeatureGeneratedClientToken(domain),
+          useFactory: () => getGeneratedClient(domain),
+        }),
+      );
+
+      clientValueProviders.push(...domainClientProviders);
+    }
+
+    return {
+      ...module,
+      providers: module.providers ? [...module.providers, ...clientValueProviders] : clientValueProviders,
+      exports: module.exports ? [...module.exports, ...clientValueProviders] : clientValueProviders,
+    };
+  }
+}
+
+/**
+ * Options for injecting a typed feature flag into a route handler.
+ */
+interface TypedFeatureProps {
+  /**
+   * The domain of the OpenFeature client, if a domain scoped client should be used.
+   * @see {@link OpenFeature#getClient}
+   */
+  domain?: string;
+  /**
+   * The {@link EvaluationContext} for evaluating the feature flag.
+   * @see {@link OpenFeature#getClient}
+   */
+  context?: EvaluationContext;
+}
+
+{{ range .Flagset.Flags }}
+/**
+ * Gets the {@link EvaluationDetails} for `{{ .Key }}` from a domain scoped or the default OpenFeature
+ * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
+ *
+ * **Details:**
+ * - flag key: `{{ .Key }}`
+ * - description: `{{ .Description }}`
+ * - default value: `{{ .DefaultValue }}`
+ * - type: `{{ .Type | OpenFeatureType }}`
+ *
+ * Usage:
+ * ```typescript
+ * @Get("/")
+ * public async handleRequest(
+ *     @{{ .Key | ToPascal }}()
+ *     {{ .Key | ToCamel }}: Observable<EvaluationDetails<number>>,
+ * )
+ * ```
+ * @param {TypedFeatureProps} props The options for injecting the feature flag.
+ * @returns {ParameterDecorator} The decorator function.
+ */
+export function {{ .Key | ToPascal }}(props?: TypedFeatureProps): ParameterDecorator {
+  return {{ .Type | OpenFeatureType | ToPascal }}FeatureFlag({ flagKey: {{ .Key | Quote }}, defaultValue: {{ .DefaultValue | QuoteString }}, ...props });
+}
+{{ end -}}

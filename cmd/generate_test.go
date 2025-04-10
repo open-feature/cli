@@ -49,6 +49,13 @@ func TestGenerate(t *testing.T) {
 			outputFile:     "openfeature.ts",
 		},
 		{
+			name:           "NestJS generation success",
+			command:        "nestjs",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/success_nestjs.golden",
+			outputFile:     "openfeature-decorators.ts",
+		},
+		{
 			name:           "Python generation success",
 			command:        "python",
 			manifestGolden: "testdata/success_manifest.golden",
@@ -67,7 +74,7 @@ func TestGenerate(t *testing.T) {
 
 			// Constant paths
 			const memoryManifestPath = "manifest/path.json"
-			
+
 			// Use default output path if not specified
 			outputPath := tc.outputPath
 			if outputPath == "" {
@@ -107,7 +114,7 @@ func TestGenerate(t *testing.T) {
 
 func readOsFileAndWriteToMemMap(t *testing.T, inputPath string, memPath string, memFs afero.Fs) {
 	data, err := os.ReadFile(inputPath)
-	if (err != nil) {
+	if err != nil {
 		t.Fatalf("error reading file %q: %v", inputPath, err)
 	}
 	if err := memFs.MkdirAll(filepath.Dir(memPath), os.ModePerm); err != nil {
@@ -137,11 +144,11 @@ func compareOutput(t *testing.T, testFile, memoryOutputPath string, fs afero.Fs)
 	if err != nil {
 		t.Fatalf("error reading file %q: %v", memoryOutputPath, err)
 	}
-	
+
 	// Convert to string arrays by splitting on newlines
 	wantLines := strings.Split(string(want), "\n")
 	gotLines := strings.Split(string(got), "\n")
-	
+
 	if diff := cmp.Diff(wantLines, gotLines); diff != "" {
 		t.Errorf("output mismatch (-want +got):\n%s", diff)
 	}

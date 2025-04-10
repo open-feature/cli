@@ -1,0 +1,194 @@
+import type { DynamicModule, FactoryProvider as NestFactoryProvider } from "@nestjs/common";
+import { Inject, Module } from "@nestjs/common";
+import type { Observable } from "rxjs";
+
+import type {
+  OpenFeature,
+  Client,
+  EvaluationContext,
+  EvaluationDetails,
+  OpenFeatureModuleOptions,
+} from "@openfeature/nestjs-sdk";
+import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag } from "@openfeature/nestjs-sdk";
+
+import type { GeneratedClient } from "./openfeature";
+import { getGeneratedClient } from "./openfeature";
+
+/**
+ * Returns an injection token for a (domain scoped) generated OpenFeature client.
+ * @param {string} domain The domain of the generated OpenFeature client.
+ * @returns {string} The injection token.
+ */
+export function getOpenFeatureGeneratedClientToken(domain?: string): string {
+  return domain ? `OpenFeatureGeneratedClient_${domain}` : "OpenFeatureGeneratedClient_default";
+}
+
+/**
+ * Options for injecting an OpenFeature client into a constructor.
+ */
+interface FeatureClientProps {
+  /**
+   * The domain of the OpenFeature client, if a domain scoped client should be used.
+   * @see {@link Client.getBooleanDetails}
+   */
+  domain?: string;
+}
+
+/**
+ * Injects a generated typesafe feature client into a constructor or property of a class.
+ * @param {FeatureClientProps} [props] The options for injecting the client.
+ * @returns {PropertyDecorator & ParameterDecorator} The decorator function.
+ */
+export const GeneratedOpenFeatureClient = (props?: FeatureClientProps): PropertyDecorator & ParameterDecorator =>
+  Inject(getOpenFeatureGeneratedClientToken(props?.domain));
+
+/**
+ * GeneratedOpenFeatureModule is a generated typesafe NestJS wrapper for OpenFeature Server-SDK.
+ */
+@Module({})
+export class GeneratedOpenFeatureModule extends OpenFeatureModule {
+  static override forRoot({ useGlobalInterceptor = true, ...options }: OpenFeatureModuleOptions): DynamicModule {
+    const module = super.forRoot({ useGlobalInterceptor, ...options });
+
+    const clientValueProviders: NestFactoryProvider<GeneratedClient>[] = [
+      {
+        provide: getOpenFeatureGeneratedClientToken(),
+        useFactory: () => getGeneratedClient(),
+      },
+    ];
+
+    if (options?.providers) {
+      const domainClientProviders: NestFactoryProvider<GeneratedClient>[] = Object.keys(options.providers).map(
+        (domain) => ({
+          provide: getOpenFeatureGeneratedClientToken(domain),
+          useFactory: () => getGeneratedClient(domain),
+        }),
+      );
+
+      clientValueProviders.push(...domainClientProviders);
+    }
+
+    return {
+      ...module,
+      providers: module.providers ? [...module.providers, ...clientValueProviders] : clientValueProviders,
+      exports: module.exports ? [...module.exports, ...clientValueProviders] : clientValueProviders,
+    };
+  }
+}
+
+/**
+ * Options for injecting a typed feature flag into a route handler.
+ */
+interface TypedFeatureProps {
+  /**
+   * The domain of the OpenFeature client, if a domain scoped client should be used.
+   * @see {@link OpenFeature#getClient}
+   */
+  domain?: string;
+  /**
+   * The {@link EvaluationContext} for evaluating the feature flag.
+   * @see {@link OpenFeature#getClient}
+   */
+  context?: EvaluationContext;
+}
+
+
+/**
+ * Gets the {@link EvaluationDetails} for `discountPercentage` from a domain scoped or the default OpenFeature
+ * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
+ *
+ * **Details:**
+ * - flag key: `discountPercentage`
+ * - description: `Discount percentage applied to purchases.`
+ * - default value: `0.15`
+ * - type: `number`
+ *
+ * Usage:
+ * ```typescript
+ * @Get("/")
+ * public async handleRequest(
+ *     @DiscountPercentage()
+ *     discountPercentage: Observable<EvaluationDetails<number>>,
+ * )
+ * ```
+ * @param {TypedFeatureProps} props The options for injecting the feature flag.
+ * @returns {ParameterDecorator} The decorator function.
+ */
+export function DiscountPercentage(props?: TypedFeatureProps): ParameterDecorator {
+  return NumberFeatureFlag({ flagKey: "discountPercentage", defaultValue: 0.15, ...props });
+}
+
+/**
+ * Gets the {@link EvaluationDetails} for `enableFeatureA` from a domain scoped or the default OpenFeature
+ * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
+ *
+ * **Details:**
+ * - flag key: `enableFeatureA`
+ * - description: `Controls whether Feature A is enabled.`
+ * - default value: `false`
+ * - type: `boolean`
+ *
+ * Usage:
+ * ```typescript
+ * @Get("/")
+ * public async handleRequest(
+ *     @EnableFeatureA()
+ *     enableFeatureA: Observable<EvaluationDetails<number>>,
+ * )
+ * ```
+ * @param {TypedFeatureProps} props The options for injecting the feature flag.
+ * @returns {ParameterDecorator} The decorator function.
+ */
+export function EnableFeatureA(props?: TypedFeatureProps): ParameterDecorator {
+  return BooleanFeatureFlag({ flagKey: "enableFeatureA", defaultValue: false, ...props });
+}
+
+/**
+ * Gets the {@link EvaluationDetails} for `greetingMessage` from a domain scoped or the default OpenFeature
+ * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
+ *
+ * **Details:**
+ * - flag key: `greetingMessage`
+ * - description: `The message to use for greeting users.`
+ * - default value: `Hello there!`
+ * - type: `string`
+ *
+ * Usage:
+ * ```typescript
+ * @Get("/")
+ * public async handleRequest(
+ *     @GreetingMessage()
+ *     greetingMessage: Observable<EvaluationDetails<number>>,
+ * )
+ * ```
+ * @param {TypedFeatureProps} props The options for injecting the feature flag.
+ * @returns {ParameterDecorator} The decorator function.
+ */
+export function GreetingMessage(props?: TypedFeatureProps): ParameterDecorator {
+  return StringFeatureFlag({ flagKey: "greetingMessage", defaultValue: "Hello there!", ...props });
+}
+
+/**
+ * Gets the {@link EvaluationDetails} for `usernameMaxLength` from a domain scoped or the default OpenFeature
+ * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
+ *
+ * **Details:**
+ * - flag key: `usernameMaxLength`
+ * - description: `Maximum allowed length for usernames.`
+ * - default value: `50`
+ * - type: `number`
+ *
+ * Usage:
+ * ```typescript
+ * @Get("/")
+ * public async handleRequest(
+ *     @UsernameMaxLength()
+ *     usernameMaxLength: Observable<EvaluationDetails<number>>,
+ * )
+ * ```
+ * @param {TypedFeatureProps} props The options for injecting the feature flag.
+ * @returns {ParameterDecorator} The decorator function.
+ */
+export function UsernameMaxLength(props?: TypedFeatureProps): ParameterDecorator {
+  return NumberFeatureFlag({ flagKey: "usernameMaxLength", defaultValue: 50, ...props });
+}
