@@ -7,6 +7,7 @@ import (
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
 	"github.com/open-feature/cli/internal/generators/golang"
+	"github.com/open-feature/cli/internal/generators/nestjs"
 	"github.com/open-feature/cli/internal/generators/nodejs"
 	"github.com/open-feature/cli/internal/generators/python"
 	"github.com/open-feature/cli/internal/generators/react"
@@ -69,9 +70,9 @@ func GetGenerateNodeJSCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-	
+
 			logger.Default.GenerationComplete("Node.js")
-			
+
 			return nil
 		},
 	}
@@ -95,7 +96,7 @@ func GetGenerateReactCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
-			
+
 			logger.Default.GenerationStarted("React")
 
 			params := generators.Params[react.Params]{
@@ -113,9 +114,9 @@ func GetGenerateReactCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			logger.Default.GenerationComplete("React")
-			
+
 			return nil
 		},
 	}
@@ -123,6 +124,60 @@ func GetGenerateReactCmd() *cobra.Command {
 	addStabilityInfo(reactCmd)
 
 	return reactCmd
+}
+
+func GetGenerateNestJsCmd() *cobra.Command {
+	nestJsCmd := &cobra.Command{
+		Use:   "nestjs",
+		Short: "Generate typesafe NestJS decorators.",
+		Long:  `Generate typesafe NestJS decorators compatible with the OpenFeature NestJS SDK.`,
+		Annotations: map[string]string{
+			"stability": string(generators.Alpha),
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate.nestjs")
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			manifestPath := config.GetManifestPath(cmd)
+			outputPath := config.GetOutputPath(cmd)
+
+			logger.Default.GenerationStarted("NestJS")
+
+			flagset, err := flagset.Load(manifestPath)
+			if err != nil {
+				return err
+			}
+
+			nestjsParams := generators.Params[nestjs.Params]{
+				OutputPath: outputPath,
+				Custom:     nestjs.Params{},
+			}
+			nestjsGenerator := nestjs.NewGenerator(flagset)
+			logger.Default.Debug("Executing NestJS generator")
+			err = nestjsGenerator.Generate(&nestjsParams)
+			if err != nil {
+				return err
+			}
+
+			nodejsParams := generators.Params[nodejs.Params]{
+				OutputPath: outputPath,
+				Custom:     nodejs.Params{},
+			}
+			nodeGenerator := nodejs.NewGenerator(flagset)
+			err = nodeGenerator.Generate(&nodejsParams)
+			if err != nil {
+				return err
+			}
+
+			logger.Default.GenerationComplete("NestJS")
+
+			return nil
+		},
+	}
+
+	addStabilityInfo(nestJsCmd)
+
+	return nestJsCmd
 }
 
 func GetGenerateGoCmd() *cobra.Command {
@@ -140,7 +195,7 @@ func GetGenerateGoCmd() *cobra.Command {
 			goPackageName := config.GetGoPackageName(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
-			
+
 			logger.Default.GenerationStarted("Go")
 
 			params := generators.Params[golang.Params]{
@@ -161,9 +216,9 @@ func GetGenerateGoCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			logger.Default.GenerationComplete("Go")
-			
+
 			return nil
 		},
 	}
@@ -223,6 +278,7 @@ func init() {
 	generators.DefaultManager.Register(GetGenerateGoCmd)
 	generators.DefaultManager.Register(GetGenerateNodeJSCmd)
 	generators.DefaultManager.Register(getGeneratePythonCmd)
+	generators.DefaultManager.Register(GetGenerateNestJsCmd)
 }
 
 func GetGenerateCmd() *cobra.Command {
@@ -245,7 +301,7 @@ func GetGenerateCmd() *cobra.Command {
 	for _, subCmd := range generators.DefaultManager.GetCommands() {
 		generateCmd.AddCommand(subCmd)
 	}
-	
+
 	addStabilityInfo(generateCmd)
 
 	return generateCmd
