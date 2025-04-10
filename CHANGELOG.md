@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.3](https://github.com/open-feature/cli/compare/v0.3.2...v0.3.3) (2025-04-10)
+
+
+### 🐛 Bug Fixes
+
+* use the correct json schema url in init command ([#96](https://github.com/open-feature/cli/issues/96)) ([412a117](https://github.com/open-feature/cli/commit/412a1174b5dfe9ba77e18ec57d5a761711067386))
+
+
+### ✨ New Features
+
+* Python generator ([#95](https://github.com/open-feature/cli/issues/95)) ([1f8f43a](https://github.com/open-feature/cli/commit/1f8f43ae049fcf7c4feba3edaa697329688f7343))
+
 ## [0.3.2](https://github.com/open-feature/cli/compare/v0.3.1...v0.3.2) (2025-04-02)
 
 
