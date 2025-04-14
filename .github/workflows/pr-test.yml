@@ -46,7 +46,7 @@ jobs:
           fi
           
   csharp-test:
-    name: C# Generator Test
+    name: 'C# Generator Test'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
