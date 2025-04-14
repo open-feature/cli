@@ -1,3 +1,7 @@
+# Contributing to OpenFeature CLI
+
+Thank you for your interest in contributing to the OpenFeature CLI! This document provides guidelines and instructions to help you get started with contributing to the project. Whether you're fixing a bug, adding a new feature, or improving documentation, your contributions are greatly appreciated.
+
 ## Contributing New Generators
 
 We welcome contributions for new generators to extend the functionality of the OpenFeature CLI. Below are the steps to contribute a new generator:
@@ -42,12 +46,62 @@ make test-csharp
 ```
 
 This will:
+
 1. Build the CLI
 2. Generate a C# client
 3. Compile the C# code in a Docker container
 4. Validate that the code compiles correctly
 
 Consider adding more integration tests for new generators.
+
+## Setting Up Lefthook
+
+To streamline the setup of Git hooks for this project, we utilize [Lefthook](https://github.com/evilmartians/lefthook). Lefthook automates pre-commit and pre-push checks, ensuring consistent enforcement of best practices across the team. These checks include code formatting, documentation generation, and running tests.
+
+This tool is particularly helpful for new contributors or those returning to the project after some time, as it provides a seamless way to align with the project's standards. By catching issues early in your local development environment, Lefthook helps you address potential problems before opening a Pull Request, saving time and effort for both contributors and maintainers.
+
+### Installation
+
+1. Install Lefthook using Homebrew:
+
+   ```bash
+   brew install lefthook
+   ```
+
+2. Install the Lefthook configuration into your Git repository:
+
+   ```bash
+   lefthook install
+   ```
+
+### Pre-Commit Hook
+
+The pre-commit hook is configured to run the following check:
+
+1. **Code Formatting**: Ensures all files are properly formatted using `go fmt`. Any changes made by `go fmt` will be automatically staged.
+
+### Pre-Push Hook
+
+The pre-push hook is configured to run the following checks:
+
+1. **Documentation Generation**: Runs `make generate-docs` to ensure documentation is up-to-date. If any changes are detected, the push will be blocked until the changes are committed.
+2. **Tests**: Executes `make test` to verify that all tests pass. If any tests fail, the push will be blocked.
+
+### Running Hooks Manually
+
+You can manually run the hooks using the following commands:
+
+- Pre-commit hook:
+
+  ```bash
+  lefthook run pre-commit
+  ```
+
+- Pre-push hook:
+
+  ```bash
+  lefthook run pre-push
+  ```
 
 ## Templates
 
