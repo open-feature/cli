@@ -60,7 +60,7 @@ func TestGenerate(t *testing.T) {
 			command:        "csharp",
 			manifestGolden: "testdata/success_manifest.golden",
 			outputGolden:   "testdata/success_csharp.golden",
-			outputFile:     "OpenFeature.cs",
+			outputFile:     "OpenFeature.g.cs",
 			packageName:    "TestNamespace", // Using packageName field for namespace
 		},
 		// Add more test cases here as needed

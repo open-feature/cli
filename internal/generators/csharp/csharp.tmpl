@@ -3,11 +3,45 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using OpenFeature;
 using OpenFeature.Model;
 
 namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else }}OpenFeatureGenerated{{ end }}
 {
+    /// <summary>
+    /// Service collection extensions for OpenFeature
+    /// </summary>
+    public static class OpenFeatureServiceExtensions
+    {
+        /// <summary>
+        /// Adds OpenFeature services to the service collection with the generated client
+        /// </summary>
+        /// <param name="services">The service collection to add services to</param>
+        /// <returns>The service collection for chaining</returns>
+        public static IServiceCollection AddOpenFeature(this IServiceCollection services)
+        {
+            return services
+                .AddSingleton(_ => Api.Instance)
+                .AddSingleton(provider => provider.GetRequiredService<Api>().GetClient())
+                .AddSingleton<GeneratedClient>();
+        }
+
+        /// <summary>
+        /// Adds OpenFeature services to the service collection with the generated client for a specific domain
+        /// </summary>
+        /// <param name="services">The service collection to add services to</param>
+        /// <param name="domain">The domain to get the client for</param>
+        /// <returns>The service collection for chaining</returns>
+        public static IServiceCollection AddOpenFeature(this IServiceCollection services, string domain)
+        {
+            return services
+                .AddSingleton(_ => Api.Instance)
+                .AddSingleton(provider => provider.GetRequiredService<Api>().GetClient(domain))
+                .AddSingleton<GeneratedClient>();
+        }
+    }
+
     /// <summary>
     /// Generated OpenFeature client for typesafe flag access
     /// </summary>
