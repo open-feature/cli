@@ -4,15 +4,16 @@ test:
 	@go test -v ./...
 	@echo "Tests passed successfully!"
 
-.PHONY: test-csharp
-test-csharp:
-	@echo "Running C# integration test..."
-	@./test/csharp-integration/test-compilation.sh
-
-.PHONY: test-csharp-dagger
-test-csharp-dagger:
+# Dagger-based integration tests
+.PHONY: test-integration-csharp
+test-integration-csharp:
 	@echo "Running C# integration test with Dagger..."
-	@cd test/csharp-integration && go run dagger.go
+	@go run ./test/integration/cmd/csharp/run.go
+
+.PHONY: test-integration
+test-integration:
+	@echo "Running all integration tests with Dagger..."
+	@go run ./test/integration/cmd/run.go
 
 generate-docs:
 	@echo "Generating documentation..."
