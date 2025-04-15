@@ -9,6 +9,11 @@ test-csharp:
 	@echo "Running C# integration test..."
 	@./test/csharp-integration/test-compilation.sh
 
+.PHONY: test-csharp-dagger
+test-csharp-dagger:
+	@echo "Running C# integration test with Dagger..."
+	@cd test/csharp-integration && go run dagger.go
+
 generate-docs:
 	@echo "Generating documentation..."
 	@go run ./docs/generate-commands.go

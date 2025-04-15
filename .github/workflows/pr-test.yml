@@ -56,8 +56,11 @@ jobs:
         with:
           go-version-file: 'go.mod'
       
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
+      - name: Install Dagger CLI
+        run: |
+          cd /usr/local
+          curl -L https://dl.dagger.io/dagger/install.sh | sh
+          dagger version
       
-      - name: 'Run C# integration test'
-        run: ./test/csharp-integration/test-compilation.sh
+      - name: 'Run C# integration test with Dagger'
+        run: make test-csharp-dagger
