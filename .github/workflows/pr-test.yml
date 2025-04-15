@@ -45,8 +45,8 @@ jobs:
             exit 1
           fi
           
-  csharp-test:
-    name: 'C# Generator Test'
+  integration-tests:
+    name: 'Generator Integration Tests'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,5 +62,5 @@ jobs:
           curl -L https://dl.dagger.io/dagger/install.sh | sh
           dagger version
       
-      - name: 'Run C# integration test with Dagger'
-        run: make test-csharp-dagger
+      - name: 'Run all integration tests with Dagger'
+        run: make test-integration
