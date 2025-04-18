@@ -6,19 +6,21 @@ import (
 
 // Flag name constants to avoid duplication
 const (
-	DebugFlagName     = "debug"
-	ManifestFlagName  = "manifest"
-	OutputFlagName    = "output"
-	NoInputFlagName   = "no-input"
-	GoPackageFlagName = "package-name"
-	OverrideFlagName  = "override"
+	DebugFlagName       = "debug"
+	ManifestFlagName    = "manifest"
+	OutputFlagName      = "output"
+	NoInputFlagName     = "no-input"
+	GoPackageFlagName   = "package-name"
+	CSharpNamespaceName = "namespace"
+	OverrideFlagName    = "override"
 )
 
 // Default values for flags
 const (
-	DefaultManifestPath  = "flags.json"
-	DefaultOutputPath    = ""
-	DefaultGoPackageName = "openfeature"
+	DefaultManifestPath    = "flags.json"
+	DefaultOutputPath      = ""
+	DefaultGoPackageName   = "openfeature"
+	DefaultCSharpNamespace = "OpenFeature"
 )
 
 // AddRootFlags adds the common flags to the given command
@@ -36,6 +38,11 @@ func AddGenerateFlags(cmd *cobra.Command) {
 // AddGoGenerateFlags adds the go generator specific flags to the given command
 func AddGoGenerateFlags(cmd *cobra.Command) {
 	cmd.Flags().String(GoPackageFlagName, DefaultGoPackageName, "Name of the generated Go package")
+}
+
+// AddCSharpGenerateFlags adds the C# generator specific flags to the given command
+func AddCSharpGenerateFlags(cmd *cobra.Command) {
+	cmd.Flags().String(CSharpNamespaceName, DefaultCSharpNamespace, "Namespace for the generated C# code")
 }
 
 // AddInitFlags adds the init command specific flags
@@ -59,6 +66,12 @@ func GetOutputPath(cmd *cobra.Command) string {
 func GetGoPackageName(cmd *cobra.Command) string {
 	goPackageName, _ := cmd.Flags().GetString(GoPackageFlagName)
 	return goPackageName
+}
+
+// GetCSharpNamespace gets the C# namespace from the given command
+func GetCSharpNamespace(cmd *cobra.Command) string {
+	namespace, _ := cmd.Flags().GetString(CSharpNamespaceName)
+	return namespace
 }
 
 // GetNoInput gets the no-input flag from the given command

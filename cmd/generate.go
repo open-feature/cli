@@ -6,6 +6,7 @@ import (
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
+	"github.com/open-feature/cli/internal/generators/csharp"
 	"github.com/open-feature/cli/internal/generators/golang"
 	"github.com/open-feature/cli/internal/generators/nestjs"
 	"github.com/open-feature/cli/internal/generators/nodejs"
@@ -14,6 +15,32 @@ import (
 	"github.com/open-feature/cli/internal/logger"
 	"github.com/spf13/cobra"
 )
+
+func GetGenerateCmd() *cobra.Command {
+	generateCmd := &cobra.Command{
+		Use:   "generate",
+		Short: "Generate typesafe OpenFeature accessors.",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate")
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.Println("Available generators:")
+			return generators.DefaultManager.PrintGeneratorsTable()
+		},
+	}
+
+	// Add generate flags using the config package
+	config.AddGenerateFlags(generateCmd)
+
+	// Add all registered generator commands
+	for _, subCmd := range generators.DefaultManager.GetCommands() {
+		generateCmd.AddCommand(subCmd)
+	}
+
+	addStabilityInfo(generateCmd)
+
+	return generateCmd
+}
 
 // addStabilityInfo adds stability information to the command's help template before "Usage:"
 func addStabilityInfo(cmd *cobra.Command) {
@@ -38,7 +65,7 @@ func addStabilityInfo(cmd *cobra.Command) {
 	}
 }
 
-func GetGenerateNodeJSCmd() *cobra.Command {
+func getGenerateNodeJSCmd() *cobra.Command {
 	nodeJSCmd := &cobra.Command{
 		Use:   "nodejs",
 		Short: "Generate typesafe Node.js client.",
@@ -82,7 +109,7 @@ func GetGenerateNodeJSCmd() *cobra.Command {
 	return nodeJSCmd
 }
 
-func GetGenerateReactCmd() *cobra.Command {
+func getGenerateReactCmd() *cobra.Command {
 	reactCmd := &cobra.Command{
 		Use:   "react",
 		Short: "Generate typesafe React Hooks.",
@@ -180,7 +207,57 @@ func GetGenerateNestJsCmd() *cobra.Command {
 	return nestJsCmd
 }
 
-func GetGenerateGoCmd() *cobra.Command {
+func getGenerateCSharpCmd() *cobra.Command {
+	csharpCmd := &cobra.Command{
+		Use:   "csharp",
+		Short: "Generate typesafe C# client.",
+		Long:  `Generate typesafe C# client compatible with the OpenFeature .NET SDK.`,
+		Annotations: map[string]string{
+			"stability": string(generators.Alpha),
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate.csharp")
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			namespace := config.GetCSharpNamespace(cmd)
+			manifestPath := config.GetManifestPath(cmd)
+			outputPath := config.GetOutputPath(cmd)
+
+			logger.Default.GenerationStarted("C#")
+
+			params := generators.Params[csharp.Params]{
+				OutputPath: outputPath,
+				Custom: csharp.Params{
+					Namespace: namespace,
+				},
+			}
+			flagset, err := flagset.Load(manifestPath)
+			if err != nil {
+				return err
+			}
+
+			generator := csharp.NewGenerator(flagset)
+			logger.Default.Debug("Executing C# generator")
+			err = generator.Generate(&params)
+			if err != nil {
+				return err
+			}
+
+			logger.Default.GenerationComplete("C#")
+
+			return nil
+		},
+	}
+
+	// Add C#-specific flags
+	config.AddCSharpGenerateFlags(csharpCmd)
+
+	addStabilityInfo(csharpCmd)
+
+	return csharpCmd
+}
+
+func getGenerateGoCmd() *cobra.Command {
 	goCmd := &cobra.Command{
 		Use:   "go",
 		Short: "Generate typesafe accessors for OpenFeature.",
@@ -274,35 +351,10 @@ func getGeneratePythonCmd() *cobra.Command {
 
 func init() {
 	// Register generators with the manager
-	generators.DefaultManager.Register(GetGenerateReactCmd)
-	generators.DefaultManager.Register(GetGenerateGoCmd)
-	generators.DefaultManager.Register(GetGenerateNodeJSCmd)
+	generators.DefaultManager.Register(getGenerateReactCmd)
+	generators.DefaultManager.Register(getGenerateGoCmd)
+	generators.DefaultManager.Register(getGenerateNodeJSCmd)
 	generators.DefaultManager.Register(getGeneratePythonCmd)
+  generators.DefaultManager.Register(getGenerateCSharpCmd)
 	generators.DefaultManager.Register(GetGenerateNestJsCmd)
-}
-
-func GetGenerateCmd() *cobra.Command {
-	generateCmd := &cobra.Command{
-		Use:   "generate",
-		Short: "Generate typesafe OpenFeature accessors.",
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			return initializeConfig(cmd, "generate")
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cmd.Println("Available generators:")
-			return generators.DefaultManager.PrintGeneratorsTable()
-		},
-	}
-
-	// Add generate flags using the config package
-	config.AddGenerateFlags(generateCmd)
-
-	// Add all registered generator commands
-	for _, subCmd := range generators.DefaultManager.GetCommands() {
-		generateCmd.AddCommand(subCmd)
-	}
-
-	addStabilityInfo(generateCmd)
-
-	return generateCmd
 }

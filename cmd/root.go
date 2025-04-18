@@ -44,7 +44,7 @@ func GetRootCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printBanner()
-			logger.Default.Println("");
+			logger.Default.Println("")
 			logger.Default.Println("To see all the options, try 'openfeature --help'")
 			return nil
 		},
