@@ -36,23 +36,31 @@ We welcome contributions for new generators to extend the functionality of the O
 
 11. **Address Feedback**: Be responsive to feedback from the maintainers. Make any necessary changes and update your pull request as needed.
 
-### Integration Tests
+### Testing
 
-To verify that generated code compiles correctly, the project includes integration tests, for example, for c#:
+The OpenFeature CLI includes both unit and integration tests to ensure quality and correctness.
+
+#### Unit Tests
+
+Run the unit tests with:
 
 ```bash
-# Test the C# generator output
-make test-csharp
+go test ./...
 ```
 
-This will:
+#### Integration Tests
 
-1. Build the CLI
-2. Generate a C# client
-3. Compile the C# code in a Docker container
-4. Validate that the code compiles correctly
+To verify that generated code compiles correctly, the project includes integration tests. The CLI uses a Dagger-based integration testing framework to test code generation for each supported language:
 
-Consider adding more integration tests for new generators.
+```bash
+# Run all integration tests
+make test-integration
+
+# Run tests for a specific language
+make test-csharp-dagger
+```
+
+For more information on the integration testing framework, see [Integration Testing](./docs/integration-testing.md).
 
 ## Setting Up Lefthook
 
