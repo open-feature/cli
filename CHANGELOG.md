@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.3](https://github.com/open-feature/cli/compare/v0.3.2...v0.3.3) (2025-04-18)
+
+
+### 🐛 Bug Fixes
+
+* use the correct json schema url in init command ([#96](https://github.com/open-feature/cli/issues/96)) ([412a117](https://github.com/open-feature/cli/commit/412a1174b5dfe9ba77e18ec57d5a761711067386))
+
+
+### ✨ New Features
+
+* add codegen for NestJS ([#99](https://github.com/open-feature/cli/issues/99)) ([5210429](https://github.com/open-feature/cli/commit/5210429e39c10c91482cb0a0a8b2f4431a0aa182))
+* **csharp:** added generator and integration tests ([#97](https://github.com/open-feature/cli/issues/97)) ([ae64581](https://github.com/open-feature/cli/commit/ae645813c48b5ef10d8557406e7ab5c96ce3df69))
+* Python generator ([#95](https://github.com/open-feature/cli/issues/95)) ([1f8f43a](https://github.com/open-feature/cli/commit/1f8f43ae049fcf7c4feba3edaa697329688f7343))
+
+
+### 🧹 Chore
+
+* automate project standards before push ([#94](https://github.com/open-feature/cli/issues/94)) ([e32547f](https://github.com/open-feature/cli/commit/e32547f73495a525ed4ef5e2cadd45642d6fb172))
+
 ## [0.3.2](https://github.com/open-feature/cli/compare/v0.3.1...v0.3.2) (2025-04-02)
 
 
