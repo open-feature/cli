@@ -12,6 +12,10 @@ import (
 
 var viperKey = "filesystem"
 
+type Config struct {
+	FlagSourceUrl string `yaml:"flagSourceUrl"`
+}
+
 // Get the filesystem interface from the viper configuration.
 // If the filesystem interface is not set, the default filesystem interface is returned.
 func FileSystem() afero.Fs {
@@ -46,6 +50,11 @@ func WriteFile(path string, data []byte) error {
 	}
 
 	return nil
+}
+
+func ReadFile(path string) ([]byte, error) {
+	fs := FileSystem()
+	return afero.ReadFile(fs, path)
 }
 
 // Checks if a file exists at the given path using the filesystem interface.
