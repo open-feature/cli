@@ -27,3 +27,5 @@ dist
 
 # openfeature cli config
 .openfeature.yaml
+
+.idea/
