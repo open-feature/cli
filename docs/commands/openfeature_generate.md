@@ -25,11 +25,12 @@ openfeature generate [flags]
 
 ### SEE ALSO
 
-* [openfeature](openfeature.md)	 - CLI for OpenFeature.
+* [openfeature](openfeature.md)	 - CLI for      OpenFeature.
 * [openfeature generate csharp](openfeature_generate_csharp.md)	 - Generate typesafe C# client.
 * [openfeature generate go](openfeature_generate_go.md)	 - Generate typesafe accessors for OpenFeature.
 * [openfeature generate nestjs](openfeature_generate_nestjs.md)	 - Generate typesafe NestJS decorators.
 * [openfeature generate nodejs](openfeature_generate_nodejs.md)	 - Generate typesafe Node.js client.
 * [openfeature generate python](openfeature_generate_python.md)	 - Generate typesafe Python client.
 * [openfeature generate react](openfeature_generate_react.md)	 - Generate typesafe React Hooks.
+* [openfeature generate java](openfeature_generate_java.md)	 - Generate typesafe Java client.
 
