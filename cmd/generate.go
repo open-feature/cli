@@ -261,8 +261,8 @@ func getGenerateCSharpCmd() *cobra.Command {
 func getGenerateJavaCmd() *cobra.Command {
 	javaCmd := &cobra.Command{
 		Use:   "java",
-		Short: "Generate typesafe Java decorators",
-		Long:  `Generate typesafe Java decorator compatible with the OpenFeature Java SDK.`,
+		Short: "Generate typesafe Java client.",
+		Long:  `Generate typesafe Java client compatible with the OpenFeature Java SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),
 		},
