@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.4](https://github.com/open-feature/cli/compare/v0.3.3...v0.3.4) (2025-05-06)
+
+
+### ✨ New Features
+
+* introduce dagger for integration testing and ci ([#100](https://github.com/open-feature/cli/issues/100)) ([96f4cde](https://github.com/open-feature/cli/commit/96f4cde0f87b8daf70e02c1d4ca3bcec018fee02))
+
 ## [0.3.3](https://github.com/open-feature/cli/compare/v0.3.2...v0.3.3) (2025-04-18)
 
 
