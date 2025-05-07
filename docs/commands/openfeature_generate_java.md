@@ -19,7 +19,7 @@ openfeature generate java [flags]
 
 ```
   -h, --help                  help for java
-      --package-name string   Name of the generated Java package (default "com.openfeature.generated")
+      --package-name string   Name of the generated Java package (default "com.example.openfeature")
 ```
 
 ### Options inherited from parent commands

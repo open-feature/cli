@@ -22,7 +22,7 @@ const (
 	DefaultOutputPath      = ""
 	DefaultGoPackageName   = "openfeature"
 	DefaultCSharpNamespace = "OpenFeature"
-	DefaultJavaPackageName = "com.openfeature.generated"
+	DefaultJavaPackageName = "com.example.openfeature"
 )
 
 // AddRootFlags adds the common flags to the given command

@@ -76,7 +76,7 @@ func TestGenerate(t *testing.T) {
 			manifestGolden: "testdata/success_manifest.golden",
 			outputGolden:   "testdata/success_java.golden",
 			outputFile:     "OpenFeature.java",
-			packageName:    "com.openfeature.generated",
+			packageName:    "com.example.openfeature",
 		},
 		// Add more test cases here as needed
 	}
