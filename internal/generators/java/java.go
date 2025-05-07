@@ -24,11 +24,11 @@ var javaTmpl string
 func openFeatureType(t flagset.FlagType) string {
 	switch t {
 	case flagset.IntType:
-		return "int"
+		return "Integer"
 	case flagset.FloatType:
-		return "float"
+		return "Double" //using Double as per openfeature Java-SDK
 	case flagset.BoolType:
-		return "boolean"
+		return "Boolean"
 	case flagset.StringType:
 		return "String"
 	default:

@@ -3,8 +3,7 @@ package {{ .Params.Custom.JavaPackage }};
 
 import dev.openfeature.sdk.Client;
 import dev.openfeature.sdk.EvaluationContext;
-import dev.openfeature.sdk.EvaluationDetails;
-import dev.openfeature.sdk.OpenFeature;
+import dev.openfeature.sdk.FlagEvaluationDetails;
 import dev.openfeature.sdk.OpenFeatureAPI;
 
 public class GeneratedClient {
@@ -35,7 +34,7 @@ public class GeneratedClient {
         return client.get{{ .Type | OpenFeatureType | ToPascal }}Value("{{ .Key }}", {{ . | FormatDefaultValue }}, ctx);
     }
 
-    public EvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
+    public FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
         return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ . | FormatDefaultValue }}, ctx);
     }
     {{ end }}

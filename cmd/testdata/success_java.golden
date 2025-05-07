@@ -3,8 +3,7 @@ package com.example.openfeature;
 
 import dev.openfeature.sdk.Client;
 import dev.openfeature.sdk.EvaluationContext;
-import dev.openfeature.sdk.EvaluationDetails;
-import dev.openfeature.sdk.OpenFeature;
+import dev.openfeature.sdk.FlagEvaluationDetails;
 import dev.openfeature.sdk.OpenFeatureAPI;
 
 public class GeneratedClient {
@@ -28,29 +27,29 @@ public class GeneratedClient {
      * Discount percentage applied to purchases.
      * Details:
      * - Flag key: discountPercentage
-     * - Type: float
+     * - Type: Double
      * - Default value: 0.15
      */
-    public float discountPercentage(EvaluationContext ctx) {
-        return client.getFloatValue("discountPercentage", 0.15, ctx);
+    public Double discountPercentage(EvaluationContext ctx) {
+        return client.getDoubleValue("discountPercentage", 0.15, ctx);
     }
 
-    public EvaluationDetails<float> discountPercentageDetails(EvaluationContext ctx) {
-        return client.getFloatDetails("discountPercentage", 0.15, ctx);
+    public FlagEvaluationDetails<Double> discountPercentageDetails(EvaluationContext ctx) {
+        return client.getDoubleDetails("discountPercentage", 0.15, ctx);
     }
 
     /**
      * Controls whether Feature A is enabled.
      * Details:
      * - Flag key: enableFeatureA
-     * - Type: boolean
+     * - Type: Boolean
      * - Default value: false
      */
-    public boolean enableFeatureA(EvaluationContext ctx) {
+    public Boolean enableFeatureA(EvaluationContext ctx) {
         return client.getBooleanValue("enableFeatureA", false, ctx);
     }
 
-    public EvaluationDetails<boolean> enableFeatureADetails(EvaluationContext ctx) {
+    public FlagEvaluationDetails<Boolean> enableFeatureADetails(EvaluationContext ctx) {
         return client.getBooleanDetails("enableFeatureA", false, ctx);
     }
 
@@ -65,7 +64,7 @@ public class GeneratedClient {
         return client.getStringValue("greetingMessage", "Hello there!", ctx);
     }
 
-    public EvaluationDetails<String> greetingMessageDetails(EvaluationContext ctx) {
+    public FlagEvaluationDetails<String> greetingMessageDetails(EvaluationContext ctx) {
         return client.getStringDetails("greetingMessage", "Hello there!", ctx);
     }
 
@@ -73,15 +72,15 @@ public class GeneratedClient {
      * Maximum allowed length for usernames.
      * Details:
      * - Flag key: usernameMaxLength
-     * - Type: int
+     * - Type: Integer
      * - Default value: 50
      */
-    public int usernameMaxLength(EvaluationContext ctx) {
-        return client.getIntValue("usernameMaxLength", 50, ctx);
+    public Integer usernameMaxLength(EvaluationContext ctx) {
+        return client.getIntegerValue("usernameMaxLength", 50, ctx);
     }
 
-    public EvaluationDetails<int> usernameMaxLengthDetails(EvaluationContext ctx) {
-        return client.getIntDetails("usernameMaxLength", 50, ctx);
+    public FlagEvaluationDetails<Integer> usernameMaxLengthDetails(EvaluationContext ctx) {
+        return client.getIntegerDetails("usernameMaxLength", 50, ctx);
     }
 
 }
