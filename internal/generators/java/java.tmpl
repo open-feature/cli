@@ -6,36 +6,59 @@ import dev.openfeature.sdk.EvaluationContext;
 import dev.openfeature.sdk.FlagEvaluationDetails;
 import dev.openfeature.sdk.OpenFeatureAPI;
 
-public class GeneratedClient {
+public final class Generated {
 
-    private final Client client;
+    private Generated() {} // prevent instantiation
 
-    public GeneratedClient(Client client) {
-        this.client = client;
+    public interface GeneratedClient {
+        {{ range .Flagset.Flags }}
+        /**
+         * {{ .Description }}
+         * Details:
+         * - Flag key: {{ .Key }}
+         * - Type: {{ .Type | OpenFeatureType }}
+         * - Default value: {{ .DefaultValue }}
+         * Returns the flag value
+         */
+        {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx);
+
+        /**
+         * {{ .Description }}
+         * Details:
+         * - Flag key: {{ .Key }}
+         * - Type: {{ .Type | OpenFeatureType }}
+         * - Default value: {{ .DefaultValue }}
+         * Returns the evaluation details containing the flag value and metadata
+         */
+        FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx);
+        {{ end }}
     }
 
-    public static GeneratedClient createClient() {
-        return new GeneratedClient(OpenFeatureAPI.getInstance().getClient());
+    private static final class OpenFeatureGeneratedClient implements GeneratedClient {
+        private final Client client;
+
+        private OpenFeatureGeneratedClient(Client client) {
+            this.client = client;
+        }
+
+        {{ range .Flagset.Flags }}
+        @Override
+        public {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx) {
+            return client.get{{ .Type | OpenFeatureType | ToPascal }}Value("{{ .Key }}", {{ . | FormatDefaultValue }}, ctx);
+        }
+
+        @Override
+        public FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
+            return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ . | FormatDefaultValue }}, ctx);
+        }
+        {{ end }}
     }
 
-    public static GeneratedClient createClient(String domain) {
-        return new GeneratedClient(OpenFeatureAPI.getInstance().getClient(domain));
+    public static GeneratedClient getClient() {
+        return new OpenFeatureGeneratedClient(OpenFeatureAPI.getInstance().getClient());
     }
 
-    {{ range .Flagset.Flags }}
-    /**
-     * {{ .Description }}
-     * Details:
-     * - Flag key: {{ .Key }}
-     * - Type: {{ .Type | OpenFeatureType }}
-     * - Default value: {{ .DefaultValue }}
-     */
-    public {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx) {
-        return client.get{{ .Type | OpenFeatureType | ToPascal }}Value("{{ .Key }}", {{ . | FormatDefaultValue }}, ctx);
+    public static GeneratedClient getClient(String domain) {
+        return new OpenFeatureGeneratedClient(OpenFeatureAPI.getInstance().getClient(domain));
     }
-
-    public FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
-        return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ . | FormatDefaultValue }}, ctx);
-    }
-    {{ end }}
 }
