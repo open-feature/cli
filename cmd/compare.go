@@ -24,11 +24,17 @@ func GetCompareCmd() *cobra.Command {
 			// Get flags
 			sourcePath := config.GetManifestPath(cmd)
 			targetPath, _ := cmd.Flags().GetString("against")
-			flatOutput, _ := cmd.Flags().GetBool("flat")
+			outputFormat, _ := cmd.Flags().GetString("output")
 
 			// Validate flags
 			if sourcePath == "" || targetPath == "" {
 				return fmt.Errorf("both source (--manifest) and target (--against) paths are required")
+			}
+
+			// Validate output format
+			if !manifest.IsValidOutputFormat(outputFormat) {
+				return fmt.Errorf("invalid output format: %s. Valid formats are: %s",
+					outputFormat, strings.Join(manifest.GetValidOutputFormats(), ", "))
 			}
 
 			// Load manifests
@@ -54,17 +60,22 @@ func GetCompareCmd() *cobra.Command {
 				return nil
 			}
 
-			// Render differences based on the output mode
-			if flatOutput {
+			// Render differences based on the output format
+			switch manifest.OutputFormat(outputFormat) {
+			case manifest.OutputFormatFlat:
 				return renderFlatDiff(changes, cmd)
+			case manifest.OutputFormatJSON:
+				return renderJSONDiff(changes, cmd)
+			default:
+				return renderTreeDiff(changes, cmd)
 			}
-			return renderTreeDiff(changes, cmd)
 		},
 	}
 
 	// Add flags specific to compare command
 	compareCmd.Flags().StringP("against", "a", "", "Path to the target manifest file to compare against")
-	compareCmd.Flags().Bool("flat", false, "Display differences in a flat format")
+	compareCmd.Flags().StringP("output", "o", string(manifest.OutputFormatTree),
+		fmt.Sprintf("Output format. Valid formats: %s", strings.Join(manifest.GetValidOutputFormats(), ", ")))
 
 	// Mark required flags
 	_ = compareCmd.MarkFlagRequired("against")
@@ -178,5 +189,41 @@ func renderFlatDiff(changes []manifest.Change, cmd *cobra.Command) error {
 		}
 	}
 
+	return nil
+}
+
+// renderJSONDiff renders changes in JSON format
+func renderJSONDiff(changes []manifest.Change, cmd *cobra.Command) error {
+	// Create a structured response that can be easily consumed by tools
+	type jsonOutput struct {
+		TotalChanges int               `json:"totalChanges"`
+		Additions    []manifest.Change `json:"additions"`
+		Removals     []manifest.Change `json:"removals"`
+		Modifications []manifest.Change `json:"modifications"`
+	}
+
+	// Group changes by type
+	var output jsonOutput
+	output.TotalChanges = len(changes)
+
+	for _, change := range changes {
+		switch change.Type {
+		case "add":
+			output.Additions = append(output.Additions, change)
+		case "remove":
+			output.Removals = append(output.Removals, change)
+		case "change":
+			output.Modifications = append(output.Modifications, change)
+		}
+	}
+
+	// Convert to JSON
+	jsonBytes, err := json.MarshalIndent(output, "", "  ")
+	if err != nil {
+		return fmt.Errorf("error marshaling JSON output: %w", err)
+	}
+
+	// Print the JSON
+	fmt.Println(string(jsonBytes))
 	return nil
 }
