@@ -13,11 +13,8 @@ func TestGetCompareCmd(t *testing.T) {
 	assert.Equal(t, "Compare two feature flag manifests", cmd.Short)
 
 	// Verify flags exist
-	sourceFlag := cmd.Flag("source")
-	assert.NotNil(t, sourceFlag)
-
-	targetFlag := cmd.Flag("target")
-	assert.NotNil(t, targetFlag)
+	againstFlag := cmd.Flag("against")
+	assert.NotNil(t, againstFlag)
 
 	// Verify optional flags
 	flatFlag := cmd.Flag("flat")
@@ -29,16 +26,18 @@ func TestCompareManifests(t *testing.T) {
 	// This test mainly verifies the command executes without errors
 	// since stdout capture is difficult with pterm usage
 
-	cmd := GetCompareCmd()
+	// Need to use the root command to properly inherit the manifest flag
+	rootCmd := GetRootCmd()
 
 	// Setup command line arguments
-	cmd.SetArgs([]string{
-		"--source", "testdata/source_manifest.json",
-		"--target", "testdata/target_manifest.json",
+	rootCmd.SetArgs([]string{
+		"compare",
+		"--manifest", "testdata/source_manifest.json",
+		"--against", "testdata/target_manifest.json",
 		"--flat",
 	})
 
 	// Execute command
-	err := cmd.Execute()
+	err := rootCmd.Execute()
 	assert.NoError(t, err, "Command should execute without errors")
 }
