@@ -17,7 +17,7 @@ openfeature compare [flags]
 ```
   -a, --against string   Path to the target manifest file to compare against
   -h, --help             help for compare
-  -o, --output string    Output format. Valid formats: tree, flat, json (default "tree")
+  -o, --output string    Output format. Valid formats: tree, flat, json, yaml (default "tree")
 ```
 
 ### Options inherited from parent commands

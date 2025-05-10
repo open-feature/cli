@@ -10,12 +10,14 @@ const (
 	OutputFormatFlat OutputFormat = "flat"
 	// OutputFormatJSON represents the JSON output format
 	OutputFormatJSON OutputFormat = "json"
+	// OutputFormatYAML represents the YAML output format
+	OutputFormatYAML OutputFormat = "yaml"
 )
 
 // IsValidOutputFormat checks if the given format is a valid output format
 func IsValidOutputFormat(format string) bool {
 	switch OutputFormat(format) {
-	case OutputFormatTree, OutputFormatFlat, OutputFormatJSON:
+	case OutputFormatTree, OutputFormatFlat, OutputFormatJSON, OutputFormatYAML:
 		return true
 	default:
 		return false
@@ -28,5 +30,6 @@ func GetValidOutputFormats() []string {
 		string(OutputFormatTree),
 		string(OutputFormatFlat),
 		string(OutputFormatJSON),
+		string(OutputFormatYAML),
 	}
 }

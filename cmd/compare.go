@@ -10,6 +10,7 @@ import (
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 func GetCompareCmd() *cobra.Command {
@@ -66,6 +67,8 @@ func GetCompareCmd() *cobra.Command {
 				return renderFlatDiff(changes, cmd)
 			case manifest.OutputFormatJSON:
 				return renderJSONDiff(changes, cmd)
+			case manifest.OutputFormatYAML:
+				return renderYAMLDiff(changes, cmd)
 			default:
 				return renderTreeDiff(changes, cmd)
 			}
@@ -195,15 +198,15 @@ func renderFlatDiff(changes []manifest.Change, cmd *cobra.Command) error {
 // renderJSONDiff renders changes in JSON format
 func renderJSONDiff(changes []manifest.Change, cmd *cobra.Command) error {
 	// Create a structured response that can be easily consumed by tools
-	type jsonOutput struct {
-		TotalChanges int               `json:"totalChanges"`
-		Additions    []manifest.Change `json:"additions"`
-		Removals     []manifest.Change `json:"removals"`
-		Modifications []manifest.Change `json:"modifications"`
+	type structuredOutput struct {
+		TotalChanges   int               `json:"totalChanges" yaml:"totalChanges"`
+		Additions      []manifest.Change `json:"additions" yaml:"additions"`
+		Removals       []manifest.Change `json:"removals" yaml:"removals"`
+		Modifications  []manifest.Change `json:"modifications" yaml:"modifications"`
 	}
 
 	// Group changes by type
-	var output jsonOutput
+	var output structuredOutput
 	output.TotalChanges = len(changes)
 
 	for _, change := range changes {
@@ -225,5 +228,41 @@ func renderJSONDiff(changes []manifest.Change, cmd *cobra.Command) error {
 
 	// Print the JSON
 	fmt.Println(string(jsonBytes))
+	return nil
+}
+
+// renderYAMLDiff renders changes in YAML format
+func renderYAMLDiff(changes []manifest.Change, cmd *cobra.Command) error {
+	// Use the same structured output type as JSON but with YAML tags
+	type structuredOutput struct {
+		TotalChanges   int               `json:"totalChanges" yaml:"totalChanges"`
+		Additions      []manifest.Change `json:"additions" yaml:"additions"`
+		Removals       []manifest.Change `json:"removals" yaml:"removals"`
+		Modifications  []manifest.Change `json:"modifications" yaml:"modifications"`
+	}
+
+	// Group changes by type
+	var output structuredOutput
+	output.TotalChanges = len(changes)
+
+	for _, change := range changes {
+		switch change.Type {
+		case "add":
+			output.Additions = append(output.Additions, change)
+		case "remove":
+			output.Removals = append(output.Removals, change)
+		case "change":
+			output.Modifications = append(output.Modifications, change)
+		}
+	}
+
+	// Convert to YAML
+	yamlBytes, err := yaml.Marshal(output)
+	if err != nil {
+		return fmt.Errorf("error marshaling YAML output: %w", err)
+	}
+
+	// Print the YAML
+	fmt.Println(string(yamlBytes))
 	return nil
 }

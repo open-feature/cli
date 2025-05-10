@@ -27,7 +27,7 @@ func TestCompareManifests(t *testing.T) {
 	// This test mainly verifies the command executes without errors
 	// with each of the supported output formats
 
-	formats := []string{"tree", "flat", "json"}
+	formats := []string{"tree", "flat", "json", "yaml"}
 
 	for _, format := range formats {
 		t.Run(fmt.Sprintf("output_format_%s", format), func(t *testing.T) {
