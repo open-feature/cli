@@ -15,10 +15,9 @@ openfeature compare [flags]
 ### Options
 
 ```
-      --flat            Display differences in a flat format
-  -h, --help            help for compare
-      --source string   Path to the source manifest file
-      --target string   Path to the target manifest file
+  -a, --against string   Path to the target manifest file to compare against
+      --flat             Display differences in a flat format
+  -h, --help             help for compare
 ```
 
 ### Options inherited from parent commands

@@ -6,12 +6,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
-// Updated to rename color mode to tree mode
 func GetCompareCmd() *cobra.Command {
 	compareCmd := &cobra.Command{
 		Use:   "compare",
@@ -22,13 +22,13 @@ func GetCompareCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get flags
-			sourcePath, _ := cmd.Flags().GetString("source")
-			targetPath, _ := cmd.Flags().GetString("target")
+			sourcePath := config.GetManifestPath(cmd)
+			targetPath, _ := cmd.Flags().GetString("against")
 			flatOutput, _ := cmd.Flags().GetBool("flat")
 
 			// Validate flags
 			if sourcePath == "" || targetPath == "" {
-				return fmt.Errorf("both --source and --target flags are required")
+				return fmt.Errorf("both source (--manifest) and target (--against) paths are required")
 			}
 
 			// Load manifests
@@ -63,13 +63,11 @@ func GetCompareCmd() *cobra.Command {
 	}
 
 	// Add flags specific to compare command
-	compareCmd.Flags().String("source", "", "Path to the source manifest file")
-	compareCmd.Flags().String("target", "", "Path to the target manifest file")
+	compareCmd.Flags().StringP("against", "a", "", "Path to the target manifest file to compare against")
 	compareCmd.Flags().Bool("flat", false, "Display differences in a flat format")
 
 	// Mark required flags
-	_ = compareCmd.MarkFlagRequired("source")
-	_ = compareCmd.MarkFlagRequired("target")
+	_ = compareCmd.MarkFlagRequired("against")
 
 	return compareCmd
 }
