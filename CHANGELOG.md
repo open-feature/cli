@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.4](https://github.com/open-feature/cli/compare/v0.3.3...v0.3.4) (2025-05-14)
+
+
+### ✨ New Features
+
+* add java generator ([#107](https://github.com/open-feature/cli/issues/107)) ([9a9f11f](https://github.com/open-feature/cli/commit/9a9f11fc6c6a8ffa38870e62ac26d9f8f679825b))
+* adds compare command ([#93](https://github.com/open-feature/cli/issues/93)) ([063cfca](https://github.com/open-feature/cli/commit/063cfca2d79c9f75e181422ec375e300e020e57f))
+* introduce dagger for integration testing and ci ([#100](https://github.com/open-feature/cli/issues/100)) ([96f4cde](https://github.com/open-feature/cli/commit/96f4cde0f87b8daf70e02c1d4ca3bcec018fee02))
+
 ## [0.3.3](https://github.com/open-feature/cli/compare/v0.3.2...v0.3.3) (2025-04-18)
 
 

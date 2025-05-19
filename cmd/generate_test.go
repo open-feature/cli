@@ -21,7 +21,7 @@ type generateTestCase struct {
 	outputGolden   string // path to the golden output file
 	outputPath     string // output directory (optional, defaults to "output")
 	outputFile     string // output file name
-	packageName    string // optional, used for Go (package-name) and C# (namespace)
+	packageName    string // optional, used for Go (package-name), Java (package-name) and C# (namespace)
 }
 
 func TestGenerate(t *testing.T) {
@@ -70,6 +70,14 @@ func TestGenerate(t *testing.T) {
 			outputFile:     "OpenFeature.g.cs",
 			packageName:    "TestNamespace", // Using packageName field for namespace
 		},
+		{
+			name:           "Java generation success",
+			command:        "java",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/success_java.golden",
+			outputFile:     "OpenFeature.java",
+			packageName:    "com.example.openfeature",
+		},
 		// Add more test cases here as needed
 	}
 
@@ -106,6 +114,8 @@ func TestGenerate(t *testing.T) {
 				if tc.command == "csharp" {
 					args = append(args, "--namespace", tc.packageName)
 				} else if tc.command == "go" {
+					args = append(args, "--package-name", tc.packageName)
+				} else if tc.command == "java" {
 					args = append(args, "--package-name", tc.packageName)
 				}
 			}
@@ -146,6 +156,17 @@ func readOsFileAndWriteToMemMap(t *testing.T, inputPath string, memPath string, 
 	}
 }
 
+// normalizeLines trims trailing whitespace and carriage returns from each line.
+// This helps ensure consistent comparison by ignoring formatting differences like indentation or line endings.
+func normalizeLines(input []string) []string {
+	normalized := make([]string, len(input))
+	for i, line := range input {
+		// Trim right whitespace and convert \r\n or \r to \n
+		normalized[i] = strings.TrimRight(line, " \t\r")
+	}
+	return normalized
+}
+
 func compareOutput(t *testing.T, testFile, memoryOutputPath string, fs afero.Fs) {
 	want, err := os.ReadFile(testFile)
 	if err != nil {
@@ -158,8 +179,8 @@ func compareOutput(t *testing.T, testFile, memoryOutputPath string, fs afero.Fs)
 	}
 
 	// Convert to string arrays by splitting on newlines
-	wantLines := strings.Split(string(want), "\n")
-	gotLines := strings.Split(string(got), "\n")
+	wantLines := normalizeLines(strings.Split(string(want), "\n"))
+	gotLines := normalizeLines(strings.Split(string(got), "\n"))
 
 	if diff := cmp.Diff(wantLines, gotLines); diff != "" {
 		t.Errorf("output mismatch (-want +got):\n%s", diff)

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag_manifest.json",
+  "flags": {
+    "darkMode": {
+      "flagType": "boolean",
+      "description": "Enable dark mode",
+      "defaultValue": false
+    },
+    "backgroundColor": {
+      "flagType": "string",
+      "description": "Background color for the application",
+      "defaultValue": "white"
+    },
+    "maxItems": {
+      "flagType": "integer",
+      "description": "Maximum number of items to display",
+      "defaultValue": 10
+    }
+  }
+}

@@ -13,6 +13,7 @@ const (
 	GoPackageFlagName   = "package-name"
 	CSharpNamespaceName = "namespace"
 	OverrideFlagName    = "override"
+	JavaPackageFlagName = "package-name"
 )
 
 // Default values for flags
@@ -21,6 +22,7 @@ const (
 	DefaultOutputPath      = ""
 	DefaultGoPackageName   = "openfeature"
 	DefaultCSharpNamespace = "OpenFeature"
+	DefaultJavaPackageName = "com.example.openfeature"
 )
 
 // AddRootFlags adds the common flags to the given command
@@ -43,6 +45,11 @@ func AddGoGenerateFlags(cmd *cobra.Command) {
 // AddCSharpGenerateFlags adds the C# generator specific flags to the given command
 func AddCSharpGenerateFlags(cmd *cobra.Command) {
 	cmd.Flags().String(CSharpNamespaceName, DefaultCSharpNamespace, "Namespace for the generated C# code")
+}
+
+// AddJavaGenerateFlags adds the Java generator specific flags to the given command
+func AddJavaGenerateFlags(cmd *cobra.Command) {
+	cmd.Flags().String(JavaPackageFlagName, DefaultJavaPackageName, "Name of the generated Java package")
 }
 
 // AddInitFlags adds the init command specific flags
@@ -72,6 +79,12 @@ func GetGoPackageName(cmd *cobra.Command) string {
 func GetCSharpNamespace(cmd *cobra.Command) string {
 	namespace, _ := cmd.Flags().GetString(CSharpNamespaceName)
 	return namespace
+}
+
+// GetJavaPackageName gets the Java package name from the given command
+func GetJavaPackageName(cmd *cobra.Command) string {
+	javaPackageName, _ := cmd.Flags().GetString(JavaPackageFlagName)
+	return javaPackageName
 }
 
 // GetNoInput gets the no-input flag from the given command

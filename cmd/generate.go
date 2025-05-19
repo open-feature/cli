@@ -8,6 +8,7 @@ import (
 	"github.com/open-feature/cli/internal/generators"
 	"github.com/open-feature/cli/internal/generators/csharp"
 	"github.com/open-feature/cli/internal/generators/golang"
+	"github.com/open-feature/cli/internal/generators/java"
 	"github.com/open-feature/cli/internal/generators/nestjs"
 	"github.com/open-feature/cli/internal/generators/nodejs"
 	"github.com/open-feature/cli/internal/generators/python"
@@ -257,6 +258,58 @@ func getGenerateCSharpCmd() *cobra.Command {
 	return csharpCmd
 }
 
+func getGenerateJavaCmd() *cobra.Command {
+	javaCmd := &cobra.Command{
+		Use:   "java",
+		Short: "Generate typesafe Java client.",
+		Long:  `Generate typesafe Java client compatible with the OpenFeature Java SDK.`,
+		Annotations: map[string]string{
+			"stability": string(generators.Alpha),
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate.java")
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			manifestPath := config.GetManifestPath(cmd)
+			javaPackageName := config.GetJavaPackageName(cmd)
+			outputPath := config.GetOutputPath(cmd)
+
+			logger.Default.GenerationStarted("Java")
+
+			params := generators.Params[java.Params]{
+				OutputPath: outputPath,
+				Custom: java.Params{
+					JavaPackage: javaPackageName,
+				},
+			}
+
+			flagset, err := flagset.Load(manifestPath)
+			if err != nil {
+				return err
+			}
+
+			generator := java.NewGenerator(flagset)
+			logger.Default.Debug("Executing Java generator")
+			err = generator.Generate(&params)
+			if err != nil {
+				return err
+			}
+
+			logger.Default.GenerationComplete("Java")
+
+			return nil
+
+		},
+	}
+
+	// Add Java specific flags
+	config.AddJavaGenerateFlags(javaCmd)
+
+	addStabilityInfo(javaCmd)
+
+	return javaCmd
+}
+
 func getGenerateGoCmd() *cobra.Command {
 	goCmd := &cobra.Command{
 		Use:   "go",
@@ -355,6 +408,7 @@ func init() {
 	generators.DefaultManager.Register(getGenerateGoCmd)
 	generators.DefaultManager.Register(getGenerateNodeJSCmd)
 	generators.DefaultManager.Register(getGeneratePythonCmd)
-  generators.DefaultManager.Register(getGenerateCSharpCmd)
+	generators.DefaultManager.Register(getGenerateCSharpCmd)
 	generators.DefaultManager.Register(GetGenerateNestJsCmd)
+	generators.DefaultManager.Register(getGenerateJavaCmd)
 }
