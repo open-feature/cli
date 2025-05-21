@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/manifest"
@@ -64,7 +65,7 @@ func Load(manifestPath string) (*Flagset, error) {
 	if err != nil {
 		return nil, err
 	} else if len(validationErrors) > 0 {
-		return nil, fmt.Errorf("validation failed: %v", validationErrors)
+		return nil, errors.New(FormatValidationError(validationErrors))
 	}
 
 	var flagset Flagset
@@ -131,4 +132,48 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 	})
 
 	return nil
+}
+func FormatValidationError(issues []manifest.ValidationError) string {
+	var sb strings.Builder
+	sb.WriteString("flag manifest validation failed:\n")
+	sb.WriteString("+--------------+-------------+------------------+\n")
+	sb.WriteString("| flag type    | flag path   | error messages  |\n")
+	sb.WriteString("+--------------+-------------+------------------+\n")
+
+	// Group messages by flag path
+	grouped := make(map[string]struct {
+		flagType string
+		messages []string
+	})
+
+	for _, issue := range issues {
+		entry := grouped[issue.Path]
+		entry.flagType = issue.Type
+		entry.messages = append(entry.messages, issue.Message)
+		grouped[issue.Path] = entry
+	}
+
+	// Sort paths for consistent output
+	paths := make([]string, 0, len(grouped))
+	for path := range grouped {
+		paths = append(paths, path)
+	}
+	sort.Strings(paths)
+
+	// Format each row
+	for _, path := range paths {
+		entry := grouped[path]
+		sb.WriteString(fmt.Sprintf("- [%-12s]  [%-11s]\n  \t~ %-16s \n\t\t%s\n \t\t\t%s:\n \t\t\t\t%s\n\t\t\t\t%s \n\n",
+			entry.flagType,
+			path,
+			strings.Join(entry.messages, ", \n\t~ "),
+			"Suggestions:",
+			path,
+			"flagType: boolean",
+			"defaultValue: true",
+		))
+	}
+
+	sb.WriteString("+--------------+-------------+------------------+\n")
+	return sb.String()
 }
