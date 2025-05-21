@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.5](https://github.com/open-feature/cli/compare/v0.3.4...v0.3.5) (2025-05-20)
+
+
+### 🐛 Bug Fixes
+
+* Naming of generated java class ([#111](https://github.com/open-feature/cli/issues/111)) ([49e65c8](https://github.com/open-feature/cli/commit/49e65c828330abb732eb3b9cf85850bb5ac36531))
+
 ## [0.3.4](https://github.com/open-feature/cli/compare/v0.3.3...v0.3.4) (2025-05-14)
 
 
