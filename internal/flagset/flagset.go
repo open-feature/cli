@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/manifest"
@@ -64,7 +65,7 @@ func Load(manifestPath string) (*Flagset, error) {
 	if err != nil {
 		return nil, err
 	} else if len(validationErrors) > 0 {
-		return nil, fmt.Errorf("validation failed: %v", validationErrors)
+		return nil, errors.New(FormatValidationError(validationErrors))
 	}
 
 	var flagset Flagset
@@ -131,4 +132,44 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 	})
 
 	return nil
+}
+func FormatValidationError(issues []manifest.ValidationError) string {
+	var sb strings.Builder
+	sb.WriteString("flag manifest validation failed:\n\n")
+
+	// Group messages by flag path
+	grouped := make(map[string]struct {
+		flagType string
+		messages []string
+	})
+
+	for _, issue := range issues {
+		entry := grouped[issue.Path]
+		entry.flagType = issue.Type
+		entry.messages = append(entry.messages, issue.Message)
+		grouped[issue.Path] = entry
+	}
+
+	// Sort paths for consistent output
+	paths := make([]string, 0, len(grouped))
+	for path := range grouped {
+		paths = append(paths, path)
+	}
+	sort.Strings(paths)
+
+	// Format each row
+	for _, path := range paths {
+		entry := grouped[path]
+		flagType := entry.flagType
+		if flagType == "" {
+			flagType = "missing"
+		}
+		sb.WriteString(fmt.Sprintf(
+			"- flagType: %s\n  flagPath: %s\n  errors:\n    ~ %s\n  \tSuggestions:\n      \t- flagType: boolean\n      \t- defaultValue: true\n\n",
+			flagType,
+			path,
+			strings.Join(entry.messages, "\n    ~ "),
+		))
+	}
+	return sb.String()
 }
