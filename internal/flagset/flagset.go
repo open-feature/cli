@@ -135,10 +135,7 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 }
 func FormatValidationError(issues []manifest.ValidationError) string {
 	var sb strings.Builder
-	sb.WriteString("flag manifest validation failed:\n")
-	sb.WriteString("+--------------+-------------+------------------+\n")
-	sb.WriteString("| flag type    | flag path   | error messages  |\n")
-	sb.WriteString("+--------------+-------------+------------------+\n")
+	sb.WriteString("flag manifest validation failed:\n\n")
 
 	// Group messages by flag path
 	grouped := make(map[string]struct {
@@ -163,17 +160,16 @@ func FormatValidationError(issues []manifest.ValidationError) string {
 	// Format each row
 	for _, path := range paths {
 		entry := grouped[path]
-		sb.WriteString(fmt.Sprintf("- [%-12s]  [%-11s]\n  \t~ %-16s \n\t\t%s\n \t\t\t%s:\n \t\t\t\t%s\n\t\t\t\t%s \n\n",
-			entry.flagType,
+		flagType := entry.flagType
+		if flagType == "" {
+			flagType = "missing"
+		}
+		sb.WriteString(fmt.Sprintf(
+			"- flagType: %s\n  flagPath: %s\n  errors:\n    ~ %s\n  \tSuggestions:\n      \t- flagType: boolean\n      \t- defaultValue: true\n\n",
+			flagType,
 			path,
-			strings.Join(entry.messages, ", \n\t~ "),
-			"Suggestions:",
-			path,
-			"flagType: boolean",
-			"defaultValue: true",
+			strings.Join(entry.messages, "\n    ~ "),
 		))
 	}
-
-	sb.WriteString("+--------------+-------------+------------------+\n")
 	return sb.String()
 }
