@@ -199,10 +199,10 @@ func renderFlatDiff(changes []manifest.Change, cmd *cobra.Command) error {
 func renderJSONDiff(changes []manifest.Change, cmd *cobra.Command) error {
 	// Create a structured response that can be easily consumed by tools
 	type structuredOutput struct {
-		TotalChanges   int               `json:"totalChanges" yaml:"totalChanges"`
-		Additions      []manifest.Change `json:"additions" yaml:"additions"`
-		Removals       []manifest.Change `json:"removals" yaml:"removals"`
-		Modifications  []manifest.Change `json:"modifications" yaml:"modifications"`
+		TotalChanges  int               `json:"totalChanges" yaml:"totalChanges"`
+		Additions     []manifest.Change `json:"additions" yaml:"additions"`
+		Removals      []manifest.Change `json:"removals" yaml:"removals"`
+		Modifications []manifest.Change `json:"modifications" yaml:"modifications"`
 	}
 
 	// Group changes by type
@@ -235,10 +235,10 @@ func renderJSONDiff(changes []manifest.Change, cmd *cobra.Command) error {
 func renderYAMLDiff(changes []manifest.Change, cmd *cobra.Command) error {
 	// Use the same structured output type as JSON but with YAML tags
 	type structuredOutput struct {
-		TotalChanges   int               `json:"totalChanges" yaml:"totalChanges"`
-		Additions      []manifest.Change `json:"additions" yaml:"additions"`
-		Removals       []manifest.Change `json:"removals" yaml:"removals"`
-		Modifications  []manifest.Change `json:"modifications" yaml:"modifications"`
+		TotalChanges  int               `json:"totalChanges" yaml:"totalChanges"`
+		Additions     []manifest.Change `json:"additions" yaml:"additions"`
+		Removals      []manifest.Change `json:"removals" yaml:"removals"`
+		Modifications []manifest.Change `json:"modifications" yaml:"modifications"`
 	}
 
 	// Group changes by type
