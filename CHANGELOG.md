@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.6](https://github.com/open-feature/cli/compare/v0.3.5...v0.3.6) (2025-05-31)
+
+
+### ✨ New Features
+
+* **flagset:** improve validation error formatting in Load function ([#119](https://github.com/open-feature/cli/issues/119)) ([8eec779](https://github.com/open-feature/cli/commit/8eec77965ab1b14121f7492a1b08bdaadd765bd9))
+* **flagset:** improve validation error formatting in Load function [#110](https://github.com/open-feature/cli/issues/110) ([8eec779](https://github.com/open-feature/cli/commit/8eec77965ab1b14121f7492a1b08bdaadd765bd9))
+
+
+### 🧹 Chore
+
+* fix the directory structure ([#121](https://github.com/open-feature/cli/issues/121)) ([bcd11ea](https://github.com/open-feature/cli/commit/bcd11ea9c8115c1c7fd925f13613a332359de700))
+* upgrade dependencies ([#123](https://github.com/open-feature/cli/issues/123)) ([79d3dce](https://github.com/open-feature/cli/commit/79d3dceb3ad306b6c04c9e3c64285b5ffec3b05a))
+
 ## [0.3.5](https://github.com/open-feature/cli/compare/v0.3.4...v0.3.5) (2025-05-20)
 
 
