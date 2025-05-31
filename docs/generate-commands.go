@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/open-feature/cli/cmd"
+	"github.com/open-feature/cli/internal/cmd"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 )

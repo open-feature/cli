@@ -58,7 +58,7 @@ docker run -it -v $(pwd):/local -w /local ghcr.io/open-feature/cli:latest
 If you have `Go >= 1.23` installed, you can install the CLI using the following command:
 
 ```bash
-go install github.com/open-feature/cli@latest
+go install github.com/open-feature/cli/cmd/openfeature@latest
 ```
 
 ### via pre-built binaries

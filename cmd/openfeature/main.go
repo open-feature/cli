@@ -1,6 +1,6 @@
 package main
 
-import "github.com/open-feature/cli/cmd"
+import "github.com/open-feature/cli/internal/cmd"
 
 var (
 	// Overridden by Go Releaser at build time
