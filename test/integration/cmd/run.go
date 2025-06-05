@@ -20,6 +20,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	//Run the nodejs test
+	nodeCmd := exec.Command("go", "run", "gtihub.com/open-feature/cli/test/integration/cmd/nodejs")
+	nodeCmd.Stdout = os.Stdout
+	nodeCmd.Stderr = os.Stderr
+	if err := nodeCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running nodejs integration test: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Add more tests here as they are available
 
 	fmt.Println("=== All integration tests passed successfully ===")
