@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-integration",
+  "version": "1.0.0",
+  "description": "Integration test for OpenFeature CLI Node.js generator",
+  "main": "index.js",
+  "type":"module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openfeature/server-sdk": "^1.18.0"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

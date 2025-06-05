@@ -29,3 +29,8 @@ dist
 .openfeature.yaml
 
 .idea/
+
+node_modules/
+npm-debug.log*
+generated/
+*.log
