@@ -57,7 +57,7 @@ jobs:
           go-version-file: 'go.mod'
 
       - name: Run all integration tests with Dagger
-        uses: dagger/dagger-for-github@v5
+        uses: dagger/dagger-for-github@b81317a976cb7f7125469707321849737cd1b3bc # v7
         with:
           workdir: .
           verb: run
