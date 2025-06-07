@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
-    <PackageReference Include="OpenFeature" Version="2.3.2" />
+    <PackageReference Include="OpenFeature" Version="2.6.0" />
   </ItemGroup>
 
   <ItemGroup>
