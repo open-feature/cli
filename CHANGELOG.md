@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.3.6](https://github.com/open-feature/cli/compare/v0.3.5...v0.3.6) (2025-06-07)
+
+
+### 🐛 Bug Fixes
+
+* **deps:** update module github.com/pterm/pterm to v0.12.81 ([#129](https://github.com/open-feature/cli/issues/129)) ([a25f90a](https://github.com/open-feature/cli/commit/a25f90a65b50d4218b905351f9ed0504d1e54fba))
+
+
+### ✨ New Features
+
+* **flagset:** improve validation error formatting in Load function ([#119](https://github.com/open-feature/cli/issues/119)) ([8eec779](https://github.com/open-feature/cli/commit/8eec77965ab1b14121f7492a1b08bdaadd765bd9))
+* **flagset:** improve validation error formatting in Load function [#110](https://github.com/open-feature/cli/issues/110) ([8eec779](https://github.com/open-feature/cli/commit/8eec77965ab1b14121f7492a1b08bdaadd765bd9))
+
+
+### 🧹 Chore
+
+* add renovate.json file [#122](https://github.com/open-feature/cli/issues/122) ([#124](https://github.com/open-feature/cli/issues/124)) ([83dac70](https://github.com/open-feature/cli/commit/83dac705b9bfe00725e23c07cd7154d4e0877f22))
+* **deps:** update alpine docker tag to v3.22 ([#130](https://github.com/open-feature/cli/issues/130)) ([11b9c34](https://github.com/open-feature/cli/commit/11b9c34d86ab72e25387f9efb8f5453dc19f9dd1))
+* **deps:** update dependency microsoft.extensions.dependencyinjection to 8.0.1 ([#127](https://github.com/open-feature/cli/issues/127)) ([3ec8443](https://github.com/open-feature/cli/commit/3ec8443823455b546245f999904923a197833e4f))
+* fix the directory structure ([#121](https://github.com/open-feature/cli/issues/121)) ([bcd11ea](https://github.com/open-feature/cli/commit/bcd11ea9c8115c1c7fd925f13613a332359de700))
+* upgrade dependencies ([#123](https://github.com/open-feature/cli/issues/123)) ([79d3dce](https://github.com/open-feature/cli/commit/79d3dceb3ad306b6c04c9e3c64285b5ffec3b05a))
+
 ## [0.3.5](https://github.com/open-feature/cli/compare/v0.3.4...v0.3.5) (2025-05-20)
 
 
