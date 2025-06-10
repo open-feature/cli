@@ -2,10 +2,9 @@
   "name": "nodejs-integration",
   "version": "1.0.0",
   "description": "Integration test for OpenFeature CLI Node.js generator",
-  "main": "index.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
-    "test": "node test.js"
+    "test": "tsx test.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +12,12 @@
   "dependencies": {
     "@openfeature/server-sdk": "^1.18.0"
   },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
   "engines": {
-    "node": ">=16"
+    "node": ">=22"
   }
 }
