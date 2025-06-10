@@ -21,7 +21,7 @@ func main() {
 	}
 
 	//Run the nodejs test
-	nodeCmd := exec.Command("go", "run", "gtihub.com/open-feature/cli/test/integration/cmd/nodejs")
+	nodeCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/nodejs")
 	nodeCmd.Stdout = os.Stdout
 	nodeCmd.Stderr = os.Stderr
 	if err := nodeCmd.Run(); err != nil {

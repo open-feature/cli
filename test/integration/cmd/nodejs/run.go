@@ -23,7 +23,7 @@ func New(projectDir, testDir string) *Test {
 func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Container, error) {
 	source := client.Host().Directory(t.ProjectDir)
 	testFiles := client.Host().Directory(t.TestDir, dagger.HostDirectoryOpts{
-		Include: []string{"package.json", "index.js", "test.js"},
+		Include: []string{"package.json", "test.ts"},
 	})
 
 	cli := client.Container().
@@ -41,7 +41,8 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 	generatedFiles := generated.Directory("/tmp/generated")
 
 	nodeContainer := client.Container().
-		From("node:18-alpine").
+		From("node:22-alpine").
+		WithExec([]string{"npm", "install", "-g", "typescript"}).
 		WithDirectory("/app/generated", generatedFiles).
 		WithDirectory("/app", testFiles).
 		WithWorkdir("/app").
@@ -62,7 +63,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	testDir, err := filepath.Abs(filepath.Join(projectDir, "test/nodejs-intergration"))
+	testDir, err := filepath.Abs(filepath.Join(projectDir, "test/nodejs-integration"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get test dir: %v\n", err)
 		os.Exit(1)
