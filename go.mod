@@ -3,7 +3,7 @@ module github.com/open-feature/cli
 go 1.23.0
 
 require (
-	dagger.io/dagger v0.18.9
+	dagger.io/dagger v0.18.10
 	github.com/google/go-cmp v0.7.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/invopop/jsonschema v0.13.0
@@ -22,7 +22,7 @@ require (
 	atomicgo.dev/cursor v0.2.0 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
 	atomicgo.dev/schedule v0.1.0 // indirect
-	github.com/99designs/gqlgen v0.17.73 // indirect
+	github.com/99designs/gqlgen v0.17.74 // indirect
 	github.com/Khan/genqlient v0.8.1 // indirect
 	github.com/adrg/xdg v0.5.3 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
@@ -75,12 +75,12 @@ require (
 	go.opentelemetry.io/proto/otlp v1.7.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20250530174510-65e920069ea6 // indirect
-	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/term v0.32.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250528174236-200df99c418a // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect
-	google.golang.org/grpc v1.72.2 // indirect
+	google.golang.org/grpc v1.73.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )
