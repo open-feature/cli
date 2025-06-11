@@ -4,6 +4,7 @@ on:
     branches:
       - main
   pull_request:
+  merge_group:
 
 permissions:
   # Required: allow read access to the content for analysis.
