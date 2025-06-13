@@ -10,6 +10,11 @@ test-integration-csharp:
 	@echo "Running C# integration test with Dagger..."
 	@go run ./test/integration/cmd/csharp/run.go
 
+.PHONY: test-integration-go
+test-integration-go:
+	@echo "Running Go integration test with Dagger..."
+	@go run ./test/integration/cmd/go/run.go
+
 .PHONY: test-integration
 test-integration:
 	@echo "Running all integration tests with Dagger..."
