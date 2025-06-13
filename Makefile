@@ -11,8 +11,8 @@ test-integration-csharp:
 	@go run ./test/integration/cmd/csharp/run.go
 
 .PHONY: test-integration-nodejs
-test-intergration-nodejs:
-    @echo "Running NodeJS integration test with Dagger..."
+test-integration-nodejs:
+	@echo "Running NodeJS integration test with Dagger..."
 	@go run ./test/integration/cmd/nodejs/run.go
 
 .PHONY: test-integration
