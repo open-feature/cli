@@ -82,6 +82,7 @@ async function main() {
                 }
             } else {
                 console.log(`⚠️  ${test.name} method not found`);
+                process.exit(1);
             }
         }
 
