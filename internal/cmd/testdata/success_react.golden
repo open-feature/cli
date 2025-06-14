@@ -89,6 +89,33 @@ export const useSuspenseGreetingMessage = (options?: ReactFlagEvaluationNoSuspen
 };
 
 /**
+* Allows customization of theme colors.
+* 
+* **Details:**
+* - flag key: `themeCustomization`
+* - default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
+* - type: `object`
+*/
+export const useThemeCustomization = (options?: ReactFlagEvaluationOptions) => {
+  return useFlag("themeCustomization", {"primaryColor":"#007bff","secondaryColor":"#6c757d"}, options);
+};
+
+/**
+* Allows customization of theme colors.
+* 
+* **Details:**
+* - flag key: `themeCustomization`
+* - default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
+* - type: `object`
+*
+* Equivalent to useFlag with options: `{ suspend: true }`
+* @experimental — Suspense is an experimental feature subject to change in future versions.
+*/
+export const useSuspenseThemeCustomization = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
+  return useSuspenseFlag("themeCustomization", {"primaryColor":"#007bff","secondaryColor":"#6c757d"}, options);
+};
+
+/**
 * Maximum allowed length for usernames.
 * 
 * **Details:**
