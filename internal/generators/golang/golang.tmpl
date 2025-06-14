@@ -15,7 +15,7 @@ type IntProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext
 type IntProviderDetails func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.IntEvaluationDetails, error)
 type StringProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext) (string, error)
 type StringProviderDetails func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.StringEvaluationDetails, error)
-type ObjectProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext) (map[string]interface{}, error)
+type ObjectProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext) (any, error)
 type ObjectProviderDetails func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.InterfaceEvaluationDetails, error)
 
 var client openfeature.IClient = nil
@@ -31,11 +31,11 @@ var {{ .Key | ToPascal }} = struct {
     // the evaluation error, if any, and the evaluation details.
     ValueWithDetails {{ .Type | OpenFeatureType }}ProviderDetails
 }{
-    Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) ({{ .Type | TypeString }}, error) {
-        return client.{{ .Type | OpenFeatureType }}Value(ctx, {{ .Key | Quote }}, {{- if eq (OpenFeatureType .Type) "Object" }} {{.DefaultValue | ToMapLiteral }} {{- else }} {{ .DefaultValue | QuoteString }} {{- end}}, evalCtx)
+    Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) ({{- if eq (OpenFeatureType .Type) "Object"}}any{{- else }} {{ .Type | TypeString }}{{- end }}, error) {
+        return client.{{ .Type | OpenFeatureType }}Value(ctx, {{ .Key | Quote }}, {{- if eq (OpenFeatureType .Type) "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
     },
-    ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.{{ .Type | OpenFeatureType }}EvaluationDetails, error){
-        return client.{{ .Type | OpenFeatureType }}ValueDetails(ctx, {{ .Key | Quote }}, {{- if eq (OpenFeatureType .Type) "Object" }} {{.DefaultValue | ToMapLiteral }} {{- else }} {{ .DefaultValue | QuoteString }} {{- end}}, evalCtx)
+    ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.{{- if eq (OpenFeatureType .Type) "Object"}}Interface{{- else }}{{ .Type | OpenFeatureType }}{{- end}}EvaluationDetails, error){
+        return client.{{ .Type | OpenFeatureType }}ValueDetails(ctx, {{ .Key | Quote }}, {{- if eq (OpenFeatureType .Type) "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
     },
 }
 {{- end}}
