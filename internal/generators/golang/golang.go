@@ -3,6 +3,8 @@ package golang
 import (
 	_ "embed"
 	"fmt"
+	"maps"
+	"slices"
 	"sort"
 	"strings"
 	"text/template"
@@ -72,16 +74,18 @@ func toMapLiteral(value any) string {
 		return "nil"
 	}
 
+	// To have a determined order of the object for comparison
+	keys := slices.Sorted(maps.Keys(assertedMap))
+
 	var builder strings.Builder
 	builder.WriteString("map[string]any{")
 
-	firstVal := true
-	for key, val := range assertedMap {
-		if !firstVal {
+	for index, key := range keys {
+		if index != 0 {
 			builder.WriteString(",")
 		}
+		val := assertedMap[key]
 
-		firstVal = false
 		builder.WriteString(fmt.Sprintf(`"%s": %q`, key, val))
 	}
 
