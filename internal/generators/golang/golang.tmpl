@@ -32,10 +32,10 @@ var {{ .Key | ToPascal }} = struct {
     ValueWithDetails {{ .Type | OpenFeatureType }}ProviderDetails
 }{
     Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) ({{- if eq (OpenFeatureType .Type) "Object"}}any{{- else }} {{ .Type | TypeString }}{{- end }}, error) {
-        return client.{{ .Type | OpenFeatureType }}Value(ctx, {{ .Key | Quote }}, {{- if eq (OpenFeatureType .Type) "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
+        return client.{{ .Type | OpenFeatureType }}Value(ctx, {{ .Key | Quote }}, {{ if eq (OpenFeatureType .Type) "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
     },
     ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.{{- if eq (OpenFeatureType .Type) "Object"}}Interface{{- else }}{{ .Type | OpenFeatureType }}{{- end}}EvaluationDetails, error){
-        return client.{{ .Type | OpenFeatureType }}ValueDetails(ctx, {{ .Key | Quote }}, {{- if eq (OpenFeatureType .Type) "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
+        return client.{{ .Type | OpenFeatureType }}ValueDetails(ctx, {{ .Key | Quote }}, {{ if eq (OpenFeatureType .Type) "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
     },
 }
 {{- end}}
