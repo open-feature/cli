@@ -2,6 +2,11 @@ package python
 
 import (
 	_ "embed"
+	"encoding/json"
+	"fmt"
+	"maps"
+	"slices"
+	"strings"
 	"text/template"
 
 	"github.com/open-feature/cli/internal/flagset"
@@ -43,6 +48,8 @@ func methodType(flagType flagset.FlagType) string {
 		return "boolean"
 	case flagset.FloatType:
 		return "float"
+	case flagset.ObjectType:
+		return "object"
 	default:
 		panic("unsupported flag type")
 	}
@@ -74,6 +81,49 @@ func pythonBoolLiteral(value interface{}) interface{} {
 	return value
 }
 
+func toPythonDict(value any) string {
+	assertedMap, ok := value.(map[string]any)
+	if !ok {
+		return "None"
+	}
+
+	// To have a determined order of the object for comparison
+	keys := slices.Sorted(maps.Keys(assertedMap))
+
+	var builder strings.Builder
+	builder.WriteString("{")
+
+	for index, key := range keys {
+		if index != 0 {
+			builder.WriteString(",")
+		}
+		val := assertedMap[key]
+
+		builder.WriteString(fmt.Sprintf("%q: ", key))
+
+		switch val.(type) {
+		case string:
+			builder.WriteString(fmt.Sprintf("%q", val))
+		case bool:
+			builder.WriteString(pythonBoolLiteral(val).(string))
+		case int:
+			builder.WriteString(fmt.Sprintf("%v", val))
+		case float64:
+			builder.WriteString(fmt.Sprintf("%v", val))
+		default:
+			jsonBytes, err := json.Marshal(val)
+			if err != nil {
+				builder.WriteString("None")
+			}
+			str := strings.ReplaceAll(string(jsonBytes), "null", "None")
+			builder.WriteString(str)
+		}
+	}
+
+	builder.WriteString("}")
+	return builder.String()
+}
+
 func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
 		"OpenFeatureType":         openFeatureType,
@@ -82,6 +132,7 @@ func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
 		"TypedDetailsMethodSync":  typedDetailsMethodSync,
 		"TypedDetailsMethodAsync": typedDetailsMethodAsync,
 		"PythonBoolLiteral":       pythonBoolLiteral,
+		"ToPythonDict":            toPythonDict,
 	}
 
 	newParams := &generators.Params[any]{
@@ -95,8 +146,6 @@ func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
 // NewGenerator creates a generator for Python.
 func NewGenerator(fs *flagset.Flagset) *PythonGenerator {
 	return &PythonGenerator{
-		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{
-			flagset.ObjectType: true,
-		}),
+		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{}),
 	}
 }
