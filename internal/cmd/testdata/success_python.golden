@@ -278,6 +278,94 @@ class GeneratedClient:
             flag_evaluation_options=flag_evaluation_options,
         )
 
+    def theme_customization(
+        self,
+        evaluation_context: Optional[EvaluationContext] = None,
+        flag_evaluation_options: Optional[FlagEvaluationOptions] = None,
+    ) -> object:
+        """
+        Allows customization of theme colors.
+
+        **Details:**
+        - flag key: `themeCustomization`
+        - default value: `{"primaryColor": "#007bff","secondaryColor": "#6c757d"}`
+        - type: `object`
+        
+        Performs a flag evaluation that returns a `object`.
+        """
+        return self.client.get_object_value(
+            flag_key="themeCustomization",
+            default_value={"primaryColor": "#007bff","secondaryColor": "#6c757d"},
+            evaluation_context=evaluation_context,
+            flag_evaluation_options=flag_evaluation_options,
+        )
+    
+    def theme_customization_details(
+        self,
+        evaluation_context: Optional[EvaluationContext] = None,
+        flag_evaluation_options: Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails:
+        """
+        Allows customization of theme colors.
+
+        **Details:**
+        - flag key: `themeCustomization`
+        - default value: `{"primaryColor": "#007bff","secondaryColor": "#6c757d"}`
+        - type: `object`
+        
+        Performs a flag evaluation that returns a `FlagEvaluationDetails` instance.
+        """
+        return self.client.get_object_details(
+            flag_key="themeCustomization",
+            default_value={"primaryColor": "#007bff","secondaryColor": "#6c757d"},
+            evaluation_context=evaluation_context,
+            flag_evaluation_options=flag_evaluation_options,
+        )
+    
+    async def theme_customization_async(
+        self,
+        evaluation_context: Optional[EvaluationContext] = None,
+        flag_evaluation_options: Optional[FlagEvaluationOptions] = None,
+    ) -> object:
+        """
+        Allows customization of theme colors.
+
+        **Details:**
+        - flag key: `themeCustomization`
+        - default value: `{"primaryColor": "#007bff","secondaryColor": "#6c757d"}`
+        - type: `object`
+        
+        Performs a flag evaluation asynchronously and returns a `object`.
+        """
+        return await self.client.get_object_value_async(
+            flag_key="themeCustomization",
+            default_value={"primaryColor": "#007bff","secondaryColor": "#6c757d"},
+            evaluation_context=evaluation_context,
+            flag_evaluation_options=flag_evaluation_options,
+        )
+    
+    async def theme_customization_details_async(
+        self,
+        evaluation_context: Optional[EvaluationContext] = None,
+        flag_evaluation_options: Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails:
+        """
+        Allows customization of theme colors.
+
+        **Details:**
+        - flag key: `themeCustomization`
+        - default value: `{"primaryColor": "#007bff","secondaryColor": "#6c757d"}`
+        - type: `object`
+        
+        Performs a flag evaluation asynchronously and returns a `FlagEvaluationDetails` instance.
+        """
+        return await self.client.get_object_details_async(
+            flag_key="themeCustomization",
+            default_value={"primaryColor": "#007bff","secondaryColor": "#6c757d"},
+            evaluation_context=evaluation_context,
+            flag_evaluation_options=flag_evaluation_options,
+        )
+
     def username_max_length(
         self,
         evaluation_context: Optional[EvaluationContext] = None,
