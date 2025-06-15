@@ -2,6 +2,7 @@ package golang
 
 import (
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"maps"
 	"slices"
@@ -81,16 +82,47 @@ func toMapLiteral(value any) string {
 	builder.WriteString("map[string]any{")
 
 	for index, key := range keys {
-		if index != 0 {
+		if index > 0 {
 			builder.WriteString(",")
 		}
 		val := assertedMap[key]
 
-		builder.WriteString(fmt.Sprintf(`"%s": %q`, key, val))
+		builder.WriteString(fmt.Sprintf(`%q: %s`, key, composeNestedLiteral(val)))
 	}
 
 	builder.WriteString("}")
 	return builder.String()
+}
+
+func composeNestedLiteral(value any) string {
+	switch val := value.(type) {
+	case string:
+		return fmt.Sprintf("%q", val)
+	case bool:
+		return fmt.Sprintf("%t", val)
+	case int, int64, float64:
+		return fmt.Sprintf("%v", val)
+	case map[string]any:
+		return toMapLiteral(val)
+	case []any:
+		var sliceBuilder strings.Builder
+		sliceBuilder.WriteString("[]any{")
+		for index, elem := range val {
+			if index == 0 {
+				sliceBuilder.WriteString(",")
+			}
+
+			sliceBuilder.WriteString(composeNestedLiteral(elem))
+		}
+		sliceBuilder.WriteString("}")
+		return sliceBuilder.String()
+	default:
+		jsonBytes, err := json.Marshal(val)
+		if err != nil {
+			return "nil"
+		}
+		return fmt.Sprintf("%q", string(jsonBytes))
+	}
 }
 
 func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {

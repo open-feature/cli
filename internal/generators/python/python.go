@@ -71,7 +71,7 @@ func typedDetailsMethodAsync(flagType flagset.FlagType) string {
 	return "get_" + methodType(flagType) + "_details_async"
 }
 
-func pythonBoolLiteral(value interface{}) interface{} {
+func pythonBoolLiteral(value any) any {
 	if v, ok := value.(bool); ok {
 		if v {
 			return "True"
@@ -99,29 +99,43 @@ func toPythonDict(value any) string {
 		}
 		val := assertedMap[key]
 
-		builder.WriteString(fmt.Sprintf("%q: ", key))
-
-		switch val.(type) {
-		case string:
-			builder.WriteString(fmt.Sprintf("%q", val))
-		case bool:
-			builder.WriteString(pythonBoolLiteral(val).(string))
-		case int:
-			builder.WriteString(fmt.Sprintf("%v", val))
-		case float64:
-			builder.WriteString(fmt.Sprintf("%v", val))
-		default:
-			jsonBytes, err := json.Marshal(val)
-			if err != nil {
-				builder.WriteString("None")
-			}
-			str := strings.ReplaceAll(string(jsonBytes), "null", "None")
-			builder.WriteString(str)
-		}
+		builder.WriteString(fmt.Sprintf(`%q: %s`, key, composeNestedDict(val)))
 	}
 
 	builder.WriteString("}")
 	return builder.String()
+}
+
+func composeNestedDict(value any) string {
+	switch val := value.(type) {
+	case string:
+		return fmt.Sprintf("%q", val)
+	case bool:
+		return fmt.Sprintf(pythonBoolLiteral(val).(string))
+	case int, int64, float64:
+		return fmt.Sprintf("%v", val)
+	case map[string]any:
+		return toPythonDict(val)
+	case []any:
+		var sliceBuilder strings.Builder
+		sliceBuilder.WriteString("[")
+		for index, elem := range val {
+			if index > 0 {
+				sliceBuilder.WriteString(",")
+			}
+
+			sliceBuilder.WriteString(composeNestedDict(elem))
+		}
+		sliceBuilder.WriteString("]")
+		return sliceBuilder.String()
+	default:
+		jsonBytes, err := json.Marshal(val)
+		if err != nil {
+			return "None"
+		}
+		return strings.ReplaceAll(string(jsonBytes), "null", "None")
+	}
+
 }
 
 func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
