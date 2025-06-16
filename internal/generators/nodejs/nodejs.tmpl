@@ -17,7 +17,7 @@ export interface GeneratedClient {
   * 
   * **Details:**
   * - flag key: `{{ .Key }}`
-  * - default value: `{{ .DefaultValue }}`
+  * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
   * - type: `{{ .Type | OpenFeatureType }}`
   * 
   * Performs a flag evaluation that returns a {{ .Type | OpenFeatureType }}.
@@ -75,11 +75,11 @@ export function getGeneratedClient(domainOrContext?: string | EvaluationContext,
   return {
 {{- range .Flagset.Flags }}
     {{ .Key | ToCamel }}: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<{{ .Type | OpenFeatureType }}> => {
-      return client.get{{ .Type | OpenFeatureType | ToPascal }}Value({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, context, options);
+      return client.get{{ .Type | OpenFeatureType | ToPascal }}Value({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, context, options);
     },
 
     {{ .Key | ToCamel }}Details: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<{{ .Type | OpenFeatureType }}>> => {
-      return client.get{{ .Type | OpenFeatureType | ToPascal }}Details({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, context, options);
+      return client.get{{ .Type | OpenFeatureType | ToPascal }}Details({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, context, options);
     },
 {{ end -}}
 {{ printf "  " }}}

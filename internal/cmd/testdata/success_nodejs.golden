@@ -102,6 +102,36 @@ export interface GeneratedClient {
   greetingMessageDetails(context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<string>>;
 
   /**
+  * Allows customization of theme colors.
+  * 
+  * **Details:**
+  * - flag key: `themeCustomization`
+  * - default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
+  * - type: `object`
+  * 
+  * Performs a flag evaluation that returns a object.
+  * @param {EvaluationContext} context The evaluation context used on an individual flag evaluation
+  * @param {FlagEvaluationOptions} options Additional flag evaluation options
+  * @returns {Promise<object>} Flag evaluation response
+  */
+  themeCustomization(context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<object>;
+
+  /**
+  * Allows customization of theme colors.
+  * 
+  * **Details:**
+  * - flag key: `themeCustomization`
+  * - default value: `map[primaryColor:#007bff secondaryColor:#6c757d]`
+  * - type: `object`
+  * 
+  * Performs a flag evaluation that a returns an evaluation details object.
+  * @param {EvaluationContext} context The evaluation context used on an individual flag evaluation
+  * @param {FlagEvaluationOptions} options Additional flag evaluation options
+  * @returns {Promise<EvaluationDetails<object>>} Flag evaluation details response
+  */
+  themeCustomizationDetails(context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<object>>;
+
+  /**
   * Maximum allowed length for usernames.
   * 
   * **Details:**
@@ -183,6 +213,14 @@ export function getGeneratedClient(domainOrContext?: string | EvaluationContext,
 
     greetingMessageDetails: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<string>> => {
       return client.getStringDetails("greetingMessage", "Hello there!", context, options);
+    },
+
+    themeCustomization: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<object> => {
+      return client.getObjectValue("themeCustomization", {"primaryColor":"#007bff","secondaryColor":"#6c757d"}, context, options);
+    },
+
+    themeCustomizationDetails: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<object>> => {
+      return client.getObjectDetails("themeCustomization", {"primaryColor":"#007bff","secondaryColor":"#6c757d"}, context, options);
     },
 
     usernameMaxLength: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<number> => {
