@@ -65,14 +65,17 @@ func toHashMap(value any) string {
 	keys := slices.Sorted(maps.Keys(assertedMap))
 
 	var builder strings.Builder
-	builder.WriteString("Map<String, Object> flag = new LinkedHashMap<>(); \n")
+	builder.WriteString("Map.of(")
 
-	for _, key := range keys {
+	for index, key := range keys {
+		if index > 0 {
+			builder.WriteString(", ")
+		}
 		val := assertedMap[key]
 
-		builder.WriteString(fmt.Sprintf("map.put(%q, %s);\n", key, formatNestedValue(val)))
+		builder.WriteString(fmt.Sprintf("%q, %s", key, formatNestedValue(val)))
 	}
-	builder.WriteString("return map")
+	builder.WriteString(")")
 
 	return builder.String()
 }
@@ -80,13 +83,29 @@ func toHashMap(value any) string {
 func formatNestedValue(value any) string {
 	switch val := value.(type) {
 	case string:
-		return fmt.Sprintf("%q", val)
+		flag := flagset.Flag{
+			Type:         flagset.StringType,
+			DefaultValue: val,
+		}
+		return formatDefaultValueForJava(flag)
 	case bool:
-		return fmt.Sprintf("%t", val)
+		flag := flagset.Flag{
+			Type:         flagset.BoolType,
+			DefaultValue: val,
+		}
+		return formatDefaultValueForJava(flag)
 	case int, int64:
-		return fmt.Sprintf("%v", val)
+		flag := flagset.Flag{
+			Type:         flagset.IntType,
+			DefaultValue: val,
+		}
+		return formatDefaultValueForJava(flag)
 	case float64:
-		return fmt.Sprintf("%f", val) + "d"
+		flag := flagset.Flag{
+			Type:         flagset.FloatType,
+			DefaultValue: val,
+		}
+		return formatDefaultValueForJava(flag)
 	case map[string]any:
 		return toHashMap(val)
 	case []any:
