@@ -32,7 +32,7 @@ export interface GeneratedClient {
   * 
   * **Details:**
   * - flag key: `{{ .Key }}`
-  * - default value: `{{ .DefaultValue }}`
+  * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
   * - type: `{{ .Type | OpenFeatureType }}`
   * 
   * Performs a flag evaluation that a returns an evaluation details object.

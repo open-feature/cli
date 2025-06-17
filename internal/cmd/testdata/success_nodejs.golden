@@ -121,7 +121,7 @@ export interface GeneratedClient {
   * 
   * **Details:**
   * - flag key: `themeCustomization`
-  * - default value: `map[primaryColor:#007bff secondaryColor:#6c757d]`
+  * - default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
   * - type: `object`
   * 
   * Performs a flag evaluation that a returns an evaluation details object.
