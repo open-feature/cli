@@ -56,7 +56,7 @@ func formatDefaultValueForJava(flag flagset.Flag) string {
 	}
 }
 
-func toHashMap(value any) string {
+func toMapLiteral(value any) string {
 	assertedMap, ok := value.(map[string]any)
 	if !ok {
 		return "null"
@@ -107,7 +107,7 @@ func formatNestedValue(value any) string {
 		}
 		return formatDefaultValueForJava(flag)
 	case map[string]any:
-		return toHashMap(val)
+		return toMapLiteral(val)
 	case []any:
 		var sliceBuilder strings.Builder
 		sliceBuilder.WriteString("List.of(")
@@ -133,7 +133,7 @@ func (g *JavaGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
 		"OpenFeatureType":    openFeatureType,
 		"FormatDefaultValue": formatDefaultValueForJava,
-		"ToHashMap":          toHashMap,
+		"ToMapLiteral":       toMapLiteral,
 	}
 
 	newParams := &generators.Params[any]{

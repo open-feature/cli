@@ -17,7 +17,7 @@ public final class OpenFeature {
          * Details:
          * - Flag key: {{ .Key }}
          * - Type: {{ .Type | OpenFeatureType }}
-         * - Default value: {{ .DefaultValue }}
+         * - Default value: {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ .DefaultValue }}{{ end }}
          * Returns the flag value
          */
         {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx);
@@ -27,7 +27,7 @@ public final class OpenFeature {
          * Details:
          * - Flag key: {{ .Key }}
          * - Type: {{ .Type | OpenFeatureType }}
-         * - Default value: {{ .DefaultValue }}
+         * - Default value: {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ .DefaultValue }}{{ end }}
          * Returns the evaluation details containing the flag value and metadata
          */
         FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx);
@@ -44,12 +44,12 @@ public final class OpenFeature {
         {{ range .Flagset.Flags }}
         @Override
         public {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx) {
-            return client.get{{ .Type | OpenFeatureType | ToPascal }}Value("{{ .Key }}", {{ . | FormatDefaultValue }}, ctx);
+            return client.get{{ .Type | OpenFeatureType | ToPascal }}Value("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
         }
 
         @Override
         public FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
-            return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ . | FormatDefaultValue }}, ctx);
+            return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
         }
         {{ end }}
     }
