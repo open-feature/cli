@@ -59,13 +59,13 @@ func formatDefaultValue(flag flagset.Flag) string {
 func toCSharpDict(value any) string {
 	assertedMap, ok := value.(map[string]any)
 	if !ok {
-		return "new Value()"
+		return "null"
 	}
 
 	keys := slices.Sorted(maps.Keys(assertedMap))
 
 	var builder strings.Builder
-	builder.WriteString("new Value(new Dictionary<string, Value>{")
+	builder.WriteString("new Dictionary<string, object>{")
 
 	for index, key := range keys {
 		if index > 0 {
@@ -75,7 +75,7 @@ func toCSharpDict(value any) string {
 
 		builder.WriteString(fmt.Sprintf("{ %q, %s }", key, formatNestedValue(val)))
 	}
-	builder.WriteString("})")
+	builder.WriteString("}")
 
 	return builder.String()
 }
@@ -83,38 +83,34 @@ func toCSharpDict(value any) string {
 func formatNestedValue(value any) string {
 	switch val := value.(type) {
 	case string:
-		// flag := flagset.Flag{
-		// 	Type:         flagset.StringType,
-		// 	DefaultValue: val,
-		// }
-		// return formatDefaultValue(flag)
-		return fmt.Sprintf("new Value(%q)", val)
+		flag := flagset.Flag{
+			Type:         flagset.StringType,
+			DefaultValue: val,
+		}
+		return formatDefaultValue(flag)
 	case bool:
-		// flag := flagset.Flag{
-		// 	Type:         flagset.BoolType,
-		// 	DefaultValue: val,
-		// }
-		// return formatDefaultValue(flag)
-		return fmt.Sprintf("new Value(%t)", val)
+		flag := flagset.Flag{
+			Type:         flagset.BoolType,
+			DefaultValue: val,
+		}
+		return formatDefaultValue(flag)
 	case int, int64:
-		// flag := flagset.Flag{
-		// 	Type:         flagset.IntType,
-		// 	DefaultValue: val,
-		// }
-		// return formatDefaultValue(flag)
-		return fmt.Sprintf("new Value(%d)", val)
+		flag := flagset.Flag{
+			Type:         flagset.IntType,
+			DefaultValue: val,
+		}
+		return formatDefaultValue(flag)
 	case float64:
-		// flag := flagset.Flag{
-		// 	Type:         flagset.FloatType,
-		// 	DefaultValue: val,
-		// }
-		// return formatDefaultValue(flag)
-		return fmt.Sprintf("new Value(%f)", val)
+		flag := flagset.Flag{
+			Type:         flagset.FloatType,
+			DefaultValue: val,
+		}
+		return formatDefaultValue(flag)
 	case map[string]any:
 		return toCSharpDict(val)
 	case []any:
 		var sliceBuilder strings.Builder
-		sliceBuilder.WriteString("new Value(new List<Value>{")
+		sliceBuilder.WriteString("new List<object>{")
 		for index, elem := range val {
 			if index > 0 {
 				sliceBuilder.WriteString(",")
@@ -122,14 +118,14 @@ func formatNestedValue(value any) string {
 
 			sliceBuilder.WriteString(formatNestedValue(elem))
 		}
-		sliceBuilder.WriteString("})")
+		sliceBuilder.WriteString("}")
 		return sliceBuilder.String()
 	default:
 		jsonBytes, err := json.Marshal(val)
 		if err != nil {
-			return "new Value()"
+			return "null"
 		}
-		return fmt.Sprintf("new Value(%q)", string(jsonBytes))
+		return fmt.Sprintf("%q", string(jsonBytes))
 	}
 }
 
