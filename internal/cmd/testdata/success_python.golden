@@ -288,14 +288,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `themeCustomization`
-        - default value: `{"primaryColor": "#007bff","secondaryColor": "#6c757d"}`
+        - default value: `{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}`
         - type: `object`
         
         Performs a flag evaluation that returns a `object`.
         """
         return self.client.get_object_value(
             flag_key="themeCustomization",
-            default_value={"primaryColor": "#007bff","secondaryColor": "#6c757d"},
+            default_value={"primaryColor": "#007bff", "secondaryColor": "#6c757d"},
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -310,14 +310,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `themeCustomization`
-        - default value: `{"primaryColor": "#007bff","secondaryColor": "#6c757d"}`
+        - default value: `{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}`
         - type: `object`
         
         Performs a flag evaluation that returns a `FlagEvaluationDetails` instance.
         """
         return self.client.get_object_details(
             flag_key="themeCustomization",
-            default_value={"primaryColor": "#007bff","secondaryColor": "#6c757d"},
+            default_value={"primaryColor": "#007bff", "secondaryColor": "#6c757d"},
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -332,14 +332,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `themeCustomization`
-        - default value: `{"primaryColor": "#007bff","secondaryColor": "#6c757d"}`
+        - default value: `{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}`
         - type: `object`
         
         Performs a flag evaluation asynchronously and returns a `object`.
         """
         return await self.client.get_object_value_async(
             flag_key="themeCustomization",
-            default_value={"primaryColor": "#007bff","secondaryColor": "#6c757d"},
+            default_value={"primaryColor": "#007bff", "secondaryColor": "#6c757d"},
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )
@@ -354,14 +354,14 @@ class GeneratedClient:
 
         **Details:**
         - flag key: `themeCustomization`
-        - default value: `{"primaryColor": "#007bff","secondaryColor": "#6c757d"}`
+        - default value: `{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}`
         - type: `object`
         
         Performs a flag evaluation asynchronously and returns a `FlagEvaluationDetails` instance.
         """
         return await self.client.get_object_details_async(
             flag_key="themeCustomization",
-            default_value={"primaryColor": "#007bff","secondaryColor": "#6c757d"},
+            default_value={"primaryColor": "#007bff", "secondaryColor": "#6c757d"},
             evaluation_context=evaluation_context,
             flag_evaluation_options=flag_evaluation_options,
         )

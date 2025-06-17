@@ -80,10 +80,10 @@ var ThemeCustomization = struct {
     ValueWithDetails ObjectProviderDetails
 }{
     Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (any, error) {
-        return client.ObjectValue(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff","secondaryColor": "#6c757d"}, evalCtx)
+        return client.ObjectValue(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}, evalCtx)
     },
     ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.InterfaceEvaluationDetails, error){
-        return client.ObjectValueDetails(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff","secondaryColor": "#6c757d"}, evalCtx)
+        return client.ObjectValueDetails(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}, evalCtx)
     },
 }
 // Maximum allowed length for usernames.

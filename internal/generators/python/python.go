@@ -95,7 +95,7 @@ func toPythonDict(value any) string {
 
 	for index, key := range keys {
 		if index != 0 {
-			builder.WriteString(",")
+			builder.WriteString(", ")
 		}
 		val := assertedMap[key]
 
