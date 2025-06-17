@@ -73,7 +73,7 @@ func toCSharpDict(value any) string {
 		}
 		val := assertedMap[key]
 
-		builder.WriteString(fmt.Sprintf("%q, %s", key, formatNestedValue(val)))
+		builder.WriteString(fmt.Sprintf("{ %q, %s }", key, formatNestedValue(val)))
 	}
 	builder.WriteString("}")
 
