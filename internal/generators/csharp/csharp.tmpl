@@ -64,7 +64,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
         /// </summary>
         /// <remarks>
         /// <para>Flag key: {{ .Key }}</para>
-        /// <para>Default value: {{ .DefaultValue }}</para>
+        /// <para>Default value: {{ if eq (.Type | OpenFeatureType) "object" }}{{ .DefaultValue | ToCSharpDict }}{{ else }}{{ .DefaultValue }}{{ end }}</para>
         /// <para>Type: {{ .Type | OpenFeatureType }}</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
@@ -80,6 +80,8 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
             return await _client.GetBooleanValueAsync("{{ .Key }}", {{ . | FormatDefaultValue }}, evaluationContext, options);
             {{- else if eq .Type 4 }}
             return await _client.GetStringValueAsync("{{ .Key }}", {{ . | FormatDefaultValue }}, evaluationContext, options);
+            {{- else if eq .Type 5 }}
+            return await _client.GetObjectValueAsync("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "object" }}{{ .DefaultValue | ToCSharpDict }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, evaluationContext, options);
             {{- else }}
             throw new NotSupportedException("Unsupported flag type");
             {{- end }}
@@ -90,7 +92,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
         /// </summary>
         /// <remarks>
         /// <para>Flag key: {{ .Key }}</para>
-        /// <para>Default value: {{ .DefaultValue }}</para>
+        /// <para>Default value: {{ if eq (.Type | OpenFeatureType) "object" }}{{ .DefaultValue | ToCSharpDict }}{{ else }}{{ .DefaultValue }}{{ end }}</para>
         /// <para>Type: {{ .Type | OpenFeatureType }}</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
@@ -106,6 +108,8 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
             return await _client.GetBooleanDetailsAsync("{{ .Key }}", {{ . | FormatDefaultValue }}, evaluationContext, options);
             {{- else if eq .Type 4 }}
             return await _client.GetStringDetailsAsync("{{ .Key }}", {{ . | FormatDefaultValue }}, evaluationContext, options);
+            {{- else if eq .Type 5 }}
+            return await _client.GetObjectValueAsync("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "object" }}{{ .DefaultValue | ToCSharpDict }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, evaluationContext, options);
             {{- else }}
             throw new NotSupportedException("Unsupported flag type");
             {{- end }}
