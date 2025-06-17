@@ -2,7 +2,11 @@ package java
 
 import (
 	_ "embed"
+	"encoding/json"
 	"fmt"
+	"maps"
+	"slices"
+	"strings"
 	"text/template"
 
 	"github.com/open-feature/cli/internal/flagset"
@@ -31,6 +35,8 @@ func openFeatureType(t flagset.FlagType) string {
 		return "Boolean"
 	case flagset.StringType:
 		return "String"
+	case flagset.ObjectType:
+		return "Object"
 	default:
 		return ""
 	}
@@ -50,10 +56,65 @@ func formatDefaultValueForJava(flag flagset.Flag) string {
 	}
 }
 
+func toHashMap(value any) string {
+	assertedMap, ok := value.(map[string]any)
+	if !ok {
+		return "null"
+	}
+
+	keys := slices.Sorted(maps.Keys(assertedMap))
+
+	var builder strings.Builder
+	builder.WriteString("Map<String, Object> flag = new LinkedHashMap<>(); \n")
+
+	for _, key := range keys {
+		val := assertedMap[key]
+
+		builder.WriteString(fmt.Sprintf("map.put(%q, %s);\n", key, formatNestedValue(val)))
+	}
+	builder.WriteString("return map")
+
+	return builder.String()
+}
+
+func formatNestedValue(value any) string {
+	switch val := value.(type) {
+	case string:
+		return fmt.Sprintf("%q", val)
+	case bool:
+		return fmt.Sprintf("%t", val)
+	case int, int64:
+		return fmt.Sprintf("%v", val)
+	case float64:
+		return fmt.Sprintf("%f", val) + "d"
+	case map[string]any:
+		return toHashMap(val)
+	case []any:
+		var sliceBuilder strings.Builder
+		sliceBuilder.WriteString("List.of(")
+		for index, elem := range val {
+			if index > 0 {
+				sliceBuilder.WriteString(",")
+			}
+
+			sliceBuilder.WriteString(formatNestedValue(elem))
+		}
+		sliceBuilder.WriteString(")")
+		return sliceBuilder.String()
+	default:
+		jsonBytes, err := json.Marshal(val)
+		if err != nil {
+			return "null"
+		}
+		return fmt.Sprintf("%q", string(jsonBytes))
+	}
+}
+
 func (g *JavaGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
 		"OpenFeatureType":    openFeatureType,
 		"FormatDefaultValue": formatDefaultValueForJava,
+		"ToHashMap":          toHashMap,
 	}
 
 	newParams := &generators.Params[any]{
@@ -67,8 +128,6 @@ func (g *JavaGenerator) Generate(params *generators.Params[Params]) error {
 // NewGenerator creates a generator for Java.
 func NewGenerator(fs *flagset.Flagset) *JavaGenerator {
 	return &JavaGenerator{
-		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{
-			flagset.ObjectType: true,
-		}),
+		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{}),
 	}
 }
