@@ -87,14 +87,14 @@ func toMapLiteral(value any) string {
 		}
 		val := assertedMap[key]
 
-		builder.WriteString(fmt.Sprintf(`%q: %s`, key, composeNestedLiteral(val)))
+		builder.WriteString(fmt.Sprintf(`%q: %s`, key, formatNestedValue(val)))
 	}
 
 	builder.WriteString("}")
 	return builder.String()
 }
 
-func composeNestedLiteral(value any) string {
+func formatNestedValue(value any) string {
 	switch val := value.(type) {
 	case string:
 		return fmt.Sprintf("%q", val)
@@ -108,11 +108,11 @@ func composeNestedLiteral(value any) string {
 		var sliceBuilder strings.Builder
 		sliceBuilder.WriteString("[]any{")
 		for index, elem := range val {
-			if index == 0 {
+			if index > 0 {
 				sliceBuilder.WriteString(",")
 			}
 
-			sliceBuilder.WriteString(composeNestedLiteral(elem))
+			sliceBuilder.WriteString(formatNestedValue(elem))
 		}
 		sliceBuilder.WriteString("}")
 		return sliceBuilder.String()

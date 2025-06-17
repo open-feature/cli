@@ -99,14 +99,14 @@ func toPythonDict(value any) string {
 		}
 		val := assertedMap[key]
 
-		builder.WriteString(fmt.Sprintf(`%q: %s`, key, composeNestedDict(val)))
+		builder.WriteString(fmt.Sprintf(`%q: %s`, key, formatNestedValue(val)))
 	}
 
 	builder.WriteString("}")
 	return builder.String()
 }
 
-func composeNestedDict(value any) string {
+func formatNestedValue(value any) string {
 	switch val := value.(type) {
 	case string:
 		return fmt.Sprintf("%q", val)
@@ -124,7 +124,7 @@ func composeNestedDict(value any) string {
 				sliceBuilder.WriteString(",")
 			}
 
-			sliceBuilder.WriteString(composeNestedDict(elem))
+			sliceBuilder.WriteString(formatNestedValue(elem))
 		}
 		sliceBuilder.WriteString("]")
 		return sliceBuilder.String()
