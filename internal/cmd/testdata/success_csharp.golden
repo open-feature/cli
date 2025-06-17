@@ -158,7 +158,7 @@ namespace TestNamespace
         /// </summary>
         /// <remarks>
         /// <para>Flag key: themeCustomization</para>
-        /// <para>Default value: new Dictionary<string, object>{{ "primaryColor", "#007bff" }, { "secondaryColor", "#6c757d" }}</para>
+        /// <para>Default value: new Value(new Dictionary<string, Value>{{ "primaryColor", new Value("#007bff") }, { "secondaryColor", new Value("#6c757d") }})</para>
         /// <para>Type: object</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
@@ -166,7 +166,7 @@ namespace TestNamespace
         /// <returns>The flag value</returns>
         public async Task<object> ThemeCustomizationAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
         {
-            return await _client.GetObjectValueAsync("themeCustomization", new Dictionary<string, object>{{ "primaryColor", "#007bff" }, { "secondaryColor", "#6c757d" }}, evaluationContext, options);
+            return await _client.GetObjectValueAsync("themeCustomization", new Value(new Dictionary<string, Value>{{ "primaryColor", new Value("#007bff") }, { "secondaryColor", new Value("#6c757d") }}), evaluationContext, options);
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace TestNamespace
         /// </summary>
         /// <remarks>
         /// <para>Flag key: themeCustomization</para>
-        /// <para>Default value: new Dictionary<string, object>{{ "primaryColor", "#007bff" }, { "secondaryColor", "#6c757d" }}</para>
+        /// <para>Default value: new Value(new Dictionary<string, Value>{{ "primaryColor", new Value("#007bff") }, { "secondaryColor", new Value("#6c757d") }})</para>
         /// <para>Type: object</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
@@ -182,7 +182,7 @@ namespace TestNamespace
         /// <returns>The evaluation details containing the flag value and metadata</returns>
         public async Task<FlagEvaluationDetails<object>> ThemeCustomizationDetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
         {
-            return await _client.GetObjectValueAsync("themeCustomization", new Dictionary<string, object>{{ "primaryColor", "#007bff" }, { "secondaryColor", "#6c757d" }}, evaluationContext, options);
+            return await _client.GetObjectValueAsync("themeCustomization", new Value(new Dictionary<string, Value>{{ "primaryColor", new Value("#007bff") }, { "secondaryColor", new Value("#6c757d") }}), evaluationContext, options);
         }
         
         /// <summary>
