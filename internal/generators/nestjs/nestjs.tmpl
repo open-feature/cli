@@ -100,7 +100,7 @@ interface TypedFeatureProps {
  * **Details:**
  * - flag key: `{{ .Key }}`
  * - description: `{{ .Description }}`
- * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}`
+ * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
  * - type: `{{ .Type | OpenFeatureType }}`
  *
  * Usage:
