@@ -68,7 +68,8 @@ async function main() {
             { name: 'enableFeatureA', expected: 'boolean' },
             { name: 'greetingMessage', expected: 'string' },
             { name: 'usernameMaxLength', expected: 'number' },
-            { name: 'discountPercentage', expected: 'number' }
+            { name: 'discountPercentage', expected: 'number' },
+            { name: 'themeCustomization', expected: 'object' }
         ];
 
         for (const test of tests) {

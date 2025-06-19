@@ -159,15 +159,15 @@ namespace TestNamespace
         /// </summary>
         /// <remarks>
         /// <para>Flag key: themeCustomization</para>
-        /// <para>Default value: map[primaryColor:#007bff secondaryColor:#6c757d]</para>
-        /// <para>Type: Value</para>
+        /// <para>Default value: new Value(new StructureBuilder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build())</para>
+        /// <para>Type: object</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
         /// <param name="options">Options for flag evaluation</param>
         /// <returns>The flag value</returns>
         public async Task<Value> ThemeCustomizationAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
         {
-            throw new NotSupportedException("Unsupported flag type");
+            return await _client.GetObjectValueAsync("themeCustomization", new Value(new StructureBuilder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build()), evaluationContext, options);
         }
 
         /// <summary>
@@ -175,15 +175,15 @@ namespace TestNamespace
         /// </summary>
         /// <remarks>
         /// <para>Flag key: themeCustomization</para>
-        /// <para>Default value: map[primaryColor:#007bff secondaryColor:#6c757d]</para>
-        /// <para>Type: Value</para>
+        /// <para>Default value: new Value(new StructureBuilder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build())</para>
+        /// <para>Type: object</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
         /// <param name="options">Options for flag evaluation</param>
         /// <returns>The evaluation details containing the flag value and metadata</returns>
         public async Task<FlagEvaluationDetails<Value>> ThemeCustomizationDetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
         {
-            throw new NotSupportedException("Unsupported flag type");
+            return await _client.GetObjectValueAsync("themeCustomization", new Value(new StructureBuilder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build()), evaluationContext, options);
         }
         
         /// <summary>
