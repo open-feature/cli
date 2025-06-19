@@ -64,7 +64,7 @@ func toCSharpDict(value any) string {
 	keys := slices.Sorted(maps.Keys(assertedMap))
 
 	var builder strings.Builder
-	builder.WriteString("new Value(new Structure.Builder()")
+	builder.WriteString("new Value(new StructureBuilder()")
 
 	for _, key := range keys {
 		val := assertedMap[key]
