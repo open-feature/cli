@@ -70,7 +70,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
         /// <param name="options">Options for flag evaluation</param>
         /// <returns>The flag value</returns>
-        public async Task<{{ .Type | OpenFeatureType }}> {{ .Key | ToPascal }}Async(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<{{ if eq (.Type | OpenFeatureType) "object" }}Value{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> {{ .Key | ToPascal }}Async(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
         {
             {{- if eq .Type 1 }}
             return await _client.GetIntegerValueAsync("{{ .Key }}", {{ . | FormatDefaultValue }}, evaluationContext, options);
@@ -98,7 +98,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
         /// <param name="options">Options for flag evaluation</param>
         /// <returns>The evaluation details containing the flag value and metadata</returns>
-        public async Task<FlagEvaluationDetails<{{ .Type | OpenFeatureType }}>> {{ .Key | ToPascal }}DetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
+        public async Task<FlagEvaluationDetails<{{ if eq (.Type | OpenFeatureType) "object" }}Value{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>> {{ .Key | ToPascal }}DetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
         {
             {{- if eq .Type 1 }}
             return await _client.GetIntegerDetailsAsync("{{ .Key }}", {{ . | FormatDefaultValue }}, evaluationContext, options);

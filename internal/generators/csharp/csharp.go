@@ -2,7 +2,6 @@ package csharp
 
 import (
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"maps"
 	"slices"
@@ -65,17 +64,14 @@ func toCSharpDict(value any) string {
 	keys := slices.Sorted(maps.Keys(assertedMap))
 
 	var builder strings.Builder
-	builder.WriteString("new Dictionary<string, object>{")
+	builder.WriteString("new Value(new Structure.Builder()")
 
-	for index, key := range keys {
-		if index > 0 {
-			builder.WriteString(", ")
-		}
+	for _, key := range keys {
 		val := assertedMap[key]
 
-		builder.WriteString(fmt.Sprintf("{ %q, %s }", key, formatNestedValue(val)))
+		builder.WriteString(fmt.Sprintf(".Set(%q, %s)", key, formatNestedValue(val)))
 	}
-	builder.WriteString("}")
+	builder.WriteString(".Build())")
 
 	return builder.String()
 }
@@ -110,22 +106,18 @@ func formatNestedValue(value any) string {
 		return toCSharpDict(val)
 	case []any:
 		var sliceBuilder strings.Builder
-		sliceBuilder.WriteString("new List<object>{")
+		sliceBuilder.WriteString("new Value(new List<Value>{")
 		for index, elem := range val {
 			if index > 0 {
-				sliceBuilder.WriteString(",")
+				sliceBuilder.WriteString(", ")
 			}
 
 			sliceBuilder.WriteString(formatNestedValue(elem))
 		}
-		sliceBuilder.WriteString("}")
+		sliceBuilder.WriteString("})")
 		return sliceBuilder.String()
 	default:
-		jsonBytes, err := json.Marshal(val)
-		if err != nil {
-			return "null"
-		}
-		return fmt.Sprintf("%q", string(jsonBytes))
+		return fmt.Sprintf("new Value(%s)", val)
 	}
 }
 
