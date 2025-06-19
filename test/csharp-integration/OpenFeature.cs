@@ -117,7 +117,7 @@ namespace OpenFeature
         /// </summary>
         /// <remarks>
         /// <para>Flag key: themeCustomization</para>
-        /// <para>Default value: new Value(new StructureBuilder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build())</para>
+        /// <para>Default value: new Value(Structure.Builder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build())</para>
         /// <para>Type: object</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
@@ -125,7 +125,7 @@ namespace OpenFeature
         /// <returns>The flag value</returns>
         public async Task<Value> ThemeCustomizationAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
         {
-            return await _client.GetObjectValueAsync("themeCustomization", new Value(new StructureBuilder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build()), evaluationContext, options);
+            return await _client.GetObjectValueAsync("themeCustomization", new Value(Structure.Builder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build()), evaluationContext, options);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace OpenFeature
         /// </summary>
         /// <remarks>
         /// <para>Flag key: themeCustomization</para>
-        /// <para>Default value: new Value(new StructureBuilder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build())</para>
+        /// <para>Default value: new Value(Structure.Builder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build())</para>
         /// <para>Type: object</para>
         /// </remarks>
         /// <param name="evaluationContext">Optional context for the flag evaluation</param>
@@ -141,7 +141,7 @@ namespace OpenFeature
         /// <returns>The evaluation details containing the flag value and metadata</returns>
         public async Task<FlagEvaluationDetails<Value>> ThemeCustomizationDetailsAsync(EvaluationContext? evaluationContext = null, FlagEvaluationOptions? options = null)
         {
-            return await _client.GetObjectValueAsync("themeCustomization", new Value(new StructureBuilder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build()), evaluationContext, options);
+            return await _client.GetObjectValueAsync("themeCustomization", new Value(Structure.Builder().Set("primaryColor", "#007bff").Set("secondaryColor", "#6c757d").Build()), evaluationContext, options);
         }
         
         /// <summary>
