@@ -5,6 +5,7 @@ import {
   type ReactFlagEvaluationNoSuspenseOptions,
   useFlag,
   useSuspenseFlag,
+  JsonValue
 } from "@openfeature/react-sdk";
 
 /**
@@ -94,7 +95,7 @@ export const useSuspenseGreetingMessage = (options?: ReactFlagEvaluationNoSuspen
 * **Details:**
 * - flag key: `themeCustomization`
 * - default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
-* - type: `object`
+* - type: `JsonValue`
 */
 export const useThemeCustomization = (options?: ReactFlagEvaluationOptions) => {
   return useFlag("themeCustomization", {"primaryColor":"#007bff","secondaryColor":"#6c757d"}, options);
@@ -106,7 +107,7 @@ export const useThemeCustomization = (options?: ReactFlagEvaluationOptions) => {
 * **Details:**
 * - flag key: `themeCustomization`
 * - default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
-* - type: `object`
+* - type: `JsonValue`
 *
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.

@@ -8,6 +8,7 @@ import type {
   EvaluationContext,
   EvaluationDetails,
   OpenFeatureModuleOptions,
+  JsonValue
 } from "@openfeature/nestjs-sdk";
 import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag, ObjectFeatureFlag } from "@openfeature/nestjs-sdk";
 
@@ -176,14 +177,14 @@ export function GreetingMessage(props?: TypedFeatureProps): ParameterDecorator {
  * - flag key: `themeCustomization`
  * - description: `Allows customization of theme colors.`
  * - default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
- * - type: `object`
+ * - type: `JsonValue`
  *
  * Usage:
  * ```typescript
  * @Get("/")
  * public async handleRequest(
  *     @ThemeCustomization()
- *     themeCustomization: Observable<EvaluationDetails<object>>,
+ *     themeCustomization: Observable<EvaluationDetails<JsonValue>>,
  * )
  * ```
  * @param {TypedFeatureProps} props The options for injecting the feature flag.

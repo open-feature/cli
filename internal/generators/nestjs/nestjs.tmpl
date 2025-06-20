@@ -8,6 +8,7 @@ import type {
   EvaluationContext,
   EvaluationDetails,
   OpenFeatureModuleOptions,
+  JsonValue
 } from "@openfeature/nestjs-sdk";
 import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag, ObjectFeatureFlag } from "@openfeature/nestjs-sdk";
 
@@ -101,14 +102,14 @@ interface TypedFeatureProps {
  * - flag key: `{{ .Key }}`
  * - description: `{{ .Description }}`
  * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
- * - type: `{{ .Type | OpenFeatureType }}`
+ * - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
  *
  * Usage:
  * ```typescript
  * @Get("/")
  * public async handleRequest(
  *     @{{ .Key | ToPascal }}()
- *     {{ .Key | ToCamel }}: Observable<EvaluationDetails<{{ .Type | OpenFeatureType }}>>,
+ *     {{ .Key | ToCamel }}: Observable<EvaluationDetails<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>>,
  * )
  * ```
  * @param {TypedFeatureProps} props The options for injecting the feature flag.
