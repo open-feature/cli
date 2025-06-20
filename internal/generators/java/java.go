@@ -113,7 +113,7 @@ func formatNestedValue(value any) string {
 		sliceBuilder.WriteString("List.of(")
 		for index, elem := range val {
 			if index > 0 {
-				sliceBuilder.WriteString(",")
+				sliceBuilder.WriteString(", ")
 			}
 
 			sliceBuilder.WriteString(formatNestedValue(elem))
