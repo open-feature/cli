@@ -14,6 +14,8 @@ type IntProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext
 type IntProviderDetails func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.IntEvaluationDetails, error)
 type StringProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext) (string, error)
 type StringProviderDetails func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.StringEvaluationDetails, error)
+type ObjectProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext) (any, error)
+type ObjectProviderDetails func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.InterfaceEvaluationDetails, error)
 
 var client openfeature.IClient = nil
 // Discount percentage applied to purchases.
@@ -65,6 +67,23 @@ var GreetingMessage = struct {
     },
     ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.StringEvaluationDetails, error){
         return client.StringValueDetails(ctx, "greetingMessage", "Hello there!", evalCtx)
+    },
+}
+// Allows customization of theme colors.
+var ThemeCustomization = struct {
+    // Value returns the value of the flag ThemeCustomization,
+    // as well as the evaluation error, if present.
+    Value ObjectProvider
+
+    // ValueWithDetails returns the value of the flag ThemeCustomization,
+    // the evaluation error, if any, and the evaluation details.
+    ValueWithDetails ObjectProviderDetails
+}{
+    Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (any, error) {
+        return client.ObjectValue(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}, evalCtx)
+    },
+    ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.InterfaceEvaluationDetails, error){
+        return client.ObjectValueDetails(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}, evalCtx)
     },
 }
 // Maximum allowed length for usernames.

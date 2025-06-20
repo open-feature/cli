@@ -3,6 +3,9 @@ package csharp
 import (
 	_ "embed"
 	"fmt"
+	"maps"
+	"slices"
+	"strings"
 	"text/template"
 
 	"github.com/open-feature/cli/internal/flagset"
@@ -31,6 +34,8 @@ func openFeatureType(t flagset.FlagType) string {
 		return "bool"
 	case flagset.StringType:
 		return "string"
+	case flagset.ObjectType:
+		return "object"
 	default:
 		return ""
 	}
@@ -50,10 +55,77 @@ func formatDefaultValue(flag flagset.Flag) string {
 	}
 }
 
+func toCSharpDict(value any) string {
+	assertedMap, ok := value.(map[string]any)
+	if !ok {
+		return "null"
+	}
+
+	keys := slices.Sorted(maps.Keys(assertedMap))
+
+	var builder strings.Builder
+	builder.WriteString("new Value(Structure.Builder()")
+
+	for _, key := range keys {
+		val := assertedMap[key]
+
+		builder.WriteString(fmt.Sprintf(".Set(%q, %s)", key, formatNestedValue(val)))
+	}
+	builder.WriteString(".Build())")
+
+	return builder.String()
+}
+
+func formatNestedValue(value any) string {
+	switch val := value.(type) {
+	case string:
+		flag := flagset.Flag{
+			Type:         flagset.StringType,
+			DefaultValue: val,
+		}
+		return formatDefaultValue(flag)
+	case bool:
+		flag := flagset.Flag{
+			Type:         flagset.BoolType,
+			DefaultValue: val,
+		}
+		return formatDefaultValue(flag)
+	case int, int64:
+		flag := flagset.Flag{
+			Type:         flagset.IntType,
+			DefaultValue: val,
+		}
+		return formatDefaultValue(flag)
+	case float64:
+		flag := flagset.Flag{
+			Type:         flagset.FloatType,
+			DefaultValue: val,
+		}
+		return formatDefaultValue(flag)
+	case map[string]any:
+		return toCSharpDict(val)
+	case []any:
+		var sliceBuilder strings.Builder
+		sliceBuilder.WriteString("new Value(new List<Value>{")
+		for index, elem := range val {
+			if index > 0 {
+				sliceBuilder.WriteString(", ")
+			}
+
+			sliceBuilder.WriteString(formatNestedValue(elem))
+		}
+		sliceBuilder.WriteString("})")
+		return sliceBuilder.String()
+	default:
+		return fmt.Sprintf("new Value(%s)", val)
+	}
+}
+
 func (g *CsharpGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
 		"OpenFeatureType":    openFeatureType,
 		"FormatDefaultValue": formatDefaultValue,
+		"ToCSharpDict":       toCSharpDict,
 	}
 
 	newParams := &generators.Params[any]{
@@ -67,8 +139,6 @@ func (g *CsharpGenerator) Generate(params *generators.Params[Params]) error {
 // NewGenerator creates a generator for C#.
 func NewGenerator(fs *flagset.Flagset) *CsharpGenerator {
 	return &CsharpGenerator{
-		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{
-			flagset.ObjectType: true,
-		}),
+		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{}),
 	}
 }

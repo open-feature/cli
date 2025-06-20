@@ -48,6 +48,16 @@ func run() error {
 				"default": 50,
 			},
 		},
+		"themeCustomization": {
+			State:          memprovider.Enabled,
+			DefaultVariant: "default",
+			Variants: map[string]any{
+				"default": map[string]any{
+					"primaryColor":   "#007bff",
+					"secondaryColor": "#6c757d",
+				},
+			},
+		},
 	})
 
 	// Set the provider and wait for it to be ready
@@ -84,7 +94,13 @@ func run() error {
 	}
 	fmt.Printf("usernameMaxLength: %v\n", usernameMaxLength)
 
-	fmt.Println("Generated Go code compiles successfully!")
+	themeCustomization, err := generated.ThemeCustomization.Value(ctx, evalCtx)
+	if err != nil {
+		return fmt.Errorf("Error evaluating int flag: %v\n", err)
+	}
+	fmt.Printf("themeCustomization: %v\n", themeCustomization)
 
+	fmt.Println("Generated Go code compiles successfully!")
+	
 	return nil
 }

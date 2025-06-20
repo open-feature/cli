@@ -3,6 +3,7 @@ import {
   OpenFeature,
   stringOrUndefined,
   objectOrUndefined,
+  JsonValue,
 } from "@openfeature/server-sdk";
 import type {
   EvaluationContext,
@@ -17,30 +18,30 @@ export interface GeneratedClient {
   * 
   * **Details:**
   * - flag key: `{{ .Key }}`
-  * - default value: `{{ .DefaultValue }}`
-  * - type: `{{ .Type | OpenFeatureType }}`
+  * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
+  * - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
   * 
   * Performs a flag evaluation that returns a {{ .Type | OpenFeatureType }}.
   * @param {EvaluationContext} context The evaluation context used on an individual flag evaluation
   * @param {FlagEvaluationOptions} options Additional flag evaluation options
-  * @returns {Promise<{{ .Type | OpenFeatureType }}>} Flag evaluation response
+  * @returns {Promise<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>} Flag evaluation response
   */
-  {{ .Key | ToCamel }}(context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<{{ .Type | OpenFeatureType }}>;
+  {{ .Key | ToCamel }}(context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>;
 
   /**
   * {{ .Description }}
   * 
   * **Details:**
   * - flag key: `{{ .Key }}`
-  * - default value: `{{ .DefaultValue }}`
-  * - type: `{{ .Type | OpenFeatureType }}`
+  * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
+  * - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
   * 
   * Performs a flag evaluation that a returns an evaluation details object.
   * @param {EvaluationContext} context The evaluation context used on an individual flag evaluation
   * @param {FlagEvaluationOptions} options Additional flag evaluation options
-  * @returns {Promise<EvaluationDetails<{{ .Type | OpenFeatureType }}>>} Flag evaluation details response
+  * @returns {Promise<EvaluationDetails<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>>} Flag evaluation details response
   */
-  {{ .Key | ToCamel }}Details(context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<{{ .Type | OpenFeatureType }}>>;
+  {{ .Key | ToCamel }}Details(context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>>;
 {{ end -}}
 }
 
@@ -74,12 +75,12 @@ export function getGeneratedClient(domainOrContext?: string | EvaluationContext,
 
   return {
 {{- range .Flagset.Flags }}
-    {{ .Key | ToCamel }}: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<{{ .Type | OpenFeatureType }}> => {
-      return client.get{{ .Type | OpenFeatureType | ToPascal }}Value({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, context, options);
+    {{ .Key | ToCamel }}: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> => {
+      return client.get{{ .Type | OpenFeatureType | ToPascal }}Value({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, context, options);
     },
 
-    {{ .Key | ToCamel }}Details: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<{{ .Type | OpenFeatureType }}>> => {
-      return client.get{{ .Type | OpenFeatureType | ToPascal }}Details({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, context, options);
+    {{ .Key | ToCamel }}Details: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<EvaluationDetails<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>> => {
+      return client.get{{ .Type | OpenFeatureType | ToPascal }}Details({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, context, options);
     },
 {{ end -}}
 {{ printf "  " }}}

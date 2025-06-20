@@ -5,6 +5,7 @@ import {
   type ReactFlagEvaluationNoSuspenseOptions,
   useFlag,
   useSuspenseFlag,
+  JsonValue
 } from "@openfeature/react-sdk";
 {{ range .Flagset.Flags }}
 /**
@@ -12,11 +13,11 @@ import {
 * 
 * **Details:**
 * - flag key: `{{ .Key }}`
-* - default value: `{{ .DefaultValue }}`
-* - type: `{{ .Type | OpenFeatureType }}`
+* - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
+* - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
 */
 export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions) => {
-  return useFlag({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, options);
+  return useFlag({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, options);
 };
 
 /**
@@ -24,13 +25,13 @@ export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions) =
 * 
 * **Details:**
 * - flag key: `{{ .Key }}`
-* - default value: `{{ .DefaultValue }}`
-* - type: `{{ .Type | OpenFeatureType }}`
+* - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
+* - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
 *
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
 export const useSuspense{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationNoSuspenseOptions) => {
-  return useSuspenseFlag({{ .Key | Quote }}, {{ .DefaultValue | QuoteString }}, options);
+  return useSuspenseFlag({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, options);
 };
 {{ end}}

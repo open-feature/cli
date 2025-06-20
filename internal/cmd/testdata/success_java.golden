@@ -71,7 +71,27 @@ public final class OpenFeature {
          * Returns the evaluation details containing the flag value and metadata
          */
         FlagEvaluationDetails<String> greetingMessageDetails(EvaluationContext ctx);
+        
+        /**
+         * Allows customization of theme colors.
+         * Details:
+         * - Flag key: themeCustomization
+         * - Type: Object
+         * - Default value: Map.of("primaryColor", "#007bff", "secondaryColor", "#6c757d")
+         * Returns the flag value
+         */
+        Object themeCustomization(EvaluationContext ctx);
 
+        /**
+         * Allows customization of theme colors.
+         * Details:
+         * - Flag key: themeCustomization
+         * - Type: Object
+         * - Default value: Map.of("primaryColor", "#007bff", "secondaryColor", "#6c757d")
+         * Returns the evaluation details containing the flag value and metadata
+         */
+        FlagEvaluationDetails<Object> themeCustomizationDetails(EvaluationContext ctx);
+        
         /**
          * Maximum allowed length for usernames.
          * Details:
@@ -131,7 +151,17 @@ public final class OpenFeature {
         public FlagEvaluationDetails<String> greetingMessageDetails(EvaluationContext ctx) {
             return client.getStringDetails("greetingMessage", "Hello there!", ctx);
         }
+        
+        @Override
+        public Object themeCustomization(EvaluationContext ctx) {
+            return client.getObjectValue("themeCustomization", Map.of("primaryColor", "#007bff", "secondaryColor", "#6c757d"), ctx);
+        }
 
+        @Override
+        public FlagEvaluationDetails<Object> themeCustomizationDetails(EvaluationContext ctx) {
+            return client.getObjectDetails("themeCustomization", Map.of("primaryColor", "#007bff", "secondaryColor", "#6c757d"), ctx);
+        }
+        
         @Override
         public Integer usernameMaxLength(EvaluationContext ctx) {
             return client.getIntegerValue("usernameMaxLength", 50, ctx);
