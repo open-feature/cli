@@ -8,8 +8,9 @@ import type {
   EvaluationContext,
   EvaluationDetails,
   OpenFeatureModuleOptions,
+  JsonValue
 } from "@openfeature/nestjs-sdk";
-import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag } from "@openfeature/nestjs-sdk";
+import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag, ObjectFeatureFlag } from "@openfeature/nestjs-sdk";
 
 import type { GeneratedClient } from "./openfeature";
 import { getGeneratedClient } from "./openfeature";
@@ -100,21 +101,21 @@ interface TypedFeatureProps {
  * **Details:**
  * - flag key: `{{ .Key }}`
  * - description: `{{ .Description }}`
- * - default value: `{{ .DefaultValue }}`
- * - type: `{{ .Type | OpenFeatureType }}`
+ * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
+ * - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
  *
  * Usage:
  * ```typescript
  * @Get("/")
  * public async handleRequest(
  *     @{{ .Key | ToPascal }}()
- *     {{ .Key | ToCamel }}: Observable<EvaluationDetails<number>>,
+ *     {{ .Key | ToCamel }}: Observable<EvaluationDetails<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>>,
  * )
  * ```
  * @param {TypedFeatureProps} props The options for injecting the feature flag.
  * @returns {ParameterDecorator} The decorator function.
  */
 export function {{ .Key | ToPascal }}(props?: TypedFeatureProps): ParameterDecorator {
-  return {{ .Type | OpenFeatureType | ToPascal }}FeatureFlag({ flagKey: {{ .Key | Quote }}, defaultValue: {{ .DefaultValue | QuoteString }}, ...props });
+  return {{ .Type | OpenFeatureType | ToPascal }}FeatureFlag({ flagKey: {{ .Key | Quote }}, defaultValue: {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, ...props });
 }
 {{ end -}}

@@ -2,6 +2,7 @@ package react
 
 import (
 	_ "embed"
+	"encoding/json"
 	"text/template"
 
 	"github.com/open-feature/cli/internal/flagset"
@@ -28,14 +29,25 @@ func openFeatureType(t flagset.FlagType) string {
 		return "boolean"
 	case flagset.StringType:
 		return "string"
+	case flagset.ObjectType:
+		return "object"
 	default:
 		return ""
 	}
 }
 
+func toJSONString(value any) string {
+	bytes, err := json.Marshal(value)
+	if err != nil {
+		return "{}"
+	}
+	return string(bytes)
+}
+
 func (g *ReactGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
 		"OpenFeatureType": openFeatureType,
+		"ToJSONString":    toJSONString,
 	}
 
 	newParams := &generators.Params[any]{
@@ -49,8 +61,6 @@ func (g *ReactGenerator) Generate(params *generators.Params[Params]) error {
 // NewGenerator creates a generator for React.
 func NewGenerator(fs *flagset.Flagset) *ReactGenerator {
 	return &ReactGenerator{
-		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{
-			flagset.ObjectType: true,
-		}),
+		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{}),
 	}
 }

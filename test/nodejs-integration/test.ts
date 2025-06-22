@@ -1,4 +1,4 @@
-import { OpenFeature } from "@openfeature/server-sdk";
+import { OpenFeature, JsonValue } from "@openfeature/server-sdk";
 import { existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,8 +23,8 @@ class TestProvider {
         const values: Record<string, number> = { usernameMaxLength: 100, discountPercentage: 0.25 };
         return { value: values[flagKey] ?? defaultValue, reason: 'STATIC' };
     }
-    async resolveObjectEvaluation<T>(flagKey: string, defaultValue: T) {
-        const values: Record<string, T> = {
+    async resolveObjectEvaluation<T>(flagKey: string, defaultValue: JsonValue) {
+        const values: Record<string, JsonValue> = {
             themeCustomization: {
                 primaryColor: '#ff0000',
                 secondaryColor: '#00ff00'
@@ -68,7 +68,8 @@ async function main() {
             { name: 'enableFeatureA', expected: 'boolean' },
             { name: 'greetingMessage', expected: 'string' },
             { name: 'usernameMaxLength', expected: 'number' },
-            { name: 'discountPercentage', expected: 'number' }
+            { name: 'discountPercentage', expected: 'number' },
+            { name: 'themeCustomization', expected: 'object' }
         ];
 
         for (const test of tests) {

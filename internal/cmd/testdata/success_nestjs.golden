@@ -8,8 +8,9 @@ import type {
   EvaluationContext,
   EvaluationDetails,
   OpenFeatureModuleOptions,
+  JsonValue
 } from "@openfeature/nestjs-sdk";
-import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag } from "@openfeature/nestjs-sdk";
+import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag, ObjectFeatureFlag } from "@openfeature/nestjs-sdk";
 
 import type { GeneratedClient } from "./openfeature";
 import { getGeneratedClient } from "./openfeature";
@@ -133,7 +134,7 @@ export function DiscountPercentage(props?: TypedFeatureProps): ParameterDecorato
  * @Get("/")
  * public async handleRequest(
  *     @EnableFeatureA()
- *     enableFeatureA: Observable<EvaluationDetails<number>>,
+ *     enableFeatureA: Observable<EvaluationDetails<boolean>>,
  * )
  * ```
  * @param {TypedFeatureProps} props The options for injecting the feature flag.
@@ -158,7 +159,7 @@ export function EnableFeatureA(props?: TypedFeatureProps): ParameterDecorator {
  * @Get("/")
  * public async handleRequest(
  *     @GreetingMessage()
- *     greetingMessage: Observable<EvaluationDetails<number>>,
+ *     greetingMessage: Observable<EvaluationDetails<string>>,
  * )
  * ```
  * @param {TypedFeatureProps} props The options for injecting the feature flag.
@@ -166,6 +167,31 @@ export function EnableFeatureA(props?: TypedFeatureProps): ParameterDecorator {
  */
 export function GreetingMessage(props?: TypedFeatureProps): ParameterDecorator {
   return StringFeatureFlag({ flagKey: "greetingMessage", defaultValue: "Hello there!", ...props });
+}
+
+/**
+ * Gets the {@link EvaluationDetails} for `themeCustomization` from a domain scoped or the default OpenFeature
+ * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
+ *
+ * **Details:**
+ * - flag key: `themeCustomization`
+ * - description: `Allows customization of theme colors.`
+ * - default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
+ * - type: `JsonValue`
+ *
+ * Usage:
+ * ```typescript
+ * @Get("/")
+ * public async handleRequest(
+ *     @ThemeCustomization()
+ *     themeCustomization: Observable<EvaluationDetails<JsonValue>>,
+ * )
+ * ```
+ * @param {TypedFeatureProps} props The options for injecting the feature flag.
+ * @returns {ParameterDecorator} The decorator function.
+ */
+export function ThemeCustomization(props?: TypedFeatureProps): ParameterDecorator {
+  return ObjectFeatureFlag({ flagKey: "themeCustomization", defaultValue: {"primaryColor":"#007bff","secondaryColor":"#6c757d"}, ...props });
 }
 
 /**
