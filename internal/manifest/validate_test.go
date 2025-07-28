@@ -1,15 +1,13 @@
-package flagset
+package manifest
 
 import (
 	"strings"
 	"testing"
-
-	"github.com/open-feature/cli/internal/manifest"
 )
 
 // Sample test for FormatValidationError
 func TestFormatValidationError_SortsByPath(t *testing.T) {
-	issues := []manifest.ValidationError{
+	issues := []ValidationError{
 		{Path: "zeta.flag", Type: "boolean", Message: "must not be empty"},
 		{Path: "alpha.flag", Type: "string", Message: "invalid value"},
 		{Path: "beta.flag", Type: "number", Message: "must be greater than zero"},
