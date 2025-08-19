@@ -47,36 +47,36 @@ func GetInitCmd() *cobra.Command {
 			}
 
 			configFileExists, _ := filesystem.Exists(".openfeature.yaml")
+			shouldWriteConfig := false
+			var writeMessage string
+
 			if !configFileExists {
-				pterm.Info.Println("Creating .openfeature.yaml configuration file")
-				template := getConfigTemplate(flagSourceUrl)
-				err = filesystem.WriteFile(".openfeature.yaml", []byte(template))
-				if err != nil {
-					return err
-				}
+				shouldWriteConfig = true
+				writeMessage = "Creating .openfeature.yaml configuration file"
 			} else if flagSourceUrl != "" {
-				if !override {
+				if override {
+					shouldWriteConfig = true
+					writeMessage = "Updating flag source URL in .openfeature.yaml"
+				} else {
 					confirmMessage := "An existing .openfeature.yaml configuration file was found. Would you like to override it?"
 					shouldOverride, _ := pterm.DefaultInteractiveConfirm.Show(confirmMessage)
 					// Print a blank line for better readability.
 					pterm.Println()
-					if !shouldOverride {
-						logger.Default.Info("Configuration file was not modified.")
+					if shouldOverride {
+						shouldWriteConfig = true
+						writeMessage = "Updating flag source URL in .openfeature.yaml"
 					} else {
-						pterm.Info.Println("Updating flag source URL in .openfeature.yaml", pterm.LightWhite(flagSourceUrl))
-						template := getConfigTemplate(flagSourceUrl)
-						err = filesystem.WriteFile(".openfeature.yaml", []byte(template))
-						if err != nil {
-							return err
-						}
+						logger.Default.Info("Configuration file was not modified.")
 					}
-				} else {
-					pterm.Info.Println("Updating flag source URL in .openfeature.yaml", pterm.LightWhite(flagSourceUrl))
-					template := getConfigTemplate(flagSourceUrl)
-					err = filesystem.WriteFile(".openfeature.yaml", []byte(template))
-					if err != nil {
-						return err
-					}
+				}
+			}
+
+			if shouldWriteConfig {
+				pterm.Info.Println(writeMessage, pterm.LightWhite(flagSourceUrl))
+				template := getConfigTemplate(flagSourceUrl)
+				err = filesystem.WriteFile(".openfeature.yaml", []byte(template))
+				if err != nil {
+					return err
 				}
 			}
 
