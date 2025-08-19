@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -13,44 +12,57 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func promptForDefaultValue(flag *flagset.Flag) any {
+func promptForDefaultValue(flag *flagset.Flag) (any, error) {
 	switch flag.Type {
 	case flagset.BoolType:
 		options := []string{"false", "true"}
 		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
-		boolStr, _ := pterm.DefaultInteractiveSelect.WithOptions(options).WithFilter(false).Show(prompt)
-		boolValue, _ := strconv.ParseBool(boolStr)
-		return boolValue
+		boolStr, err := pterm.DefaultInteractiveSelect.WithOptions(options).WithFilter(false).Show(prompt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to prompt for bool value: %w", err)
+		}
+		boolValue, err := strconv.ParseBool(boolStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse bool value: %w", err)
+		}
+		return boolValue, nil
 	case flagset.IntType:
-		err := errors.New("Input a valid integer")
 		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
-		defaultValue := 0
-		for err != nil {
-			defaultValueString, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("0").Show(prompt)
-			defaultValue, err = strconv.Atoi(defaultValueString)
-		}
-		return defaultValue
-	case flagset.FloatType:
-		err := errors.New("Input a valid float")
-		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
-		defaultValue := 0.0
-		for err != nil {
-			defaultValueString, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("0.0").Show(prompt)
-			defaultValue, err = strconv.ParseFloat(defaultValueString, 64)
+		for {
+			defaultValueString, err := pterm.DefaultInteractiveTextInput.WithDefaultText("0").Show(prompt)
 			if err != nil {
-				pterm.Error.Println("Input a valid float")
+				return nil, fmt.Errorf("failed to prompt for int value: %w", err)
 			}
+			defaultValue, err := strconv.Atoi(defaultValueString)
+			if err == nil {
+				return defaultValue, nil
+			}
+			pterm.Error.Println("Input a valid integer")
 		}
-		return defaultValue
+	case flagset.FloatType:
+		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
+		for {
+			defaultValueString, err := pterm.DefaultInteractiveTextInput.WithDefaultText("0.0").Show(prompt)
+			if err != nil {
+				return nil, fmt.Errorf("failed to prompt for float value: %w", err)
+			}
+			defaultValue, err := strconv.ParseFloat(defaultValueString, 64)
+			if err == nil {
+				return defaultValue, nil
+			}
+			pterm.Error.Println("Input a valid float")
+		}
 	case flagset.StringType:
 		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
-		defaultValue, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(prompt)
-		return defaultValue
-	// TODO: Add proper support for object type
+		defaultValue, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(prompt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to prompt for string value: %w", err)
+		}
+		return defaultValue, nil
 	case flagset.ObjectType:
-		return map[string]any{}
+		return nil, fmt.Errorf("object flags require a default value to be specified in the source - cannot safely prompt for object structure")
 	default:
-		return nil
+		return nil, fmt.Errorf("unsupported flag type: %s", flag.Type)
 	}
 }
 
@@ -119,7 +131,10 @@ Why pull from a remote source:
 					if noPrompt {
 						return fmt.Errorf("flag '%s' is missing a default value and --no-prompt was specified", flag.Key)
 					}
-					defaultValue := promptForDefaultValue(&flag)
+					defaultValue, err := promptForDefaultValue(&flag)
+					if err != nil {
+						return fmt.Errorf("failed to get default value for flag '%s': %w", flag.Key, err)
+					}
 					flags.Flags[index].DefaultValue = defaultValue
 				}
 			}
