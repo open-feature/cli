@@ -103,10 +103,9 @@ func LoadFromLocal(filePath string) (*flagset.Flagset, error) {
 
 // LoadFromRemote loads flags from a remote URL
 func LoadFromRemote(url string, authToken string) (*flagset.Flagset, error) {
-	flags := &flagset.Flagset{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return flags, err
+		return nil, err
 	}
 
 	if authToken != "" {
@@ -115,20 +114,21 @@ func LoadFromRemote(url string, authToken string) (*flagset.Flagset, error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return flags, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return flags, err
+		return nil, err
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return flags, fmt.Errorf("Received error response from flag source: %s", string(body))
+		return nil, fmt.Errorf("Received error response from flag source: %s", string(body))
 	}
 
 	// Try the standard manifest format first (with flags as object keys)
+	flags := &flagset.Flagset{}
 	if err := json.Unmarshal(body, flags); err == nil {
 		return flags, nil
 	}
@@ -136,9 +136,8 @@ func LoadFromRemote(url string, authToken string) (*flagset.Flagset, error) {
 	// Fallback to source flags format (array-based)
 	loadedFlags, err := flagset.LoadFromSourceFlags(body)
 	if err != nil {
-		return flags, err
+		return nil, err
 	}
-	flags.Flags = *loadedFlags
 
-	return flags, nil
+	return &flagset.Flagset{Flags: *loadedFlags}, nil
 }
