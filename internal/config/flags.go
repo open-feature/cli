@@ -2,18 +2,22 @@ package config
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // Flag name constants to avoid duplication
 const (
-	DebugFlagName       = "debug"
-	ManifestFlagName    = "manifest"
-	OutputFlagName      = "output"
-	NoInputFlagName     = "no-input"
-	GoPackageFlagName   = "package-name"
-	CSharpNamespaceName = "namespace"
-	OverrideFlagName    = "override"
-	JavaPackageFlagName = "package-name"
+	DebugFlagName         = "debug"
+	ManifestFlagName      = "manifest"
+	OutputFlagName        = "output"
+	NoInputFlagName       = "no-input"
+	GoPackageFlagName     = "package-name"
+	CSharpNamespaceName   = "namespace"
+	OverrideFlagName      = "override"
+	JavaPackageFlagName   = "package-name"
+	FlagSourceUrlFlagName = "flag-source-url"
+	AuthTokenFlagName     = "auth-token"
+	NoPromptFlagName      = "no-prompt"
 )
 
 // Default values for flags
@@ -55,6 +59,14 @@ func AddJavaGenerateFlags(cmd *cobra.Command) {
 // AddInitFlags adds the init command specific flags
 func AddInitFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool(OverrideFlagName, false, "Override an existing configuration")
+	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag source")
+}
+
+// AddPullFlags adds the pull command specific flags
+func AddPullFlags(cmd *cobra.Command) {
+	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag source")
+	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag source")
+	cmd.Flags().Bool(NoPromptFlagName, false, "Disable interactive prompts for missing default values")
 }
 
 // GetManifestPath gets the manifest path from the given command
@@ -97,4 +109,33 @@ func GetNoInput(cmd *cobra.Command) bool {
 func GetOverride(cmd *cobra.Command) bool {
 	override, _ := cmd.Flags().GetBool(OverrideFlagName)
 	return override
+}
+
+// GetFlagSourceUrl gets the flag source URL from the given command
+func GetFlagSourceUrl(cmd *cobra.Command) string {
+	flagSourceUrl, _ := cmd.Flags().GetString(FlagSourceUrlFlagName)
+	if flagSourceUrl == "" {
+		viper.SetConfigName(".openfeature")
+		viper.AddConfigPath(".")
+		if err := viper.ReadInConfig(); err != nil {
+			return ""
+		}
+		if !viper.IsSet("flagSourceUrl") {
+			return ""
+		}
+		flagSourceUrl = viper.GetString("flagSourceUrl")
+	}
+	return flagSourceUrl
+}
+
+// GetAuthToken gets the auth token from the given command
+func GetAuthToken(cmd *cobra.Command) string {
+	authToken, _ := cmd.Flags().GetString(AuthTokenFlagName)
+	return authToken
+}
+
+// GetNoPrompt gets the no-prompt flag from the given command
+func GetNoPrompt(cmd *cobra.Command) bool {
+	noPrompt, _ := cmd.Flags().GetBool(NoPromptFlagName)
+	return noPrompt
 }
