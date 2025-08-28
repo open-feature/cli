@@ -59,19 +59,25 @@ func LoadFlagSet(manifestPath string) (*flagset.Flagset, error) {
 }
 
 func Write(path string, flagset flagset.Flagset) error {
+	// Marshal the flagset to get the flags structure
+	flagsetJSON, err := json.Marshal(flagset)
+	if err != nil {
+		return err
+	}
+
+	// Unmarshal into a map to extract the flags
+	var flagsetMap map[string]any
+	if err := json.Unmarshal(flagsetJSON, &flagsetMap); err != nil {
+		return err
+	}
+
 	m := &initManifest{
 		Schema: flagManifestSchemaURL,
 		Manifest: Manifest{
-			Flags: map[string]any{},
+			Flags: flagsetMap["flags"].(map[string]any),
 		},
 	}
-	for _, flag := range flagset.Flags {
-		m.Manifest.Flags[flag.Key] = map[string]any{
-			"flagType":     flag.Type.String(),
-			"description":  flag.Description,
-			"defaultValue": flag.DefaultValue,
-		}
-	}
+
 	formattedInitManifest, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
 		return err

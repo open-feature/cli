@@ -112,6 +112,37 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalJSON marshals a Flagset into JSON format compatible with the manifest structure
+func (fs *Flagset) MarshalJSON() ([]byte, error) {
+	manifest := struct {
+		Flags map[string]struct {
+			FlagType     string `json:"flagType"`
+			Description  string `json:"description"`
+			DefaultValue any    `json:"defaultValue"`
+		} `json:"flags"`
+	}{
+		Flags: make(map[string]struct {
+			FlagType     string `json:"flagType"`
+			Description  string `json:"description"`
+			DefaultValue any    `json:"defaultValue"`
+		}),
+	}
+
+	for _, flag := range fs.Flags {
+		manifest.Flags[flag.Key] = struct {
+			FlagType     string `json:"flagType"`
+			Description  string `json:"description"`
+			DefaultValue any    `json:"defaultValue"`
+		}{
+			FlagType:     flag.Type.String(),
+			Description:  flag.Description,
+			DefaultValue: flag.DefaultValue,
+		}
+	}
+
+	return json.Marshal(manifest)
+}
+
 func LoadFromSourceFlags(data []byte) (*[]Flag, error) {
 	type SourceFlag struct {
 		Key          string `json:"key"`
