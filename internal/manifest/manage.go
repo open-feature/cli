@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
 
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
@@ -122,13 +123,42 @@ func createInitManifest(flags map[string]any) *initManifest {
 	}
 }
 
-// writeManifest marshals and writes a manifest to the given path
+// writeManifest marshals and writes a manifest to the given path atomically
 func writeManifest(path string, manifest *initManifest) error {
 	formattedManifest, err := json.MarshalIndent(manifest, "", "  ")
 	if err != nil {
 		return err
 	}
-	return filesystem.WriteFile(path, formattedManifest)
+
+	fs := filesystem.FileSystem()
+	dir := filepath.Dir(path)
+
+	// Create temp file in same directory as target
+	tmpFile, err := afero.TempFile(fs, dir, "manifest-*.json.tmp")
+	if err != nil {
+		return fmt.Errorf("failed to create temp file: %w", err)
+	}
+	tmpPath := tmpFile.Name()
+
+	// Write to temp file
+	if _, err := tmpFile.Write(formattedManifest); err != nil {
+		tmpFile.Close()
+		fs.Remove(tmpPath)
+		return fmt.Errorf("failed to write temp file: %w", err)
+	}
+
+	if err := tmpFile.Close(); err != nil {
+		fs.Remove(tmpPath)
+		return fmt.Errorf("failed to close temp file: %w", err)
+	}
+
+	// Atomically rename temp file to target
+	if err := fs.Rename(tmpPath, path); err != nil {
+		fs.Remove(tmpPath)
+		return fmt.Errorf("failed to rename temp file: %w", err)
+	}
+
+	return nil
 }
 
 // loadFlagsFromData attempts to load flags from JSON data using multiple formats
