@@ -72,16 +72,17 @@ Why pull from a remote source:
 			}
 
 			// Check each flag for null defaultValue
-			for index, flag := range flags.Flags {
+			for index := range flags.Flags {
+				flag := &flags.Flags[index]
 				if flag.DefaultValue == nil {
 					if noPrompt {
 						return fmt.Errorf("flag '%s' is missing a default value and --no-prompt was specified", flag.Key)
 					}
-					defaultValue, err := promptForDefaultValue(&flag)
+					defaultValue, err := promptForDefaultValue(flag)
 					if err != nil {
 						return fmt.Errorf("failed to get default value for flag '%s': %w", flag.Key, err)
 					}
-					flags.Flags[index].DefaultValue = defaultValue
+					flag.DefaultValue = defaultValue
 				}
 			}
 
