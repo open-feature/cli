@@ -12,64 +12,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func promptWithValidation[T any](
-	input *pterm.InteractiveTextInputPrinter,
-	prompt string,
-	parser func(string) (T, error),
-	typeName string,
-) (T, error) {
-	for {
-		inputString, err := input.Show(prompt)
-		if err != nil {
-			var zero T
-			return zero, fmt.Errorf("failed to prompt for %s: %w", typeName, err)
-		}
-
-		value, err := parser(inputString)
-		if err == nil {
-			return value, nil
-		}
-
-		pterm.Error.Printf("Input a valid %s\n", typeName)
-	}
-}
-
-func promptForDefaultValue(flag *flagset.Flag) (any, error) {
-	prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
-	switch flag.Type {
-	case flagset.BoolType:
-		options := []string{"false", "true"}
-		boolStr, err := pterm.DefaultInteractiveSelect.WithOptions(options).WithFilter(false).Show(prompt)
-		if err != nil {
-			return nil, fmt.Errorf("failed to prompt for bool value: %w", err)
-		}
-		boolValue, err := strconv.ParseBool(boolStr)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse bool value: %w", err)
-		}
-		return boolValue, nil
-	case flagset.IntType:
-		input := pterm.DefaultInteractiveTextInput.WithDefaultText("0")
-		return promptWithValidation(input, prompt, strconv.Atoi, "integer")
-	case flagset.FloatType:
-		input := pterm.DefaultInteractiveTextInput.WithDefaultText("0.0")
-		parser := func(s string) (float64, error) {
-			return strconv.ParseFloat(s, 64)
-		}
-		return promptWithValidation(input, prompt, parser, "float")
-	case flagset.StringType:
-		defaultValue, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(prompt)
-		if err != nil {
-			return nil, fmt.Errorf("failed to prompt for string value: %w", err)
-		}
-		return defaultValue, nil
-	case flagset.ObjectType:
-		return nil, fmt.Errorf("object flags require a default value to be specified in the source - cannot safely prompt for object structure")
-	default:
-		return nil, fmt.Errorf("unsupported flag type: %s", flag.Type)
-	}
-}
-
 func GetPullCmd() *cobra.Command {
 	pullCmd := &cobra.Command{
 		Use:   "pull",
@@ -155,4 +97,62 @@ Why pull from a remote source:
 	config.AddPullFlags(pullCmd)
 
 	return pullCmd
+}
+
+func promptWithValidation[T any](
+	input *pterm.InteractiveTextInputPrinter,
+	prompt string,
+	parser func(string) (T, error),
+	typeName string,
+) (T, error) {
+	for {
+		inputString, err := input.Show(prompt)
+		if err != nil {
+			var zero T
+			return zero, fmt.Errorf("failed to prompt for %s: %w", typeName, err)
+		}
+
+		value, err := parser(inputString)
+		if err == nil {
+			return value, nil
+		}
+
+		pterm.Error.Printf("Input a valid %s\n", typeName)
+	}
+}
+
+func promptForDefaultValue(flag *flagset.Flag) (any, error) {
+	prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
+	switch flag.Type {
+	case flagset.BoolType:
+		options := []string{"false", "true"}
+		boolStr, err := pterm.DefaultInteractiveSelect.WithOptions(options).WithFilter(false).Show(prompt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to prompt for bool value: %w", err)
+		}
+		boolValue, err := strconv.ParseBool(boolStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse bool value: %w", err)
+		}
+		return boolValue, nil
+	case flagset.IntType:
+		input := pterm.DefaultInteractiveTextInput.WithDefaultText("0")
+		return promptWithValidation(input, prompt, strconv.Atoi, "integer")
+	case flagset.FloatType:
+		input := pterm.DefaultInteractiveTextInput.WithDefaultText("0.0")
+		parser := func(s string) (float64, error) {
+			return strconv.ParseFloat(s, 64)
+		}
+		return promptWithValidation(input, prompt, parser, "float")
+	case flagset.StringType:
+		defaultValue, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(prompt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to prompt for string value: %w", err)
+		}
+		return defaultValue, nil
+	case flagset.ObjectType:
+		return nil, fmt.Errorf("object flags require a default value to be specified in the source - cannot safely prompt for object structure")
+	default:
+		return nil, fmt.Errorf("unsupported flag type: %s", flag.Type)
+	}
 }
