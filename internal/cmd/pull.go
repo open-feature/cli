@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/flagset"
@@ -52,23 +52,27 @@ Why pull from a remote source:
 			}
 
 			// fetch the flags from the remote source
-			// Check if the URL is a local file path
+			parsedURL, err := url.Parse(flagSourceUrl)
+			if err != nil {
+				return fmt.Errorf("invalid URL: %w", err)
+			}
+
 			var flags *flagset.Flagset
-			if strings.HasPrefix(flagSourceUrl, "file://") {
-				localPath := strings.TrimPrefix(flagSourceUrl, "file://")
-				loadedFlags, err := manifest.LoadFromLocal(localPath)
+			switch parsedURL.Scheme {
+			case "file":
+				loadedFlags, err := manifest.LoadFromLocal(parsedURL.Path)
 				if err != nil {
 					return fmt.Errorf("error loading flags from local file: %w", err)
 				}
 				flags = loadedFlags
-			} else if strings.HasPrefix(flagSourceUrl, "http://") || strings.HasPrefix(flagSourceUrl, "https://") {
+			case "http", "https":
 				loadedFlags, err := manifest.LoadFromRemote(flagSourceUrl, authToken)
 				if err != nil {
 					return fmt.Errorf("error fetching flags from remote source: %w", err)
 				}
 				flags = loadedFlags
-			} else {
-				return fmt.Errorf("unsupported URL scheme: %s. Supported schemes are file://, http://, and https://", flagSourceUrl)
+			default:
+				return fmt.Errorf("unsupported URL scheme: %s. Supported schemes are file://, http://, and https://", parsedURL.Scheme)
 			}
 
 			// Check each flag for null defaultValue
