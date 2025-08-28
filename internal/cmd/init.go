@@ -45,17 +45,29 @@ func GetInitCmd() *cobra.Command {
 	return initCmd
 }
 
-func confirmOverride(itemType, path string) bool {
+func confirmOverride(itemType, path string) (bool, error) {
 	message := fmt.Sprintf("An existing %s was found at %s. Would you like to override it?", itemType, path)
-	confirmed, _ := pterm.DefaultInteractiveConfirm.Show(message)
+	confirmed, err := pterm.DefaultInteractiveConfirm.Show(message)
+	if err != nil {
+		return false, fmt.Errorf("failed to show confirmation prompt: %w", err)
+	}
 	pterm.Println() // blank line for readability
-	return confirmed
+	return confirmed, nil
 }
 
 func handleManifestCreation(manifestPath string, override bool) error {
-	if exists, _ := filesystem.Exists(manifestPath); exists && !override {
+	exists, err := filesystem.Exists(manifestPath)
+	if err != nil {
+		return fmt.Errorf("failed to check if manifest exists: %w", err)
+	}
+
+	if exists && !override {
 		logger.Default.Debug(fmt.Sprintf("Manifest file already exists at %s", manifestPath))
-		if !confirmOverride("manifest", manifestPath) {
+		shouldOverride, err := confirmOverride("manifest", manifestPath)
+		if err != nil {
+			return fmt.Errorf("failed to get user confirmation: %w", err)
+		}
+		if !shouldOverride {
 			logger.Default.Info("No changes were made.")
 			return nil
 		}
@@ -72,7 +84,10 @@ func handleManifestCreation(manifestPath string, override bool) error {
 
 func handleConfigFile(flagSourceUrl string, override bool) error {
 	configPath := ".openfeature.yaml"
-	configExists, _ := filesystem.Exists(configPath)
+	configExists, err := filesystem.Exists(configPath)
+	if err != nil {
+		return fmt.Errorf("failed to check if config file exists: %w", err)
+	}
 
 	if !configExists {
 		return writeConfigFile(flagSourceUrl, "Creating .openfeature.yaml configuration file")
@@ -82,7 +97,15 @@ func handleConfigFile(flagSourceUrl string, override bool) error {
 		return nil // no config to write
 	}
 
-	if override || confirmOverride("configuration file", configPath) {
+	if override {
+		return writeConfigFile(flagSourceUrl, "Updating flag source URL in .openfeature.yaml")
+	}
+
+	shouldOverride, err := confirmOverride("configuration file", configPath)
+	if err != nil {
+		return fmt.Errorf("failed to get user confirmation: %w", err)
+	}
+	if shouldOverride {
 		return writeConfigFile(flagSourceUrl, "Updating flag source URL in .openfeature.yaml")
 	}
 
