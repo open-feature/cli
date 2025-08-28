@@ -12,6 +12,28 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func promptWithValidation[T any](
+	input *pterm.InteractiveTextInputPrinter,
+	prompt string,
+	parser func(string) (T, error),
+	typeName string,
+) (T, error) {
+	for {
+		inputString, err := input.Show(prompt)
+		if err != nil {
+			var zero T
+			return zero, fmt.Errorf("failed to prompt for %s: %w", typeName, err)
+		}
+
+		value, err := parser(inputString)
+		if err == nil {
+			return value, nil
+		}
+
+		pterm.Error.Printf("Input a valid %s\n", typeName)
+	}
+}
+
 func promptForDefaultValue(flag *flagset.Flag) (any, error) {
 	switch flag.Type {
 	case flagset.BoolType:
@@ -28,30 +50,15 @@ func promptForDefaultValue(flag *flagset.Flag) (any, error) {
 		return boolValue, nil
 	case flagset.IntType:
 		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
-		for {
-			defaultValueString, err := pterm.DefaultInteractiveTextInput.WithDefaultText("0").Show(prompt)
-			if err != nil {
-				return nil, fmt.Errorf("failed to prompt for int value: %w", err)
-			}
-			defaultValue, err := strconv.Atoi(defaultValueString)
-			if err == nil {
-				return defaultValue, nil
-			}
-			pterm.Error.Println("Input a valid integer")
-		}
+		input := pterm.DefaultInteractiveTextInput.WithDefaultText("0")
+		return promptWithValidation(input, prompt, strconv.Atoi, "integer")
 	case flagset.FloatType:
 		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
-		for {
-			defaultValueString, err := pterm.DefaultInteractiveTextInput.WithDefaultText("0.0").Show(prompt)
-			if err != nil {
-				return nil, fmt.Errorf("failed to prompt for float value: %w", err)
-			}
-			defaultValue, err := strconv.ParseFloat(defaultValueString, 64)
-			if err == nil {
-				return defaultValue, nil
-			}
-			pterm.Error.Println("Input a valid float")
+		input := pterm.DefaultInteractiveTextInput.WithDefaultText("0.0")
+		parser := func(s string) (float64, error) {
+			return strconv.ParseFloat(s, 64)
 		}
+		return promptWithValidation(input, prompt, parser, "float")
 	case flagset.StringType:
 		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
 		defaultValue, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(prompt)
