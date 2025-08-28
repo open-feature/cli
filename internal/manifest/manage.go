@@ -44,7 +44,7 @@ func LoadFlagSet(manifestPath string) (*flagset.Flagset, error) {
 
 	var flagset flagset.Flagset
 	if err := json.Unmarshal(data, &flagset); err != nil {
-		return nil, fmt.Errorf("error unmarshaling JSON: %v", validationErrors)
+		return nil, fmt.Errorf("error unmarshaling JSON: %v", err)
 	}
 
 	return &flagset, nil
@@ -52,19 +52,16 @@ func LoadFlagSet(manifestPath string) (*flagset.Flagset, error) {
 
 // Write writes a flagset to a manifest file at the given path
 func Write(path string, flagset flagset.Flagset) error {
-	// Marshal the flagset to get the flags structure
-	flagsetJSON, err := json.Marshal(flagset)
-	if err != nil {
-		return err
+	flags := make(map[string]any)
+	for _, flag := range flagset.Flags {
+		flags[flag.Key] = map[string]any{
+			"flagType":     flag.Type.String(),
+			"description":  flag.Description,
+			"defaultValue": flag.DefaultValue,
+		}
 	}
 
-	// Unmarshal into a map to extract the flags
-	var flagsetMap map[string]any
-	if err := json.Unmarshal(flagsetJSON, &flagsetMap); err != nil {
-		return err
-	}
-
-	m := createInitManifest(flagsetMap["flags"].(map[string]any))
+	m := createInitManifest(flags)
 	return writeManifest(path, m)
 }
 
