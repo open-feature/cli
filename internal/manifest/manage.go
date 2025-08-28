@@ -69,7 +69,8 @@ func Write(path string, flagset flagset.Flagset) error {
 
 // LoadFromLocal loads flags from a local file path
 func LoadFromLocal(filePath string) (*flagset.Flagset, error) {
-	data, err := filesystem.ReadFile(filePath)
+	fs := filesystem.FileSystem()
+	data, err := afero.ReadFile(fs, filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading local flags file: %w", err)
 	}
