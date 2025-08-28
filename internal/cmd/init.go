@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
+	"text/template"
 
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/filesystem"
@@ -119,13 +121,12 @@ func writeConfigFile(flagSourceUrl, message string) error {
 	return filesystem.WriteFile(".openfeature.yaml", []byte(template))
 }
 
-func getConfigTemplate(flagSourceUrl string) string {
-	flagSourceLine := "# flagSourceUrl: \"https://your-flag-service.com/api/flags\""
-	if flagSourceUrl != "" {
-		flagSourceLine = "flagSourceUrl: " + flagSourceUrl
-	}
+type configTemplateData struct {
+	FlagSourceURL    string
+	HasFlagSourceURL bool
+}
 
-	return fmt.Sprintf(`# OpenFeature CLI Configuration
+const configTemplateText = `# OpenFeature CLI Configuration
 # This file configures the OpenFeature CLI for your project.
 # For full documentation, visit: https://github.com/open-feature/cli#configuration
 
@@ -135,7 +136,7 @@ func getConfigTemplate(flagSourceUrl string) string {
 
 # URL of your flag source for the 'pull' command
 # Supports http://, https://, and file:// protocols
-%s
+{{if .HasFlagSourceURL}}flagSourceURL: {{.FlagSourceURL}}{{else}}# flagSourceUrl: "https://your-flag-service.com/api/flags"{{end}}
 
 # Authentication token for remote flag sources (if required)
 # authToken: "your-bearer-token"
@@ -172,5 +173,21 @@ func getConfigTemplate(flagSourceUrl string) string {
 #   java:
 #     output: "java/flags"
 #     package-name: "com.example.openfeature"
-`, flagSourceLine)
+`
+
+func getConfigTemplate(flagSourceUrl string) string {
+	tmpl := template.Must(template.New("config").Parse(configTemplateText))
+
+	data := configTemplateData{
+		FlagSourceURL:    flagSourceUrl,
+		HasFlagSourceURL: flagSourceUrl != "",
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		// Fallback to a simple template if there's an error
+		return fmt.Sprintf("# Error generating config template: %v\n", err)
+	}
+
+	return buf.String()
 }
