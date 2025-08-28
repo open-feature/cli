@@ -35,10 +35,10 @@ func promptWithValidation[T any](
 }
 
 func promptForDefaultValue(flag *flagset.Flag) (any, error) {
+	prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
 	switch flag.Type {
 	case flagset.BoolType:
 		options := []string{"false", "true"}
-		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
 		boolStr, err := pterm.DefaultInteractiveSelect.WithOptions(options).WithFilter(false).Show(prompt)
 		if err != nil {
 			return nil, fmt.Errorf("failed to prompt for bool value: %w", err)
@@ -49,18 +49,15 @@ func promptForDefaultValue(flag *flagset.Flag) (any, error) {
 		}
 		return boolValue, nil
 	case flagset.IntType:
-		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
 		input := pterm.DefaultInteractiveTextInput.WithDefaultText("0")
 		return promptWithValidation(input, prompt, strconv.Atoi, "integer")
 	case flagset.FloatType:
-		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
 		input := pterm.DefaultInteractiveTextInput.WithDefaultText("0.0")
 		parser := func(s string) (float64, error) {
 			return strconv.ParseFloat(s, 64)
 		}
 		return promptWithValidation(input, prompt, parser, "float")
 	case flagset.StringType:
-		prompt := fmt.Sprintf("Enter default value for flag '%s' (%s)", flag.Key, flag.Type)
 		defaultValue, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(prompt)
 		if err != nil {
 			return nil, fmt.Errorf("failed to prompt for string value: %w", err)
