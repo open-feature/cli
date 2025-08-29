@@ -10,7 +10,7 @@ import (
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 func GetCompareCmd() *cobra.Command {

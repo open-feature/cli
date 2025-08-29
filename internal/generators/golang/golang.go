@@ -140,7 +140,7 @@ func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
 		},
 	}
 
-	return g.GenerateFile(funcs, golangTmpl, newParams, params.Custom.GoPackage+".go")
+	return g.CommonGenerator.GenerateFile(funcs, golangTmpl, newParams, params.Custom.GoPackage+".go")
 }
 
 // NewGenerator creates a generator for Go.

@@ -141,7 +141,7 @@ func (g *JavaGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:     params.Custom,
 	}
 
-	return g.GenerateFile(funcs, javaTmpl, newParams, "OpenFeature.java")
+	return g.CommonGenerator.GenerateFile(funcs, javaTmpl, newParams, "OpenFeature.java")
 }
 
 // NewGenerator creates a generator for Java.

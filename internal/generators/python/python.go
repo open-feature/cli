@@ -154,7 +154,7 @@ func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:     Params{},
 	}
 
-	return g.GenerateFile(funcs, pythonTmpl, newParams, "openfeature.py")
+	return g.CommonGenerator.GenerateFile(funcs, pythonTmpl, newParams, "openfeature.py")
 }
 
 // NewGenerator creates a generator for Python.
