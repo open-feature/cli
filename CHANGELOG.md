@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.3.6](https://github.com/open-feature/cli/compare/v0.3.5...v0.3.6) (2025-08-29)
+
+
+### 🐛 Bug Fixes
+
+* **deps:** update module dagger.io/dagger to v0.18.10 ([#136](https://github.com/open-feature/cli/issues/136)) ([8b70612](https://github.com/open-feature/cli/commit/8b706124721dfd2a904d102235baeb445e67cce0))
+* **deps:** update module dagger.io/dagger to v0.18.11 ([#142](https://github.com/open-feature/cli/issues/142)) ([2835e3c](https://github.com/open-feature/cli/commit/2835e3cf1066e8446c472bd65b01cec20c864457))
+* **deps:** update module dagger.io/dagger to v0.18.12 ([#143](https://github.com/open-feature/cli/issues/143)) ([cf962d9](https://github.com/open-feature/cli/commit/cf962d967c8ada93cb0b4959d4b0bd7ae9508e08))
+* **deps:** update module github.com/pterm/pterm to v0.12.81 ([#129](https://github.com/open-feature/cli/issues/129)) ([a25f90a](https://github.com/open-feature/cli/commit/a25f90a65b50d4218b905351f9ed0504d1e54fba))
+* **security:** update module github.com/go-viper/mapstructure/v2 to v2.3.0 [security] ([#149](https://github.com/open-feature/cli/issues/149)) ([616b446](https://github.com/open-feature/cli/commit/616b446ca18a816c5fea89811555c30188734c11))
+* **security:** update module github.com/go-viper/mapstructure/v2 to v2.4.0 [security] ([#151](https://github.com/open-feature/cli/issues/151)) ([9d635ac](https://github.com/open-feature/cli/commit/9d635ac4520b0100970b7f6f64f2d1b5b0532bc4))
+
+
+### ✨ New Features
+
+* `openfeature pull` command ([#147](https://github.com/open-feature/cli/issues/147)) ([c517e87](https://github.com/open-feature/cli/commit/c517e8722e749e296687cc9917b8e02cc7a60f8a))
+* basic object flags ([#141](https://github.com/open-feature/cli/issues/141)) ([288023c](https://github.com/open-feature/cli/commit/288023c5ddd03095e6d545bf4062374758b33c82))
+* **flagset:** improve validation error formatting in Load function ([#119](https://github.com/open-feature/cli/issues/119)) ([8eec779](https://github.com/open-feature/cli/commit/8eec77965ab1b14121f7492a1b08bdaadd765bd9))
+* **flagset:** improve validation error formatting in Load function [#110](https://github.com/open-feature/cli/issues/110) ([8eec779](https://github.com/open-feature/cli/commit/8eec77965ab1b14121f7492a1b08bdaadd765bd9))
+* integration tests for nodejs generator ([#140](https://github.com/open-feature/cli/issues/140)) ([b867485](https://github.com/open-feature/cli/commit/b8674851013d9bd6d374c78ff781e0b210aa6686))
+
+
+### 🧹 Chore
+
+* add merge group trigger to pr lint ([32f912a](https://github.com/open-feature/cli/commit/32f912a08973a1e3a5127739691ddd314f094b96))
+* add renovate.json file [#122](https://github.com/open-feature/cli/issues/122) ([#124](https://github.com/open-feature/cli/issues/124)) ([83dac70](https://github.com/open-feature/cli/commit/83dac705b9bfe00725e23c07cd7154d4e0877f22))
+* **deps:** update alpine docker tag to v3.22 ([#130](https://github.com/open-feature/cli/issues/130)) ([11b9c34](https://github.com/open-feature/cli/commit/11b9c34d86ab72e25387f9efb8f5453dc19f9dd1))
+* **deps:** update dagger/dagger-for-github action to v7 ([#132](https://github.com/open-feature/cli/issues/132)) ([1b4d062](https://github.com/open-feature/cli/commit/1b4d0620450b94a628445a9f753b543b1159d8a6))
+* **deps:** update dependency microsoft.extensions.dependencyinjection to 8.0.1 ([#127](https://github.com/open-feature/cli/issues/127)) ([3ec8443](https://github.com/open-feature/cli/commit/3ec8443823455b546245f999904923a197833e4f))
+* **deps:** update dependency microsoft.extensions.dependencyinjection to 9.0.6 ([#138](https://github.com/open-feature/cli/issues/138)) ([5d7a607](https://github.com/open-feature/cli/commit/5d7a60754a612054d65ef9094fa01f40156b39b2))
+* **deps:** update dependency microsoft.extensions.dependencyinjection to v9 ([#133](https://github.com/open-feature/cli/issues/133)) ([51232fe](https://github.com/open-feature/cli/commit/51232fea1cd7a9ad22cd6533d227f55778de37eb))
+* **deps:** update dependency openfeature to 2.6.0 ([#131](https://github.com/open-feature/cli/issues/131)) ([35533dc](https://github.com/open-feature/cli/commit/35533dceb01f52e59f258ef5583455a938bf658f))
+* **deps:** update dependency openfeature to 2.7.0 ([#144](https://github.com/open-feature/cli/issues/144)) ([2003666](https://github.com/open-feature/cli/commit/2003666eaa0637ab57337d2d657701558dc1e5f6))
+* **deps:** update golangci/golangci-lint-action action to v8 ([#134](https://github.com/open-feature/cli/issues/134)) ([4f909c1](https://github.com/open-feature/cli/commit/4f909c10686183057d01c304e1495a2987c1edf5))
+* fix the directory structure ([#121](https://github.com/open-feature/cli/issues/121)) ([bcd11ea](https://github.com/open-feature/cli/commit/bcd11ea9c8115c1c7fd925f13613a332359de700))
+* revert golang ci lint to v6 ([594cf53](https://github.com/open-feature/cli/commit/594cf538be3eab815ab40473c20dbf551adf87f5))
+* upgrade dependencies ([#123](https://github.com/open-feature/cli/issues/123)) ([79d3dce](https://github.com/open-feature/cli/commit/79d3dceb3ad306b6c04c9e3c64285b5ffec3b05a))
+
 ## [0.3.5](https://github.com/open-feature/cli/compare/v0.3.4...v0.3.5) (2025-05-20)
 
 
