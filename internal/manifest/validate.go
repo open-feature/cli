@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/open-feature/cli/schema/v0"
+	schema "github.com/open-feature/cli/schema/v0"
 	"github.com/xeipuuv/gojsonschema"
 )
 

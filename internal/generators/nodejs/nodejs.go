@@ -55,7 +55,7 @@ func (g *NodejsGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:     Params{},
 	}
 
-	return g.GenerateFile(funcs, nodejsTmpl, newParams, "openfeature.ts")
+	return g.CommonGenerator.GenerateFile(funcs, nodejsTmpl, newParams, "openfeature.ts")
 }
 
 // NewGenerator creates a generator for NodeJS.

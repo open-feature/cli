@@ -140,24 +140,18 @@ func writeManifest(path string, manifest *initManifest) error {
 	// Write to temp file
 	if _, err := tmpFile.Write(formattedManifest); err != nil {
 		tmpFile.Close()
-		if removeErr := fs.Remove(tmpPath); removeErr != nil {
-			// Log removal error but prioritize the original error
-		}
+		_ = fs.Remove(tmpPath) // Ignore cleanup error, prioritize original error
 		return fmt.Errorf("failed to write temp file: %w", err)
 	}
 
 	if err := tmpFile.Close(); err != nil {
-		if removeErr := fs.Remove(tmpPath); removeErr != nil {
-			// Log removal error but prioritize the original error
-		}
+		_ = fs.Remove(tmpPath) // Ignore cleanup error, prioritize original error
 		return fmt.Errorf("failed to close temp file: %w", err)
 	}
 
 	// Atomically rename temp file to target
 	if err := fs.Rename(tmpPath, path); err != nil {
-		if removeErr := fs.Remove(tmpPath); removeErr != nil {
-			// Log removal error but prioritize the original error
-		}
+		_ = fs.Remove(tmpPath) // Ignore cleanup error, prioritize original error
 		return fmt.Errorf("failed to rename temp file: %w", err)
 	}
 
