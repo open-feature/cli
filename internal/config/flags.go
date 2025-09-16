@@ -18,6 +18,9 @@ const (
 	FlagSourceUrlFlagName = "flag-source-url"
 	AuthTokenFlagName     = "auth-token"
 	NoPromptFlagName      = "no-prompt"
+	TypeFlagName          = "type"
+	DefaultValueFlagName  = "default-value"
+	DescriptionFlagName   = "description"
 )
 
 // Default values for flags
@@ -138,4 +141,11 @@ func GetAuthToken(cmd *cobra.Command) string {
 func GetNoPrompt(cmd *cobra.Command) bool {
 	noPrompt, _ := cmd.Flags().GetBool(NoPromptFlagName)
 	return noPrompt
+}
+
+// AddManifestAddFlags adds the manifest add command specific flags
+func AddManifestAddFlags(cmd *cobra.Command) {
+	cmd.Flags().StringP(TypeFlagName, "t", "boolean", "Type of the flag (boolean, string, integer, float, object)")
+	cmd.Flags().StringP(DefaultValueFlagName, "d", "", "Default value for the flag (required)")
+	cmd.Flags().String(DescriptionFlagName, "", "Description of the flag")
 }
