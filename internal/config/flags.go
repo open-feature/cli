@@ -149,3 +149,8 @@ func AddManifestAddFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP(DefaultValueFlagName, "d", "", "Default value for the flag (required)")
 	cmd.Flags().String(DescriptionFlagName, "", "Description of the flag")
 }
+
+// AddManifestListFlags adds the manifest list command specific flags
+func AddManifestListFlags(cmd *cobra.Command) {
+	// Currently no specific flags for list command, but function exists for consistency
+}

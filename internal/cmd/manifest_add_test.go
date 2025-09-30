@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"testing"
 
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/filesystem"
+	"github.com/pterm/pterm"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -361,3 +363,67 @@ func TestManifestAddCmd_CreateNewManifest(t *testing.T) {
 	assert.Equal(t, true, flag["defaultValue"])
 	assert.Equal(t, "The first flag in a new manifest", flag["description"])
 }
+
+func TestManifestAddCmd_DisplaysListAfterAdd(t *testing.T) {
+	// Setup
+	fs := afero.NewMemMapFs()
+	filesystem.SetFileSystem(fs)
+
+	// Create existing manifest with one flag
+	existingManifest := `{
+		"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
+		"flags": {
+			"existing-flag": {
+				"flagType": "string",
+				"defaultValue": "test",
+				"description": "An existing flag"
+			}
+		}
+	}`
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	require.NoError(t, err)
+
+	// Enable pterm output and capture it
+	pterm.EnableOutput()
+	defer pterm.DisableOutput()
+
+	buf := &bytes.Buffer{}
+	oldStdout := pterm.DefaultTable.Writer
+	oldSection := pterm.DefaultSection.Writer
+	oldInfo := pterm.Info.Writer
+	oldSuccess := pterm.Success.Writer
+	pterm.DefaultTable.Writer = buf
+	pterm.DefaultSection.Writer = buf
+	pterm.Info.Writer = buf
+	pterm.Success.Writer = buf
+	defer func() {
+		pterm.DefaultTable.Writer = oldStdout
+		pterm.DefaultSection.Writer = oldSection
+		pterm.Info.Writer = oldInfo
+		pterm.Success.Writer = oldSuccess
+	}()
+
+	// Create command and execute
+	cmd := GetManifestCmd()
+	config.AddRootFlags(cmd)
+
+	cmd.SetArgs([]string{
+		"add", "new-flag",
+		"--default-value", "true",
+		"--description", "A new flag",
+		"-m", "flags.json",
+	})
+
+	// Execute command
+	err = cmd.Execute()
+	require.NoError(t, err)
+
+	// Validate output contains list of all flags
+	output := buf.String()
+	assert.Contains(t, output, "existing-flag", "Output should contain existing flag")
+	assert.Contains(t, output, "new-flag", "Output should contain newly added flag")
+	assert.Contains(t, output, "(2)", "Output should show total count of 2 flags")
+	assert.Contains(t, output, "string", "Output should show flag types")
+	assert.Contains(t, output, "boolean", "Output should show flag types")
+}
+

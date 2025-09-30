@@ -8,10 +8,12 @@ import (
 	"strings"
 
 	"github.com/open-feature/cli/internal/config"
+	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/logger"
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/pterm/pterm"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
@@ -67,15 +69,22 @@ Examples:
 			}
 
 			// Load existing manifest
-			fs, err := manifest.LoadFlagSet(manifestPath)
+			var fs *flagset.Flagset
+			exists, err := afero.Exists(filesystem.FileSystem(), manifestPath)
+
 			if err != nil {
-				// If manifest doesn't exist, create a new one
-				if strings.Contains(err.Error(), "error reading contents") {
-					fs = &flagset.Flagset{
-						Flags: []flagset.Flag{},
-					}
-				} else {
+				return fmt.Errorf("failed to check manifest existence: %w", err)
+			}
+
+			if exists {
+				fs, err = manifest.LoadFlagSet(manifestPath)
+				if err != nil {
 					return fmt.Errorf("failed to load manifest: %w", err)
+				}
+			} else {
+				// If manifest doesn't exist, create a new one
+				fs = &flagset.Flagset{
+					Flags: []flagset.Flag{},
 				}
 			}
 
@@ -104,6 +113,11 @@ Examples:
 			pterm.Success.Printfln("Flag '%s' added successfully to %s", flagName, manifestPath)
 			logger.Default.Debug(fmt.Sprintf("Added flag: name=%s, type=%s, defaultValue=%v, description=%s",
 				flagName, flagType, defaultValue, description))
+
+			// Display all current flags
+			displayFlagList(fs, manifestPath)
+			pterm.Println("Use the 'generate' command to update type-safe clients with the new flag.")
+			pterm.Println()
 
 			return nil
 		},
