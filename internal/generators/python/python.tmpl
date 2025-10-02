@@ -7,6 +7,13 @@ from openfeature.flag_evaluation import FlagEvaluationDetails, FlagEvaluationOpt
 from openfeature.hook import Hook
 
 
+class FlagKeys:
+    """Flag key constants for programmatic access"""
+{{- range .Flagset.Flags }}
+    {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }}  # {{ .Description }}
+{{- end }}
+
+
 class GeneratedClient:
     def __init__(
         self,

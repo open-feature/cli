@@ -11,6 +11,14 @@ import type {
   FlagEvaluationOptions,
 } from "@openfeature/server-sdk";
 
+// Flag key constants for programmatic access
+export const FlagKeys = {
+{{- range .Flagset.Flags }}
+  /** Flag key for {{ .Description }} */
+  {{ .Key | ToScreamingSnake }}: {{ .Key | Quote }},
+{{- end }}
+} as const;
+
 export interface GeneratedClient {
 {{- range .Flagset.Flags }}
   /**

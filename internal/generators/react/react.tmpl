@@ -8,6 +8,15 @@ import {
   useSuspenseFlag,
   JsonValue
 } from "@openfeature/react-sdk";
+
+// Flag key constants for programmatic access
+export const FlagKeys = {
+{{- range .Flagset.Flags }}
+  /** Flag key for {{ .Description }} */
+  {{ .Key | ToScreamingSnake }}: {{ .Key | Quote }},
+{{- end }}
+} as const;
+
 {{ range .Flagset.Flags }}
 /**
 * {{ .Description }}

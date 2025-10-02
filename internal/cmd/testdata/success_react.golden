@@ -9,6 +9,21 @@ import {
   JsonValue
 } from "@openfeature/react-sdk";
 
+// Flag key constants for programmatic access
+export const FlagKeys = {
+  /** Flag key for Discount percentage applied to purchases. */
+  DISCOUNT_PERCENTAGE: "discountPercentage",
+  /** Flag key for Controls whether Feature A is enabled. */
+  ENABLE_FEATURE_A: "enableFeatureA",
+  /** Flag key for The message to use for greeting users. */
+  GREETING_MESSAGE: "greetingMessage",
+  /** Flag key for Allows customization of theme colors. */
+  THEME_CUSTOMIZATION: "themeCustomization",
+  /** Flag key for Maximum allowed length for usernames. */
+  USERNAME_MAX_LENGTH: "usernameMaxLength",
+} as const;
+
+
 /**
 * Discount percentage applied to purchases.
 * 

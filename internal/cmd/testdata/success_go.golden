@@ -3,8 +3,17 @@ package testpackage
 
 import (
 	"context"
+	"fmt"
 	"github.com/open-feature/go-sdk/openfeature"
 )
+
+// stringer transforms a string to a Stringer
+type stringer string
+
+// String implements the fmt.Stringer interface
+func (s stringer) String() string {
+	return string(s)
+}
 
 type BooleanProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext) (bool, error)
 type BooleanProviderDetails func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.BooleanEvaluationDetails, error)
@@ -20,6 +29,7 @@ type ObjectProviderDetails func(ctx context.Context, evalCtx openfeature.Evaluat
 var client openfeature.IClient = nil
 // Discount percentage applied to purchases.
 var DiscountPercentage = struct {
+    fmt.Stringer
     // Value returns the value of the flag DiscountPercentage,
     // as well as the evaluation error, if present.
     Value FloatProvider
@@ -28,6 +38,7 @@ var DiscountPercentage = struct {
     // the evaluation error, if any, and the evaluation details.
     ValueWithDetails FloatProviderDetails
 }{
+    Stringer: stringer("discountPercentage"),
     Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (float64, error) {
         return client.FloatValue(ctx, "discountPercentage", 0.15, evalCtx)
     },
@@ -37,6 +48,7 @@ var DiscountPercentage = struct {
 }
 // Controls whether Feature A is enabled.
 var EnableFeatureA = struct {
+    fmt.Stringer
     // Value returns the value of the flag EnableFeatureA,
     // as well as the evaluation error, if present.
     Value BooleanProvider
@@ -45,6 +57,7 @@ var EnableFeatureA = struct {
     // the evaluation error, if any, and the evaluation details.
     ValueWithDetails BooleanProviderDetails
 }{
+    Stringer: stringer("enableFeatureA"),
     Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (bool, error) {
         return client.BooleanValue(ctx, "enableFeatureA", false, evalCtx)
     },
@@ -54,6 +67,7 @@ var EnableFeatureA = struct {
 }
 // The message to use for greeting users.
 var GreetingMessage = struct {
+    fmt.Stringer
     // Value returns the value of the flag GreetingMessage,
     // as well as the evaluation error, if present.
     Value StringProvider
@@ -62,6 +76,7 @@ var GreetingMessage = struct {
     // the evaluation error, if any, and the evaluation details.
     ValueWithDetails StringProviderDetails
 }{
+    Stringer: stringer("greetingMessage"),
     Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (string, error) {
         return client.StringValue(ctx, "greetingMessage", "Hello there!", evalCtx)
     },
@@ -71,6 +86,7 @@ var GreetingMessage = struct {
 }
 // Allows customization of theme colors.
 var ThemeCustomization = struct {
+    fmt.Stringer
     // Value returns the value of the flag ThemeCustomization,
     // as well as the evaluation error, if present.
     Value ObjectProvider
@@ -79,6 +95,7 @@ var ThemeCustomization = struct {
     // the evaluation error, if any, and the evaluation details.
     ValueWithDetails ObjectProviderDetails
 }{
+    Stringer: stringer("themeCustomization"),
     Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (any, error) {
         return client.ObjectValue(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}, evalCtx)
     },
@@ -88,6 +105,7 @@ var ThemeCustomization = struct {
 }
 // Maximum allowed length for usernames.
 var UsernameMaxLength = struct {
+    fmt.Stringer
     // Value returns the value of the flag UsernameMaxLength,
     // as well as the evaluation error, if present.
     Value IntProvider
@@ -96,6 +114,7 @@ var UsernameMaxLength = struct {
     // the evaluation error, if any, and the evaluation details.
     ValueWithDetails IntProviderDetails
 }{
+    Stringer: stringer("usernameMaxLength"),
     Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (int64, error) {
         return client.IntValue(ctx, "usernameMaxLength", 50, evalCtx)
     },

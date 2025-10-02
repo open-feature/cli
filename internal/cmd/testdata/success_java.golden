@@ -10,8 +10,31 @@ public final class OpenFeature {
 
     private OpenFeature() {} // prevent instantiation
 
-    public interface GeneratedClient {
+    /**
+     * Flag key constants for programmatic access
+     */
+    public static final class FlagKeys {
+        private FlagKeys() {} // prevent instantiation
 
+        /** Flag key for Discount percentage applied to purchases. */
+        public static final String DISCOUNT_PERCENTAGE = "discountPercentage";
+
+        /** Flag key for Controls whether Feature A is enabled. */
+        public static final String ENABLE_FEATURE_A = "enableFeatureA";
+
+        /** Flag key for The message to use for greeting users. */
+        public static final String GREETING_MESSAGE = "greetingMessage";
+
+        /** Flag key for Allows customization of theme colors. */
+        public static final String THEME_CUSTOMIZATION = "themeCustomization";
+
+        /** Flag key for Maximum allowed length for usernames. */
+        public static final String USERNAME_MAX_LENGTH = "usernameMaxLength";
+
+    }
+
+    public interface GeneratedClient {
+        
         /**
          * Discount percentage applied to purchases.
          * Details:
@@ -31,7 +54,7 @@ public final class OpenFeature {
          * Returns the evaluation details containing the flag value and metadata
          */
         FlagEvaluationDetails<Double> discountPercentageDetails(EvaluationContext ctx);
-
+        
         /**
          * Controls whether Feature A is enabled.
          * Details:
@@ -51,7 +74,7 @@ public final class OpenFeature {
          * Returns the evaluation details containing the flag value and metadata
          */
         FlagEvaluationDetails<Boolean> enableFeatureADetails(EvaluationContext ctx);
-
+        
         /**
          * The message to use for greeting users.
          * Details:
@@ -111,7 +134,7 @@ public final class OpenFeature {
          * Returns the evaluation details containing the flag value and metadata
          */
         FlagEvaluationDetails<Integer> usernameMaxLengthDetails(EvaluationContext ctx);
-
+        
     }
 
     private static final class OpenFeatureGeneratedClient implements GeneratedClient {
@@ -121,7 +144,7 @@ public final class OpenFeature {
             this.client = client;
         }
 
-
+        
         @Override
         public Double discountPercentage(EvaluationContext ctx) {
             return client.getDoubleValue("discountPercentage", 0.15, ctx);
@@ -131,7 +154,7 @@ public final class OpenFeature {
         public FlagEvaluationDetails<Double> discountPercentageDetails(EvaluationContext ctx) {
             return client.getDoubleDetails("discountPercentage", 0.15, ctx);
         }
-
+        
         @Override
         public Boolean enableFeatureA(EvaluationContext ctx) {
             return client.getBooleanValue("enableFeatureA", false, ctx);
@@ -141,7 +164,7 @@ public final class OpenFeature {
         public FlagEvaluationDetails<Boolean> enableFeatureADetails(EvaluationContext ctx) {
             return client.getBooleanDetails("enableFeatureA", false, ctx);
         }
-
+        
         @Override
         public String greetingMessage(EvaluationContext ctx) {
             return client.getStringValue("greetingMessage", "Hello there!", ctx);
@@ -171,7 +194,7 @@ public final class OpenFeature {
         public FlagEvaluationDetails<Integer> usernameMaxLengthDetails(EvaluationContext ctx) {
             return client.getIntegerDetails("usernameMaxLength", 50, ctx);
         }
-
+        
     }
 
     public static GeneratedClient getClient() {

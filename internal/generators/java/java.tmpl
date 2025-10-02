@@ -10,6 +10,17 @@ public final class OpenFeature {
 
     private OpenFeature() {} // prevent instantiation
 
+    /**
+     * Flag key constants for programmatic access
+     */
+    public static final class FlagKeys {
+        private FlagKeys() {} // prevent instantiation
+{{ range .Flagset.Flags }}
+        /** Flag key for {{ .Description }} */
+        public static final String {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }};
+{{ end }}
+    }
+
     public interface GeneratedClient {
         {{ range .Flagset.Flags }}
         /**

@@ -10,23 +10,6 @@ using OpenFeature.Model;
 namespace TestNamespace
 {
     /// <summary>
-    /// Flag key constants for programmatic access
-    /// </summary>
-    public static class FlagKeys
-    {
-        /// <summary>Flag key for Discount percentage applied to purchases.</summary>
-        public const string DISCOUNT_PERCENTAGE = "discountPercentage";
-        /// <summary>Flag key for Controls whether Feature A is enabled.</summary>
-        public const string ENABLE_FEATURE_A = "enableFeatureA";
-        /// <summary>Flag key for The message to use for greeting users.</summary>
-        public const string GREETING_MESSAGE = "greetingMessage";
-        /// <summary>Flag key for Allows customization of theme colors.</summary>
-        public const string THEME_CUSTOMIZATION = "themeCustomization";
-        /// <summary>Flag key for Maximum allowed length for usernames.</summary>
-        public const string USERNAME_MAX_LENGTH = "usernameMaxLength";
-    }
-
-    /// <summary>
     /// Service collection extensions for OpenFeature
     /// </summary>
     public static class OpenFeatureServiceExtensions
