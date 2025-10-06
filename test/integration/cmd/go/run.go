@@ -36,7 +36,7 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 
 	// Build the CLI
 	cli := client.Container().
-		From("golang:1.23-alpine").
+		From("golang:1.24-alpine").
 		WithExec([]string{"apk", "add", "--no-cache", "git"}).
 		WithDirectory("/src", source).
 		WithWorkdir("/src").
@@ -57,7 +57,7 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 
 	// Test Go compilation with the generated files
 	goContainer := client.Container().
-		From("golang:1.23-alpine").
+		From("golang:1.24-alpine").
 		WithExec([]string{"apk", "add", "--no-cache", "git"}).
 		WithWorkdir("/app").
 		WithDirectory("/app", testFiles).
