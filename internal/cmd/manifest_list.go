@@ -77,7 +77,7 @@ func displayFlagList(fs *flagset.Flagset, manifestPath string) {
 	}
 
 	// Render table
-	pterm.DefaultTable.WithHasHeader().WithData(tableData).Render()
+	_ = pterm.DefaultTable.WithHasHeader().WithData(tableData).Render()
 }
 
 // formatValue converts a value to a string representation suitable for display
