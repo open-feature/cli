@@ -29,7 +29,7 @@ type ObjectProviderDetails func(ctx context.Context, evalCtx openfeature.Evaluat
 var client openfeature.IClient = nil
 
 {{- range .Flagset.Flags }}
-// {{.Description}}
+// {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
 var {{ .Key | ToPascal }} = struct {
     fmt.Stringer
     // Value returns the value of the flag {{ .Key | ToPascal }},

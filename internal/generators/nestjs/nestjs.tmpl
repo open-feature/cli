@@ -103,7 +103,7 @@ interface TypedFeatureProps {
  *
  * **Details:**
  * - flag key: `{{ .Key }}`
- * - description: `{{ .Description }}`
+ * - description: `{{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}`
  * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
  * - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
  *

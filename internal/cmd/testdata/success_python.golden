@@ -9,11 +9,11 @@ from openfeature.hook import Hook
 
 class FlagKeys:
     """Flag key constants for programmatic access"""
-    DISCOUNT_PERCENTAGE = "discountPercentage"  # Discount percentage applied to purchases.
-    ENABLE_FEATURE_A = "enableFeatureA"  # Controls whether Feature A is enabled.
-    GREETING_MESSAGE = "greetingMessage"  # The message to use for greeting users.
-    THEME_CUSTOMIZATION = "themeCustomization"  # Allows customization of theme colors.
-    USERNAME_MAX_LENGTH = "usernameMaxLength"  # Maximum allowed length for usernames.
+    DISCOUNT_PERCENTAGE = "discountPercentage"  # Flag key for: Discount percentage applied to purchases.
+    ENABLE_FEATURE_A = "enableFeatureA"  # Flag key for: Controls whether Feature A is enabled.
+    GREETING_MESSAGE = "greetingMessage"  # Flag key for: The message to use for greeting users.
+    THEME_CUSTOMIZATION = "themeCustomization"  # Flag key for: Allows customization of theme colors.
+    USERNAME_MAX_LENGTH = "usernameMaxLength"  # Flag key for: Maximum allowed length for usernames.
 
 
 class GeneratedClient:

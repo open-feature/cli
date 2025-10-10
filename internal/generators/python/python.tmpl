@@ -10,7 +10,7 @@ from openfeature.hook import Hook
 class FlagKeys:
     """Flag key constants for programmatic access"""
 {{- range .Flagset.Flags }}
-    {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }}  # {{ .Description }}
+    {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }}  # Flag key for: {{ if .Description }}{{ .Description }}{{ else }}this flag{{ end }}
 {{- end }}
 
 
@@ -28,7 +28,7 @@ class GeneratedClient:
         flag_evaluation_options: Optional[FlagEvaluationOptions] = None,
     ) -> {{ .Type | OpenFeatureType }}:
         """
-        {{ .Description }}
+        {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
 
         **Details:**
         - flag key: `{{ .Key }}`
@@ -50,7 +50,7 @@ class GeneratedClient:
         flag_evaluation_options: Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
         """
-        {{ .Description }}
+        {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
 
         **Details:**
         - flag key: `{{ .Key }}`
@@ -72,7 +72,7 @@ class GeneratedClient:
         flag_evaluation_options: Optional[FlagEvaluationOptions] = None,
     ) -> {{ .Type | OpenFeatureType }}:
         """
-        {{ .Description }}
+        {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
 
         **Details:**
         - flag key: `{{ .Key }}`
@@ -94,7 +94,7 @@ class GeneratedClient:
         flag_evaluation_options: Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
         """
-        {{ .Description }}
+        {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
 
         **Details:**
         - flag key: `{{ .Key }}`

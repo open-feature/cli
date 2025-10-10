@@ -15,7 +15,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
     public static class FlagKeys
     {
         {{- range .Flagset.Flags }}
-        /// <summary>Flag key for {{ .Description }}</summary>
+        /// <summary>Flag key for {{ if .Description }}{{ .Description }}{{ else }}this flag{{ end }}</summary>
         public const string {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }};
         {{- end }}
     }
@@ -71,7 +71,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
 
         {{- range .Flagset.Flags }}
         /// <summary>
-        /// {{ .Description }}
+        /// {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
         /// </summary>
         /// <remarks>
         /// <para>Flag key: {{ .Key }}</para>
@@ -99,7 +99,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
         }
 
         /// <summary>
-        /// {{ .Description }}
+        /// {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
         /// </summary>
         /// <remarks>
         /// <para>Flag key: {{ .Key }}</para>
