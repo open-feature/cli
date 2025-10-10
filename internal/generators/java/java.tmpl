@@ -10,10 +10,21 @@ public final class OpenFeature {
 
     private OpenFeature() {} // prevent instantiation
 
+    /**
+     * Flag key constants for programmatic access
+     */
+    public static final class FlagKeys {
+        private FlagKeys() {} // prevent instantiation
+{{ range .Flagset.Flags }}
+        /** Flag key for {{ if .Description }}{{ .Description }}{{ else }}this flag{{ end }} */
+        public static final String {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }};
+{{- end }}
+    }
+
     public interface GeneratedClient {
         {{ range .Flagset.Flags }}
         /**
-         * {{ .Description }}
+         * {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
          * Details:
          * - Flag key: {{ .Key }}
          * - Type: {{ .Type | OpenFeatureType }}
@@ -23,7 +34,7 @@ public final class OpenFeature {
         {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx);
 
         /**
-         * {{ .Description }}
+         * {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
          * Details:
          * - Flag key: {{ .Key }}
          * - Type: {{ .Type | OpenFeatureType }}
@@ -31,7 +42,8 @@ public final class OpenFeature {
          * Returns the evaluation details containing the flag value and metadata
          */
         FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx);
-        {{ end }}
+
+{{- end }}
     }
 
     private static final class OpenFeatureGeneratedClient implements GeneratedClient {
@@ -51,7 +63,8 @@ public final class OpenFeature {
         public FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
             return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
         }
-        {{ end }}
+
+{{- end }}
     }
 
     public static GeneratedClient getClient() {

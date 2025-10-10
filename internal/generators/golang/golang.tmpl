@@ -7,6 +7,14 @@ import (
 {{- end}}
 )
 
+// stringer transforms a string to a Stringer
+type stringer string
+
+// String implements the fmt.Stringer interface
+func (s stringer) String() string {
+	return string(s)
+}
+
 type BooleanProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext) (bool, error)
 type BooleanProviderDetails func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.BooleanEvaluationDetails, error)
 type FloatProvider func(ctx context.Context, evalCtx openfeature.EvaluationContext) (float64, error)
@@ -21,8 +29,9 @@ type ObjectProviderDetails func(ctx context.Context, evalCtx openfeature.Evaluat
 var client openfeature.IClient = nil
 
 {{- range .Flagset.Flags }}
-// {{.Description}}
+// {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
 var {{ .Key | ToPascal }} = struct {
+    fmt.Stringer
     // Value returns the value of the flag {{ .Key | ToPascal }},
     // as well as the evaluation error, if present.
     Value {{ .Type | OpenFeatureType }}Provider
@@ -31,6 +40,7 @@ var {{ .Key | ToPascal }} = struct {
     // the evaluation error, if any, and the evaluation details.
     ValueWithDetails {{ .Type | OpenFeatureType }}ProviderDetails
 }{
+    Stringer: stringer({{ .Key | Quote }}),
     Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) ({{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}, error) {
         return client.{{ .Type | OpenFeatureType }}Value(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
     },

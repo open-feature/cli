@@ -11,10 +11,18 @@ import type {
   FlagEvaluationOptions,
 } from "@openfeature/server-sdk";
 
+// Flag key constants for programmatic access
+export const FlagKeys = {
+{{- range .Flagset.Flags }}
+  /** Flag key for {{ if .Description }}{{ .Description }}{{ else }}this flag{{ end }} */
+  {{ .Key | ToScreamingSnake }}: {{ .Key | Quote }},
+{{- end }}
+} as const;
+
 export interface GeneratedClient {
 {{- range .Flagset.Flags }}
   /**
-  * {{ .Description }}
+  * {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
   * 
   * **Details:**
   * - flag key: `{{ .Key }}`
@@ -29,7 +37,7 @@ export interface GeneratedClient {
   {{ .Key | ToCamel }}(context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>;
 
   /**
-  * {{ .Description }}
+  * {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
   * 
   * **Details:**
   * - flag key: `{{ .Key }}`
