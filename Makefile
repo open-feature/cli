@@ -1,3 +1,16 @@
+.PHONY: help
+help:
+	@echo "Available commands:"
+	@echo "  help                     - Show this help message"
+	@echo "  test                     - Run unit tests"
+	@echo "  test-integration         - Run all integration tests"
+	@echo "  test-integration-csharp  - Run C# integration tests"
+	@echo "  test-integration-go      - Run Go integration tests"
+	@echo "  test-integration-nodejs  - Run NodeJS integration tests"
+	@echo "  generate-docs            - Generate documentation"
+	@echo "  generate-schema          - Generate schema"
+	@echo "  fmt                      - Format Go code"
+
 .PHONY: test
 test: 
 	@echo "Running tests..."

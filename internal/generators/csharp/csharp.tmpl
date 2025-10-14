@@ -10,6 +10,17 @@ using OpenFeature.Model;
 namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else }}OpenFeatureGenerated{{ end }}
 {
     /// <summary>
+    /// Flag key constants for programmatic access
+    /// </summary>
+    public static class FlagKeys
+    {
+        {{- range .Flagset.Flags }}
+        /// <summary>Flag key for {{ if .Description }}{{ .Description }}{{ else }}this flag{{ end }}</summary>
+        public const string {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }};
+        {{- end }}
+    }
+
+    /// <summary>
     /// Service collection extensions for OpenFeature
     /// </summary>
     public static class OpenFeatureServiceExtensions
@@ -60,7 +71,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
 
         {{- range .Flagset.Flags }}
         /// <summary>
-        /// {{ .Description }}
+        /// {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
         /// </summary>
         /// <remarks>
         /// <para>Flag key: {{ .Key }}</para>
@@ -88,7 +99,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
         }
 
         /// <summary>
-        /// {{ .Description }}
+        /// {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
         /// </summary>
         /// <remarks>
         /// <para>Flag key: {{ .Key }}</para>

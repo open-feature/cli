@@ -13,7 +13,10 @@ import type {
 import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeatureFlag, ObjectFeatureFlag } from "@openfeature/nestjs-sdk";
 
 import type { GeneratedClient } from "./openfeature";
-import { getGeneratedClient } from "./openfeature";
+import { getGeneratedClient, FlagKeys } from "./openfeature";
+
+// Re-export flag keys for convenience
+export { FlagKeys };
 
 /**
  * Returns an injection token for a (domain scoped) generated OpenFeature client.
@@ -100,7 +103,7 @@ interface TypedFeatureProps {
  *
  * **Details:**
  * - flag key: `{{ .Key }}`
- * - description: `{{ .Description }}`
+ * - description: `{{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}`
  * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
  * - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
  *

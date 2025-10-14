@@ -100,6 +100,13 @@ func run() error {
 	}
 	fmt.Printf("themeCustomization: %v\n", themeCustomization)
 
+	// Test the String() method functionality for all flags
+	fmt.Printf("enableFeatureA flag key: %s\n", generated.EnableFeatureA.String())
+	fmt.Printf("discountPercentage flag key: %s\n", generated.DiscountPercentage.String())
+	fmt.Printf("greetingMessage flag key: %s\n", generated.GreetingMessage.String())
+	fmt.Printf("usernameMaxLength flag key: %s\n", generated.UsernameMaxLength.String())
+	fmt.Printf("themeCustomization flag key: %s\n", generated.ThemeCustomization.String())
+
 	fmt.Println("Generated Go code compiles successfully!")
 	
 	return nil

@@ -111,7 +111,7 @@ func formatNestedValue(value any) string {
 	case string:
 		return fmt.Sprintf("%q", val)
 	case bool:
-		return fmt.Sprintf(pythonBoolLiteral(val).(string))
+		return pythonBoolLiteral(val).(string)
 	case int, int64, float64:
 		return fmt.Sprintf("%v", val)
 	case map[string]any:

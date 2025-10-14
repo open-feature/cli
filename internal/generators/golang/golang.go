@@ -63,6 +63,7 @@ func supportImports(flags []flagset.Flag) []string {
 	var res []string
 	if len(flags) > 0 {
 		res = append(res, "\"context\"")
+		res = append(res, "\"fmt\"")
 		res = append(res, "\"github.com/open-feature/go-sdk/openfeature\"")
 	}
 	sort.Strings(res)
