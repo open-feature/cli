@@ -1,15 +1,19 @@
 package manifest
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
+	"strings"
 
+	"github.com/open-feature/cli/internal/api/sync"
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
+	"github.com/open-feature/cli/internal/logger"
 	"github.com/spf13/afero"
 )
 
@@ -81,7 +85,22 @@ func LoadFromLocal(filePath string) (*flagset.Flagset, error) {
 	return flags, nil
 }
 
-// LoadFromRemote loads flags from a remote URL
+// LoadFromSyncAPI loads flags from a remote URL using the sync API client
+// This should be used when the remote source implements the sync API specification
+func LoadFromSyncAPI(baseURL string, authToken string) (*flagset.Flagset, error) {
+	logger.Default.Debug(fmt.Sprintf("Loading flags from sync API at %s", baseURL))
+
+	client, err := sync.NewClient(baseURL, authToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create sync client: %w", err)
+	}
+
+	ctx := context.Background()
+	return client.PullFlags(ctx)
+}
+
+// LoadFromRemote loads flags from a remote URL using direct HTTP requests
+// This is a fallback for sources that don't implement the sync API specification
 func LoadFromRemote(url string, authToken string) (*flagset.Flagset, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -103,11 +122,24 @@ func LoadFromRemote(url string, authToken string) (*flagset.Flagset, error) {
 		return nil, err
 	}
 
+	logger.Default.Debug(fmt.Sprintf("Fetched from %s (status %d):\n%s", url, resp.StatusCode, string(body)))
+
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, fmt.Errorf("Received error response from flag source: %s", string(body))
+		return nil, fmt.Errorf("received error response from flag source: %s", string(body))
 	}
 
 	return loadFlagsFromData(body)
+}
+
+// URLLooksLikeAFile checks if the given URL string appears to point to a file
+func URLLooksLikeAFile(url string) bool {
+	fileExtensions := []string{".json", ".yaml", ".yml"}
+	for _, ext := range fileExtensions {
+		if strings.HasSuffix(url, ext) {
+			return true
+		}
+	}
+	return false
 }
 
 // createInitManifest creates an initManifest with the given flags
@@ -173,4 +205,30 @@ func loadFlagsFromData(data []byte) (*flagset.Flagset, error) {
 	}
 
 	return &flagset.Flagset{Flags: *loadedFlags}, nil
+}
+
+// SaveToRemote saves flags to a remote URL using HTTP/HTTPS
+// This function performs a smart push: it fetches remote flags first,
+// compares them with local flags, and intelligently creates or updates
+// flags as needed. Returns a PushResult with details of what was changed.
+// If dryRun is true, only performs the comparison without making actual API calls.
+func SaveToRemote(url string, flags *flagset.Flagset, authToken string, dryRun bool) (*sync.PushResult, error) {
+	// Use the generated OpenAPI client for type-safe API calls
+	client, err := sync.NewClient(url, authToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create push client: %w", err)
+	}
+
+	ctx := context.Background()
+
+	// Fetch remote flags to compare with local flags using the sync client
+	logger.Default.Debug("Fetching remote flags for comparison")
+	remoteFlags, err := client.PullFlags(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch remote flags: %w", err)
+	}
+	logger.Default.Debug(fmt.Sprintf("Fetched %d remote flags", len(remoteFlags.Flags)))
+
+	// Smart push: compare and intelligently create or update flags
+	return client.PushFlags(ctx, flags, remoteFlags, dryRun)
 }

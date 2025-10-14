@@ -58,8 +58,8 @@ func (fs *Flagset) Filter(unsupportedFlagTypes map[FlagType]bool) *Flagset {
 	return &filtered
 }
 
-// parseFlagType converts a string flag type to FlagType enum
-func parseFlagType(typeStr string) (FlagType, error) {
+// ParseFlagType converts a string flag type to FlagType enum
+func ParseFlagType(typeStr string) (FlagType, error) {
 	switch typeStr {
 	case "integer", "Integer":
 		return IntType, nil
@@ -91,7 +91,7 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 	}
 
 	for key, flag := range manifest.Flags {
-		flagType, err := parseFlagType(flag.FlagType)
+		flagType, err := ParseFlagType(flag.FlagType)
 		if err != nil {
 			return err
 		}
@@ -158,8 +158,8 @@ func LoadFromSourceFlags(data []byte) (*[]Flag, error) {
 
 	var sourceFlagsArray []SourceFlag
 
-	if err := json.Unmarshal(data, &sourceWithWrapper); err == nil && len(sourceWithWrapper.Flags) > 0 {
-		// Successfully unmarshaled as object with flags property
+	if err := json.Unmarshal(data, &sourceWithWrapper); err == nil && sourceWithWrapper.Flags != nil {
+		// Successfully unmarshaled as object with flags property (even if empty)
 		sourceFlagsArray = sourceWithWrapper.Flags
 	} else {
 		// Try to unmarshal as a direct array of flags (for backward compatibility)
@@ -170,7 +170,7 @@ func LoadFromSourceFlags(data []byte) (*[]Flag, error) {
 
 	var flags []Flag
 	for _, sf := range sourceFlagsArray {
-		flagType, err := parseFlagType(sf.Type)
+		flagType, err := ParseFlagType(sf.Type)
 		if err != nil {
 			return nil, err
 		}

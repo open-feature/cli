@@ -1,0 +1,548 @@
+openapi: 3.0.3
+info:
+  title: Manifest Management API
+  version: 0.1.0
+  description: |
+    CRUD endpoints that expose a manifest-friendly view of project flags for tooling such
+    as the OpenFeature CLI. The specification is provider-agnostic; replace the server
+    section with your deployment's base URL and token semantics.
+tags:
+  - name: Manifest
+    description: Operations for reading and mutating manifest-friendly flag data.
+servers:
+  - url: https://example.com
+    description: Replace with the provider base URL
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    FlagDefaultValue:
+      description: Default value for a flag (can be boolean, string, integer, or object)
+      oneOf:
+        - type: boolean
+        - type: string
+        - type: integer
+        - type: object
+    ManifestFlag:
+      type: object
+      required:
+        - key
+        - type
+        - defaultValue
+      properties:
+        key:
+          type: string
+          description: Unique flag key within the flag set.
+          example: search-rollout
+        name:
+          type: string
+          description: Human-friendly flag name. Defaults to the key when omitted.
+          example: Search rollout
+        type:
+          type: string
+          description: Flag data type.
+          enum: [boolean, string, integer, object]
+        description:
+          type: string
+          nullable: true
+          description: Optional flag description.
+          example: Enable the new search experience.
+        defaultValue:
+          $ref: '#/components/schemas/FlagDefaultValue'
+    ManifestEnvelope:
+      type: object
+      required:
+        - flags
+      properties:
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManifestFlag'
+    ManifestFlagResponse:
+      type: object
+      required:
+        - flag
+        - updatedAt
+      properties:
+        flag:
+          $ref: '#/components/schemas/ManifestFlag'
+        updatedAt:
+          type: string
+          format: date-time
+          description: |
+            ISO timestamp reflecting the last update to the flag record. Clients can use this to
+            detect changes between manifest fetches or to implement optimistic concurrency checks.
+          example: 2024-03-02T09:45:03.000Z
+    ArchiveResponse:
+      type: object
+      required:
+        - message
+        - archivedAt
+      properties:
+        message:
+          type: string
+          example: Flag "search-rollout" archived. Restore it using your management interface if needed.
+        archivedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp recording when the flag was archived.
+    ErrorDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Field path related to the error.
+          example: key
+        code:
+          type: string
+          description: Short machine-readable code (matches Zod issue codes).
+          example: invalid_type
+        message:
+          type: string
+          description: Human-friendly error message.
+          example: Flag exists but is archived. Restore it via the UI to reuse this key.
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - message
+            - status
+          properties:
+            message:
+              type: string
+              example: Flag type cannot be changed from boolean to string.
+            status:
+              type: integer
+              example: 409
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/ErrorDetail'
+paths:
+  /openfeature/v0/manifest:
+    get:
+      tags:
+        - Manifest
+      summary: Get Project Manifest
+      description: |
+        Returns the project manifest containing active flags. Archived flags are excluded.
+        The response includes an `X-Manifest-Capabilities` header listing token capabilities.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Manifest exported successfully.
+          headers:
+            X-Manifest-Capabilities:
+              schema:
+                type: string
+                example: read,write,delete
+              description: Comma-separated list that reflects the token capabilities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestEnvelope'
+              examples:
+                manifest:
+                  summary: Sample manifest
+                  value:
+                    flags:
+                      - key: search-rollout
+                        name: Search rollout
+                        type: boolean
+                        description: Enable the new search experience.
+                        defaultValue: false
+                      - key: welcome-banner
+                        name: Welcome banner
+                        type: string
+                        description: Localized welcome message
+                        defaultValue: control
+        '401':
+          description: Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  value:
+                    error:
+                      message: Authorization header required
+                      status: 401
+        '403':
+          description: Token lacks scope to read the manifest.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                forbidden:
+                  value:
+                    error:
+                      message: This API token does not have read access.
+                      status: 403
+        '500':
+          description: Unexpected server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                serverError:
+                  value:
+                    error:
+                      message: Unexpected error
+                      status: 500
+  /openfeature/v0/manifest/flags:
+    post:
+      tags:
+        - Manifest
+      summary: Create Manifest Flag
+      description: |
+        Creates a new flag exposed through the manifest. The request must be authenticated
+        with a token that includes `write` or `delete` capability. Attempting to create a
+        flag whose key already exists (active or archived) returns 409.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - key
+                - type
+                - defaultValue
+              properties:
+                key:
+                  type: string
+                  example: search-rollout
+                type:
+                  type: string
+                  enum: [boolean, string, integer, object]
+                name:
+                  type: string
+                  description: Optional display name. Defaults to the key.
+                  example: Search rollout
+                description:
+                  type: string
+                  nullable: true
+                  example: Enable the new search experience.
+                defaultValue:
+                  $ref: '#/components/schemas/FlagDefaultValue'
+              additionalProperties: false
+            examples:
+              booleanFlag:
+                value:
+                  key: search-rollout
+                  type: boolean
+                  name: Search rollout
+                  description: Enable the new search experience.
+                  defaultValue: false
+      responses:
+        '201':
+          description: Flag created successfully.
+          headers:
+            X-Manifest-Capabilities:
+              schema:
+                type: string
+                example: read,write,delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestFlagResponse'
+        '400':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                validation:
+                  value:
+                    error:
+                      message: Validation failed.
+                      status: 400
+                      details:
+                        - field: key
+                          code: too_small
+                          message: Flag key is required.
+        '401':
+          description: Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  value:
+                    error:
+                      message: Authorization header required
+                      status: 401
+        '403':
+          description: Token lacks write scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                forbidden:
+                  value:
+                    error:
+                      message: This API token does not have write access.
+                      status: 403
+        '409':
+          description: Flag key already exists (active or archived).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                archivedConflict:
+                  value:
+                    error:
+                      message: Flag with key "search-rollout" is archived. Restore it in the UI or choose a new key.
+                      status: 409
+                      details:
+                        - field: key
+                          message: Flag exists but is archived. Restore it to reuse this key.
+        '500':
+          description: Unexpected server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /openfeature/v0/manifest/flags/{key}:
+    put:
+      tags:
+        - Manifest
+      summary: Update Manifest Flag
+      description: |
+        Replaces metadata for an existing manifest flag. The path parameter and body key must
+        match. Archived flags cannot be updated; they must be restored before modification.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Flag key to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - key
+                - type
+              properties:
+                key:
+                  type: string
+                  example: search-rollout
+                type:
+                  type: string
+                  enum: [boolean, string, integer, object]
+                name:
+                  type: string
+                  example: Search rollout
+                description:
+                  type: string
+                  nullable: true
+                defaultValue:
+                  $ref: '#/components/schemas/FlagDefaultValue'
+              additionalProperties: false
+      responses:
+        '200':
+          description: Flag updated successfully.
+          headers:
+            X-Manifest-Capabilities:
+              schema:
+                type: string
+                example: read,write,delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestFlagResponse'
+        '400':
+          description: Validation failure (e.g., mismatched keys).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                mismatchedKey:
+                  value:
+                    error:
+                      message: Flag key in path and payload must match.
+                      status: 400
+                      details:
+                        - field: key
+                          message: Path key and payload key differ.
+        '401':
+          description: Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  value:
+                    error:
+                      message: Authorization header required
+                      status: 401
+        '403':
+          description: Token lacks write scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                forbidden:
+                  value:
+                    error:
+                      message: This API token does not have write access.
+                      status: 403
+        '404':
+          description: Flag not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error:
+                      message: Flag "search-rollout" was not found.
+                      status: 404
+        '409':
+          description: Conflict (archived flag, immutable type).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                archivedConflict:
+                  value:
+                    error:
+                      message: Flag "search-rollout" is archived. Restore it in the UI before updating.
+                      status: 409
+                      details:
+                        - field: key
+                          message: Archived flags cannot be updated via the manifest API.
+                typeConflict:
+                  value:
+                    error:
+                      message: Flag type cannot be changed from boolean to string.
+                      status: 409
+        '500':
+          description: Unexpected server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Manifest
+      summary: Archive Manifest Flag
+      description: |
+        Removes a flag from the manifest. Providers may implement this as either a soft
+        delete (archive) or a hard delete; consult your provider documentation for specifics.
+        Flags that are active in protected environments may reject deletion requests depending
+        on provider policy.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Flag key to archive.
+      responses:
+        '200':
+          description: Flag archived successfully (soft delete).
+          headers:
+            X-Manifest-Capabilities:
+              schema:
+                type: string
+                example: read,write,delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveResponse'
+              examples:
+                archived:
+                  value:
+                    message: Flag "search-rollout" archived. Restore it using your management interface if needed.
+                    archivedAt: 2024-03-02T10:01:22.000Z
+        '401':
+          description: Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  value:
+                    error:
+                      message: Authorization header required
+                      status: 401
+        '403':
+          description: Token lacks delete scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                forbidden:
+                  value:
+                    error:
+                      message: This API token does not have delete access.
+                      status: 403
+        '404':
+          description: Flag not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error:
+                      message: Flag "search-rollout" was not found.
+                      status: 404
+        '409':
+          description: Flag already archived or active in a protected environment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                alreadyArchived:
+                  value:
+                    error:
+                      message: Flag "search-rollout" is already archived.
+                      status: 409
+                      details:
+                        - field: key
+                          message: Flag is already archived. Restore it to use it again.
+                protectedEnvironment:
+                  value:
+                    error:
+                      message: Flag is active in a protected environment. Disable it before archiving.
+                      status: 409
+                      details:
+                        - field: key
+                          message: Disable the flag in protected environments before archiving.
