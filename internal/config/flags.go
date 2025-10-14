@@ -7,17 +7,20 @@ import (
 
 // Flag name constants to avoid duplication
 const (
-	DebugFlagName         = "debug"
-	ManifestFlagName      = "manifest"
-	OutputFlagName        = "output"
-	NoInputFlagName       = "no-input"
-	GoPackageFlagName     = "package-name"
-	CSharpNamespaceName   = "namespace"
-	OverrideFlagName      = "override"
-	JavaPackageFlagName   = "package-name"
-	FlagSourceUrlFlagName = "flag-source-url"
-	AuthTokenFlagName     = "auth-token"
-	NoPromptFlagName      = "no-prompt"
+	DebugFlagName              = "debug"
+	ManifestFlagName           = "manifest"
+	OutputFlagName             = "output"
+	NoInputFlagName            = "no-input"
+	GoPackageFlagName          = "package-name"
+	CSharpNamespaceName        = "namespace"
+	OverrideFlagName           = "override"
+	JavaPackageFlagName        = "package-name"
+	FlagSourceUrlFlagName      = "flag-source-url"
+	FlagDestinationUrlFlagName = "flag-destination-url"
+	AuthTokenFlagName          = "auth-token"
+	NoPromptFlagName           = "no-prompt"
+	DryRunFlagName             = "dry-run"
+	PushMethodFlagName         = "method"
 )
 
 // Default values for flags
@@ -69,6 +72,14 @@ func AddPullFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool(NoPromptFlagName, false, "Disable interactive prompts for missing default values")
 }
 
+// AddPushFlags adds the push command specific flags
+func AddPushFlags(cmd *cobra.Command) {
+	cmd.Flags().String(FlagDestinationUrlFlagName, "", "The URL of the flag destination")
+	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag destination")
+	cmd.Flags().Bool(DryRunFlagName, false, "Preview changes without pushing")
+	cmd.Flags().String(PushMethodFlagName, "POST", "HTTP method to use (POST or PUT)")
+}
+
 // GetManifestPath gets the manifest path from the given command
 func GetManifestPath(cmd *cobra.Command) string {
 	manifestPath, _ := cmd.Flags().GetString(ManifestFlagName)
@@ -111,21 +122,28 @@ func GetOverride(cmd *cobra.Command) bool {
 	return override
 }
 
+// getConfigValueWithFallback is a helper function that attempts to get a value from Viper config
+// if the provided value is empty. This reduces duplication for flag source/destination URLs.
+func getConfigValueWithFallback(value string, configKey string) string {
+	if value != "" {
+		return value
+	}
+
+	viper.SetConfigName(".openfeature")
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		return ""
+	}
+	if !viper.IsSet(configKey) {
+		return ""
+	}
+	return viper.GetString(configKey)
+}
+
 // GetFlagSourceUrl gets the flag source URL from the given command
 func GetFlagSourceUrl(cmd *cobra.Command) string {
 	flagSourceUrl, _ := cmd.Flags().GetString(FlagSourceUrlFlagName)
-	if flagSourceUrl == "" {
-		viper.SetConfigName(".openfeature")
-		viper.AddConfigPath(".")
-		if err := viper.ReadInConfig(); err != nil {
-			return ""
-		}
-		if !viper.IsSet("flagSourceUrl") {
-			return ""
-		}
-		flagSourceUrl = viper.GetString("flagSourceUrl")
-	}
-	return flagSourceUrl
+	return getConfigValueWithFallback(flagSourceUrl, "flagSourceUrl")
 }
 
 // GetAuthToken gets the auth token from the given command
@@ -138,4 +156,22 @@ func GetAuthToken(cmd *cobra.Command) string {
 func GetNoPrompt(cmd *cobra.Command) bool {
 	noPrompt, _ := cmd.Flags().GetBool(NoPromptFlagName)
 	return noPrompt
+}
+
+// GetFlagDestinationUrl gets the flag destination URL from the given command
+func GetFlagDestinationUrl(cmd *cobra.Command) string {
+	flagDestinationUrl, _ := cmd.Flags().GetString(FlagDestinationUrlFlagName)
+	return getConfigValueWithFallback(flagDestinationUrl, "flagDestinationUrl")
+}
+
+// GetDryRun gets the dry-run flag from the given command
+func GetDryRun(cmd *cobra.Command) bool {
+	dryRun, _ := cmd.Flags().GetBool(DryRunFlagName)
+	return dryRun
+}
+
+// GetPushMethod gets the HTTP method for push from the given command
+func GetPushMethod(cmd *cobra.Command) string {
+	method, _ := cmd.Flags().GetString(PushMethodFlagName)
+	return method
 }

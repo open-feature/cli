@@ -27,5 +27,6 @@ openfeature [flags]
 * [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
 * [openfeature init](openfeature_init.md)	 - Initialize a new project
 * [openfeature pull](openfeature_pull.md)	 - Pull a flag manifest from a remote source
+* [openfeature push](openfeature_push.md)	 - Push flag configurations to a remote source
 * [openfeature version](openfeature_version.md)	 - Print the version number of the OpenFeature CLI
 
