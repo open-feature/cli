@@ -28,5 +28,6 @@ openfeature [flags]
 * [openfeature init](openfeature_init.md)	 - Initialize a new project
 * [openfeature manifest](openfeature_manifest.md)	 - Manage flag manifest files
 * [openfeature pull](openfeature_pull.md)	 - Pull a flag manifest from a remote source
+* [openfeature push](openfeature_push.md)	 - Push flag configurations to a remote source
 * [openfeature version](openfeature_version.md)	 - Print the version number of the OpenFeature CLI
 

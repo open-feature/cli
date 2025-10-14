@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,8 +9,10 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/open-feature/cli/internal/api/push"
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
+	"github.com/open-feature/cli/internal/logger"
 	"github.com/spf13/afero"
 )
 
@@ -103,8 +106,11 @@ func LoadFromRemote(url string, authToken string) (*flagset.Flagset, error) {
 		return nil, err
 	}
 
+	// Debug: log what we got from the server
+	logger.Default.Debug(fmt.Sprintf("Fetched from %s (status %d):\n%s", url, resp.StatusCode, string(body)))
+
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, fmt.Errorf("Received error response from flag source: %s", string(body))
+		return nil, fmt.Errorf("received error response from flag source: %s", string(body))
 	}
 
 	return loadFlagsFromData(body)
@@ -173,4 +179,27 @@ func loadFlagsFromData(data []byte) (*flagset.Flagset, error) {
 	}
 
 	return &flagset.Flagset{Flags: *loadedFlags}, nil
+}
+
+// SaveToRemote saves flags to a remote URL using HTTP/HTTPS
+// This function performs a smart push: it fetches remote flags first,
+// compares them with local flags, and intelligently creates or updates
+// flags as needed. Returns a PushResult with details of what was changed.
+func SaveToRemote(url string, flags *flagset.Flagset, authToken string) (*push.PushResult, error) {
+	// Use the generated OpenAPI client for type-safe API calls
+	client, err := push.NewClient(url, authToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create push client: %w", err)
+	}
+
+	ctx := context.Background()
+
+	// Fetch remote flags to compare with local flags
+	remoteFlags, err := LoadFromRemote(url, authToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch remote flags: %w", err)
+	}
+
+	// Smart push: compare and intelligently create or update flags
+	return client.PushFlags(ctx, flags, remoteFlags, flagManifestSchemaURL)
 }

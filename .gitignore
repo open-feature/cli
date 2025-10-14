@@ -40,3 +40,8 @@ generated/
 # generated files from running the CLI
 flags.json
 generated/
+
+openfeature
+
+# Build output directory
+/bin

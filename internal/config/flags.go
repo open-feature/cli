@@ -21,6 +21,7 @@ const (
 	FlagSourceUrlFlagName = "flag-source-url"
 	AuthTokenFlagName     = "auth-token"
 	NoPromptFlagName      = "no-prompt"
+	DryRunFlagName        = "dry-run"
 	TypeFlagName          = "type"
 	DefaultValueFlagName  = "default-value"
 	DescriptionFlagName   = "description"
@@ -75,6 +76,13 @@ func AddPullFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool(NoPromptFlagName, false, "Disable interactive prompts for missing default values")
 }
 
+// AddPushFlags adds the push command specific flags
+func AddPushFlags(cmd *cobra.Command) {
+	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag destination")
+	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag destination")
+	cmd.Flags().Bool(DryRunFlagName, false, "Preview changes without pushing")
+}
+
 // GetManifestPath gets the manifest path from the given command
 func GetManifestPath(cmd *cobra.Command) string {
 	manifestPath, _ := cmd.Flags().GetString(ManifestFlagName)
@@ -117,21 +125,20 @@ func GetOverride(cmd *cobra.Command) bool {
 	return override
 }
 
+// getConfigValueWithFallback is a helper function that attempts to get a value from Viper config
+// if the provided value is empty. This reduces duplication for flag source/destination URLs.
+func getConfigValueWithFallback(value string, configKey string) string {
+	if value != "" {
+		return value
+	}
+	// Viper is already configured in initializeConfig, just retrieve the value
+	return viper.GetString(configKey)
+}
+
 // GetFlagSourceUrl gets the flag source URL from the given command
 func GetFlagSourceUrl(cmd *cobra.Command) string {
 	flagSourceUrl, _ := cmd.Flags().GetString(FlagSourceUrlFlagName)
-	if flagSourceUrl == "" {
-		viper.SetConfigName(".openfeature")
-		viper.AddConfigPath(".")
-		if err := viper.ReadInConfig(); err != nil {
-			return ""
-		}
-		if !viper.IsSet("flagSourceUrl") {
-			return ""
-		}
-		flagSourceUrl = viper.GetString("flagSourceUrl")
-	}
-	return flagSourceUrl
+	return getConfigValueWithFallback(flagSourceUrl, "flagSourceUrl")
 }
 
 // GetAuthToken gets the auth token from the given command
@@ -144,6 +151,12 @@ func GetAuthToken(cmd *cobra.Command) string {
 func GetNoPrompt(cmd *cobra.Command) bool {
 	noPrompt, _ := cmd.Flags().GetBool(NoPromptFlagName)
 	return noPrompt
+}
+
+// GetDryRun gets the dry-run flag from the given command
+func GetDryRun(cmd *cobra.Command) bool {
+	dryRun, _ := cmd.Flags().GetBool(DryRunFlagName)
+	return dryRun
 }
 
 // AddManifestAddFlags adds the manifest add command specific flags
