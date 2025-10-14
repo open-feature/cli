@@ -66,11 +66,22 @@ Why pull from a remote source:
 				}
 				flags = loadedFlags
 			case "http", "https":
-				loadedFlags, err := manifest.LoadFromRemote(flagSourceUrl, authToken)
-				if err != nil {
-					return fmt.Errorf("error fetching flags from remote source: %w", err)
+				urlContainsAFileExtension := manifest.URLLooksLikeAFile(parsedURL.String())
+				if urlContainsAFileExtension {
+					// Use direct HTTP requests for pulling flags from file-like URLs
+					loadedFlags, err := manifest.LoadFromRemote(flagSourceUrl, authToken)
+					if err != nil {
+						return fmt.Errorf("error fetching flags from remote source: %w", err)
+					}
+					flags = loadedFlags
+				} else {
+					// Use the sync API client for pulling flags
+					loadedFlags, err := manifest.LoadFromSyncAPI(flagSourceUrl, authToken)
+					if err != nil {
+						return fmt.Errorf("error fetching flags from remote source: %w", err)
+					}
+					flags = loadedFlags
 				}
-				flags = loadedFlags
 			default:
 				return fmt.Errorf("unsupported URL scheme: %s. Supported schemes are file://, http://, and https://", parsedURL.Scheme)
 			}
