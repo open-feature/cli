@@ -1,15 +1,15 @@
 package manifest
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
-	"time"
 
+	"github.com/open-feature/cli/internal/api/push"
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/spf13/afero"
@@ -179,68 +179,21 @@ func loadFlagsFromData(data []byte) (*flagset.Flagset, error) {
 
 // SaveToRemote saves flags to a remote URL using HTTP/HTTPS
 func SaveToRemote(url string, flags *flagset.Flagset, authToken string, method string) error {
-	// Define the SourceFlag structure for the array-based format
-	type SourceFlag struct {
-		Key          string `json:"key"`
-		Type         string `json:"type"`
-		Description  string `json:"description"`
-		DefaultValue any    `json:"defaultValue"`
-	}
-
-	// Convert flags to source format (array-based)
-	var sourceFlags []SourceFlag
-	for _, flag := range flags.Flags {
-		sourceFlags = append(sourceFlags, SourceFlag{
-			Key:          flag.Key,
-			Type:         flag.Type.String(),
-			Description:  flag.Description,
-			DefaultValue: flag.DefaultValue,
-		})
-	}
-
-	// Wrap in an object with "flags" property
-	sourceFlagsFormat := struct {
-		Flags []SourceFlag `json:"flags"`
-	}{
-		Flags: sourceFlags,
-	}
-
-	// Marshal to JSON
-	data, err := json.Marshal(sourceFlagsFormat)
+	// Use the generated OpenAPI client for type-safe API calls
+	client, err := push.NewClient(url, authToken)
 	if err != nil {
-		return fmt.Errorf("failed to marshal flags: %w", err)
+		return fmt.Errorf("failed to create push client: %w", err)
 	}
 
-	// Create HTTP request with the specified method
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(data))
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
+	ctx := context.Background()
 
-	// Set headers
-	req.Header.Set("Content-Type", "application/json")
-	if authToken != "" {
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", authToken))
+	// Use the appropriate method based on the HTTP verb
+	switch method {
+	case "POST":
+		return client.PushFlags(ctx, flags, flagManifestSchemaURL)
+	case "PUT":
+		return client.ReplaceFlags(ctx, flags, flagManifestSchemaURL)
+	default:
+		return fmt.Errorf("unsupported HTTP method: %s (use POST or PUT)", method)
 	}
-
-	// Execute request with a custom client that has a timeout
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Read response body for error reporting
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read response: %w", err)
-	}
-
-	// Check for successful status code
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("received error response from destination (status %d): %s", resp.StatusCode, string(body))
-	}
-
-	return nil
 }

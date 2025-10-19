@@ -31,7 +31,7 @@ func TestPush(t *testing.T) {
 
 		err := cmd.Execute()
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "flag destination URL is required")
+		assert.Contains(t, err.Error(), "flag source URL is required")
 	})
 
 	t.Run("push with HTTP destination URL using POST", func(t *testing.T) {
@@ -49,7 +49,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "http://localhost:8080/flags",
+			"--flag-source-url", "http://localhost:8080/flags",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -76,7 +76,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "https://api.example.com/flags/my-app",
+			"--flag-source-url", "https://api.example.com/flags/my-app",
 			"--method", "PUT",
 			"--manifest", "flags.json",
 		}
@@ -103,7 +103,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "https://api.example.com/flags",
+			"--flag-source-url", "https://api.example.com/flags",
 			"--auth-token", "secret-token",
 			"--manifest", "flags.json",
 		}
@@ -122,7 +122,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "https://api.example.com/flags",
+			"--flag-source-url", "https://api.example.com/flags",
 			"--dry-run",
 			"--manifest", "flags.json",
 		}
@@ -139,7 +139,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "file:///local/path/flags.json",
+			"--flag-source-url", "file:///local/path/flags.json",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -156,7 +156,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "ftp://example.com/flags",
+			"--flag-source-url", "ftp://example.com/flags",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -179,7 +179,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "https://api.example.com/flags",
+			"--flag-source-url", "https://api.example.com/flags",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -202,7 +202,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "https://api.example.com/flags",
+			"--flag-source-url", "https://api.example.com/flags",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -219,6 +219,7 @@ func TestPush(t *testing.T) {
 
 		// Expected request body structure
 		expectedBody := map[string]interface{}{
+			"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
 			"flags": []interface{}{
 				map[string]interface{}{
 					"key":          "discountPercentage",
@@ -266,7 +267,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "https://api.example.com/flags",
+			"--flag-source-url", "https://api.example.com/flags",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -282,7 +283,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "https://api.example.com/flags",
+			"--flag-source-url", "https://api.example.com/flags",
 			"--manifest", "nonexistent.json",
 		}
 		cmd.SetArgs(args)
@@ -311,7 +312,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-destination-url", "https://api.example.com/flags",
+			"--flag-source-url", "https://api.example.com/flags",
 			"--manifest", "invalid.json",
 		}
 		cmd.SetArgs(args)

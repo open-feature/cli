@@ -11,6 +11,12 @@ The push command uploads local flag configurations to a remote flag management s
 This command reads your local flag manifest and pushes it to a specified remote destination.
 It supports HTTP and HTTPS protocols for remote endpoints.
 
+The pushed data follows the OpenAPI specification defined at:
+api/v1/push.yaml
+
+Remote services implementing this API should accept the flag data in the format
+specified by the OpenFeature flag manifest schema.
+
 Note: The file:// scheme is not supported for push operations.
 For local file operations, use standard shell commands like cp or mv.
 
@@ -22,29 +28,29 @@ openfeature push [flags]
 
 ```
   # Push flags to a remote HTTPS endpoint
-  openfeature push --flag-destination-url https://api.example.com/flags --auth-token secret-token
+  openfeature push --flag-source-url https://api.example.com/flags --auth-token secret-token
 
   # Push flags to an HTTP endpoint (development)
-  openfeature push --flag-destination-url http://localhost:8080/flags
+  openfeature push --flag-source-url http://localhost:8080/flags
 
   # Push using PUT method instead of POST
-  openfeature push --flag-destination-url https://api.example.com/flags/my-app --method PUT
+  openfeature push --flag-source-url https://api.example.com/flags/my-app --method PUT
 
   # Dry run to preview what would be sent
-  openfeature push --flag-destination-url https://api.example.com/flags --dry-run
+  openfeature push --flag-source-url https://api.example.com/flags --dry-run
 ```
 
 ### Options
 
 ```
-      --auth-token string             The auth token for the flag destination
-      --debug                         Enable debug logging
-      --dry-run                       Preview changes without pushing
-      --flag-destination-url string   The URL of the flag destination
-  -h, --help                          help for push
-  -m, --manifest string               Path to the flag manifest (default "flags.json")
-      --method string                 HTTP method to use (POST or PUT) (default "POST")
-      --no-input                      Disable interactive prompts
+      --auth-token string        The auth token for the flag destination
+      --debug                    Enable debug logging
+      --dry-run                  Preview changes without pushing
+      --flag-source-url string   The URL of the flag destination
+  -h, --help                     help for push
+  -m, --manifest string          Path to the flag manifest (default "flags.json")
+      --method string            HTTP method to use (POST or PUT) (default "POST")
+      --no-input                 Disable interactive prompts
 ```
 
 ### SEE ALSO

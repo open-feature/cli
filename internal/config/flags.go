@@ -7,20 +7,19 @@ import (
 
 // Flag name constants to avoid duplication
 const (
-	DebugFlagName              = "debug"
-	ManifestFlagName           = "manifest"
-	OutputFlagName             = "output"
-	NoInputFlagName            = "no-input"
-	GoPackageFlagName          = "package-name"
-	CSharpNamespaceName        = "namespace"
-	OverrideFlagName           = "override"
-	JavaPackageFlagName        = "package-name"
-	FlagSourceUrlFlagName      = "flag-source-url"
-	FlagDestinationUrlFlagName = "flag-destination-url"
-	AuthTokenFlagName          = "auth-token"
-	NoPromptFlagName           = "no-prompt"
-	DryRunFlagName             = "dry-run"
-	PushMethodFlagName         = "method"
+	DebugFlagName         = "debug"
+	ManifestFlagName      = "manifest"
+	OutputFlagName        = "output"
+	NoInputFlagName       = "no-input"
+	GoPackageFlagName     = "package-name"
+	CSharpNamespaceName   = "namespace"
+	OverrideFlagName      = "override"
+	JavaPackageFlagName   = "package-name"
+	FlagSourceUrlFlagName = "flag-source-url"
+	AuthTokenFlagName     = "auth-token"
+	NoPromptFlagName      = "no-prompt"
+	DryRunFlagName        = "dry-run"
+	PushMethodFlagName    = "method"
 )
 
 // Default values for flags
@@ -74,7 +73,7 @@ func AddPullFlags(cmd *cobra.Command) {
 
 // AddPushFlags adds the push command specific flags
 func AddPushFlags(cmd *cobra.Command) {
-	cmd.Flags().String(FlagDestinationUrlFlagName, "", "The URL of the flag destination")
+	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag destination")
 	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag destination")
 	cmd.Flags().Bool(DryRunFlagName, false, "Preview changes without pushing")
 	cmd.Flags().String(PushMethodFlagName, "POST", "HTTP method to use (POST or PUT)")
@@ -128,15 +127,7 @@ func getConfigValueWithFallback(value string, configKey string) string {
 	if value != "" {
 		return value
 	}
-
-	viper.SetConfigName(".openfeature")
-	viper.AddConfigPath(".")
-	if err := viper.ReadInConfig(); err != nil {
-		return ""
-	}
-	if !viper.IsSet(configKey) {
-		return ""
-	}
+	// Viper is already configured in initializeConfig, just retrieve the value
 	return viper.GetString(configKey)
 }
 
@@ -156,12 +147,6 @@ func GetAuthToken(cmd *cobra.Command) string {
 func GetNoPrompt(cmd *cobra.Command) bool {
 	noPrompt, _ := cmd.Flags().GetBool(NoPromptFlagName)
 	return noPrompt
-}
-
-// GetFlagDestinationUrl gets the flag destination URL from the given command
-func GetFlagDestinationUrl(cmd *cobra.Command) string {
-	flagDestinationUrl, _ := cmd.Flags().GetString(FlagDestinationUrlFlagName)
-	return getConfigValueWithFallback(flagDestinationUrl, "flagDestinationUrl")
 }
 
 // GetDryRun gets the dry-run flag from the given command

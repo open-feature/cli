@@ -1,0 +1,223 @@
+openapi: 3.0.3
+info:
+  title: OpenFeature Flag Push API
+  description: API specification for pushing feature flags to a remote flag management service
+  version: 1.0.0
+  contact:
+    name: OpenFeature
+    url: https://openfeature.dev
+
+paths:
+  /flags:
+    post:
+      summary: Push feature flags
+      description: Upload feature flag configurations to the flag management service
+      operationId: pushFlags
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlagPayload'
+            example:
+              $schema: "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json"
+              flags:
+                - key: "feature-x-enabled"
+                  type: "boolean"
+                  description: "Enable feature X"
+                  defaultValue: true
+                - key: "max-items"
+                  type: "integer"
+                  description: "Maximum number of items to display"
+                  defaultValue: 10
+      responses:
+        '200':
+          description: Flags successfully pushed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '201':
+          description: Flags successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad request - invalid flag data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - invalid or missing authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+    put:
+      summary: Replace feature flags
+      description: Replace all existing feature flag configurations with the provided set
+      operationId: replaceFlags
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlagPayload'
+      responses:
+        '200':
+          description: Flags successfully replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad request - invalid flag data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - invalid or missing authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token authentication
+
+  schemas:
+    FlagPayload:
+      type: object
+      required:
+        - flags
+      properties:
+        $schema:
+          type: string
+          format: uri
+          description: JSON schema reference for validation
+          example: "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json"
+        flags:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Flag'
+          description: Array of feature flag configurations
+
+    Flag:
+      type: object
+      required:
+        - key
+        - type
+        - defaultValue
+      properties:
+        key:
+          type: string
+          pattern: '^[a-zA-Z][a-zA-Z0-9_.-]*$'
+          description: Unique identifier for the feature flag
+          example: "feature-x-enabled"
+        type:
+          type: string
+          enum:
+            - boolean
+            - string
+            - integer
+            - float
+            - object
+          description: Data type of the flag value
+        description:
+          type: string
+          maxLength: 500
+          description: Human-readable description of the flag's purpose
+        defaultValue:
+          description: Default value returned when flag evaluation fails
+          # Using no type constraint allows any JSON value (maps to interface{} in Go)
+
+    SuccessResponse:
+      type: object
+      required:
+        - message
+        - count
+      properties:
+        message:
+          type: string
+          example: "Successfully pushed 3 flags"
+        count:
+          type: integer
+          description: Number of flags processed
+          example: 3
+        flags:
+          type: array
+          items:
+            type: string
+          description: List of flag keys that were processed
+          example: ["feature-x-enabled", "max-items", "api-endpoint"]
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid authentication token"
+        code:
+          type: string
+          description: Error code for programmatic handling
+          example: "AUTH_INVALID"
+
+    ValidationErrorResponse:
+      type: object
+      required:
+        - error
+        - violations
+      properties:
+        error:
+          type: string
+          description: General error message
+          example: "Validation failed for one or more flags"
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationViolation'
+
+    ValidationViolation:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+          description: Field path that failed validation
+          example: "flags[0].key"
+        message:
+          type: string
+          description: Validation error message
+          example: "Flag key cannot be empty"
+        value:
+          description: The invalid value that was provided

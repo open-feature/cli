@@ -19,39 +19,45 @@ func GetPushCmd() *cobra.Command {
 This command reads your local flag manifest and pushes it to a specified remote destination.
 It supports HTTP and HTTPS protocols for remote endpoints.
 
+The pushed data follows the OpenAPI specification defined at:
+api/v1/push.yaml
+
+Remote services implementing this API should accept the flag data in the format
+specified by the OpenFeature flag manifest schema.
+
 Note: The file:// scheme is not supported for push operations.
 For local file operations, use standard shell commands like cp or mv.`,
 		Example: `  # Push flags to a remote HTTPS endpoint
-  openfeature push --flag-destination-url https://api.example.com/flags --auth-token secret-token
+  openfeature push --flag-source-url https://api.example.com/flags --auth-token secret-token
 
   # Push flags to an HTTP endpoint (development)
-  openfeature push --flag-destination-url http://localhost:8080/flags
+  openfeature push --flag-source-url http://localhost:8080/flags
 
   # Push using PUT method instead of POST
-  openfeature push --flag-destination-url https://api.example.com/flags/my-app --method PUT
+  openfeature push --flag-source-url https://api.example.com/flags/my-app --method PUT
 
   # Dry run to preview what would be sent
-  openfeature push --flag-destination-url https://api.example.com/flags --dry-run`,
+  openfeature push --flag-source-url https://api.example.com/flags --dry-run`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "push")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get configuration values
-			flagDestinationUrl := config.GetFlagDestinationUrl(cmd)
+			flagSourceUrl := config.GetFlagSourceUrl(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			authToken := config.GetAuthToken(cmd)
 			httpMethod := config.GetPushMethod(cmd)
 			dryRun := config.GetDryRun(cmd)
 
 			// Validate destination URL is provided
-			if flagDestinationUrl == "" {
-				return fmt.Errorf("flag destination URL is required. Please provide --flag-destination-url")
+			if flagSourceUrl == "" {
+				return fmt.Errorf("flag source URL is required. Please provide --flag-source-url")
 			}
 
 			// Parse and validate URL
-			parsedURL, err := url.Parse(flagDestinationUrl)
+			parsedURL, err := url.Parse(flagSourceUrl)
 			if err != nil {
-				return fmt.Errorf("invalid destination URL: %w", err)
+				return fmt.Errorf("invalid source URL: %w", err)
 			}
 
 			// Load the local manifest
@@ -64,7 +70,7 @@ For local file operations, use standard shell commands like cp or mv.`,
 
 			// If dry run, show what would be pushed
 			if dryRun {
-				fmt.Printf("DRY RUN: Would push %d flags to %s\n", len(flags.Flags), flagDestinationUrl)
+				fmt.Printf("DRY RUN: Would push %d flags to %s\n", len(flags.Flags), flagSourceUrl)
 				fmt.Printf("Method: %s\n", httpMethod)
 				if authToken != "" {
 					fmt.Println("Authentication: Bearer token provided")
@@ -81,11 +87,11 @@ For local file operations, use standard shell commands like cp or mv.`,
 			case "file":
 				return fmt.Errorf("file:// scheme is not supported for push. Use standard shell commands (cp, mv) for local file operations")
 			case "http", "https":
-				err = manifest.SaveToRemote(flagDestinationUrl, flags, authToken, httpMethod)
+				err = manifest.SaveToRemote(flagSourceUrl, flags, authToken, httpMethod)
 				if err != nil {
 					return fmt.Errorf("error pushing flags to remote destination: %w", err)
 				}
-				fmt.Printf("Successfully pushed %d flags to %s\n", len(flags.Flags), flagDestinationUrl)
+				fmt.Printf("Successfully pushed %d flags to %s\n", len(flags.Flags), flagSourceUrl)
 			default:
 				return fmt.Errorf("unsupported URL scheme: %s. Supported schemes are http:// and https://", parsedURL.Scheme)
 			}
