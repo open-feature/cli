@@ -25,9 +25,9 @@
 > Feel free to give it a shot and provide feedback, but expect breaking changes.
 
 [OpenFeature](https://openfeature.dev) is an open specification that provides a vendor-agnostic, community-driven API for feature flagging that works with your favorite feature flag management tool or in-house solution.
-<!-- x-hide-in-docs-end -->
 
 ## Overview
+<!-- x-hide-in-docs-end -->
 
 The OpenFeature CLI is a command-line tool designed to improve the developer experience when working with feature flags.
 It helps developers manage feature flags consistently across different environments and programming languages by providing powerful utilities for code generation, flag validation, and more.
