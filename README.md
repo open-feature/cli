@@ -241,6 +241,7 @@ flowchart LR
   config --> args
 ```
 
+<!-- x-hide-in-docs-start -->
 ## Get Involved
 
 - **GitHub Repository**: [open-feature/cli](https://github.com/open-feature/cli)
@@ -253,7 +254,6 @@ flowchart LR
 
 For more information, visit our [community page](https://openfeature.dev/community/).
 
-<!-- x-hide-in-docs-start -->
 ## Support the project
 
 - Give this repo a ⭐️!
