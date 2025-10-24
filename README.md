@@ -87,7 +87,7 @@ EOL
 > [!NOTE]
 > This is for demonstration purposes only.
 > In a real-world scenario, you would typically want to fetch this file from a remote flag management service.
-> See [here](https://github.com/open-feature/cli/issues/3), more more details.
+> See [here](https://github.com/open-feature/cli/issues/3), more details.
 
 2. Generate code for your preferred language:
 
