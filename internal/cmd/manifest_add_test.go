@@ -428,3 +428,148 @@ func TestManifestAddCmd_DisplaysListAfterAdd(t *testing.T) {
 	assert.Contains(t, output, "boolean", "Output should show flag types")
 }
 
+func TestManifestAddCmd_NoInputFlag(t *testing.T) {
+	tests := []struct {
+		name           string
+		args           []string
+		expectedError  string
+		validateResult func(t *testing.T, fs afero.Fs)
+	}{
+		{
+			name: "no-input with all flags provided succeeds",
+			args: []string{
+				"add", "test-flag",
+				"--default-value", "true",
+				"--description", "Test flag",
+				"--no-input",
+			},
+			validateResult: func(t *testing.T, fs afero.Fs) {
+				content, err := afero.ReadFile(fs, "flags.json")
+				require.NoError(t, err)
+
+				var manifest map[string]interface{}
+				err = json.Unmarshal(content, &manifest)
+				require.NoError(t, err)
+
+				flags := manifest["flags"].(map[string]interface{})
+				assert.Contains(t, flags, "test-flag")
+
+				flag := flags["test-flag"].(map[string]interface{})
+				assert.Equal(t, "boolean", flag["flagType"])
+				assert.Equal(t, true, flag["defaultValue"])
+				assert.Equal(t, "Test flag", flag["description"])
+			},
+		},
+		{
+			name: "no-input with missing default-value fails",
+			args: []string{
+				"add", "test-flag",
+				"--no-input",
+			},
+			expectedError: "--default-value is required",
+		},
+		{
+			name: "no-input with description omitted succeeds",
+			args: []string{
+				"add", "test-flag",
+				"--default-value", "false",
+				"--no-input",
+			},
+			validateResult: func(t *testing.T, fs afero.Fs) {
+				content, err := afero.ReadFile(fs, "flags.json")
+				require.NoError(t, err)
+
+				var manifest map[string]interface{}
+				err = json.Unmarshal(content, &manifest)
+				require.NoError(t, err)
+
+				flags := manifest["flags"].(map[string]interface{})
+				assert.Contains(t, flags, "test-flag")
+
+				flag := flags["test-flag"].(map[string]interface{})
+				assert.Equal(t, "boolean", flag["flagType"])
+				assert.Equal(t, false, flag["defaultValue"])
+				// Description should be empty when not provided with --no-input
+				desc, exists := flag["description"]
+				if exists {
+					assert.Equal(t, "", desc)
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup
+			fs := afero.NewMemMapFs()
+			filesystem.SetFileSystem(fs)
+
+			// Create empty manifest
+			existingManifest := `{
+				"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
+				"flags": {}
+			}`
+			err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+			require.NoError(t, err)
+
+			// Create command and execute
+			cmd := GetManifestCmd()
+			config.AddRootFlags(cmd)
+
+			// Set args with manifest path
+			args := append(tt.args, "-m", "flags.json")
+			cmd.SetArgs(args)
+
+			// Execute command
+			err = cmd.Execute()
+
+			// Validate
+			if tt.expectedError != "" {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedError)
+			} else {
+				assert.NoError(t, err)
+				if tt.validateResult != nil {
+					tt.validateResult(t, fs)
+				}
+			}
+		})
+	}
+}
+
+func TestManifestAddCmd_AutoDetectNonInteractive(t *testing.T) {
+	// This test verifies that when stdin is not a terminal (like in test environments),
+	// the command automatically behaves as if --no-input was set
+	
+	// Setup
+	fs := afero.NewMemMapFs()
+	filesystem.SetFileSystem(fs)
+
+	// Create empty manifest
+	existingManifest := `{
+		"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
+		"flags": {}
+	}`
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	require.NoError(t, err)
+
+	// Create command and execute
+	cmd := GetManifestCmd()
+	config.AddRootFlags(cmd)
+
+	// Test without --no-input flag, but in non-interactive environment (test)
+	// This should behave the same as with --no-input
+	cmd.SetArgs([]string{
+		"add", "test-flag",
+		"-m", "flags.json",
+	})
+
+	// Execute command
+	err = cmd.Execute()
+
+	// Should fail with the same error as --no-input since stdin is not a terminal
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "--default-value is required")
+}
+
+
