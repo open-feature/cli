@@ -176,6 +176,7 @@ func TestManifestAddCmd(t *testing.T) {
 			name: "error on missing default value",
 			args: []string{
 				"add", "new-flag",
+				"--no-input",
 			},
 			existingManifest: `{
 				"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",

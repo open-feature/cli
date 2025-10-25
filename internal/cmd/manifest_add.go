@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/pterm/pterm"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 func GetManifestAddCmd() *cobra.Command {
@@ -45,16 +47,17 @@ Examples:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flagName := args[0]
 			manifestPath := config.GetManifestPath(cmd)
+			noInput := config.GetNoInput(cmd)
+
+			// Automatically disable prompting if stdin is not a terminal (e.g., in tests or CI)
+			if !noInput && !term.IsTerminal(int(os.Stdin.Fd())) {
+				noInput = true
+			}
 
 			// Get flag configuration from command flags
 			flagType, _ := cmd.Flags().GetString("type")
 			defaultValueStr, _ := cmd.Flags().GetString("default-value")
 			description, _ := cmd.Flags().GetString("description")
-
-			// Validate that default-value is provided
-			if !cmd.Flags().Changed("default-value") {
-				return errors.New("--default-value is required")
-			}
 
 			// Parse flag type
 			parsedType, err := parseFlagTypeString(flagType)
@@ -62,10 +65,36 @@ Examples:
 				return fmt.Errorf("invalid flag type: %w", err)
 			}
 
-			// Parse and validate default value
-			defaultValue, err := parseDefaultValue(defaultValueStr, parsedType)
-			if err != nil {
-				return fmt.Errorf("invalid default value for type %s: %w", flagType, err)
+			// Handle default-value: prompt if missing and not --no-input
+			var defaultValue interface{}
+			if !cmd.Flags().Changed("default-value") {
+				if noInput {
+					return errors.New("--default-value is required")
+				}
+				// Prompt for default value
+				defaultValue, err = promptForDefaultValue(&flagset.Flag{
+					Key:  flagName,
+					Type: parsedType,
+				})
+				if err != nil {
+					return fmt.Errorf("failed to get default value: %w", err)
+				}
+			} else {
+				// Parse and validate default value from flag
+				defaultValue, err = parseDefaultValue(defaultValueStr, parsedType)
+				if err != nil {
+					return fmt.Errorf("invalid default value for type %s: %w", flagType, err)
+				}
+			}
+
+			// Handle description: prompt if missing and not --no-input
+			if !cmd.Flags().Changed("description") && !noInput {
+				promptText := fmt.Sprintf("Enter description for flag '%s' (press Enter to skip)", flagName)
+				descInput, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(promptText)
+				if err != nil {
+					return fmt.Errorf("failed to prompt for description: %w", err)
+				}
+				description = descInput
 			}
 
 			// Load existing manifest
