@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/pterm/pterm"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"golang.org/x/term"
 )
 
 func GetManifestAddCmd() *cobra.Command {
@@ -25,7 +23,18 @@ func GetManifestAddCmd() *cobra.Command {
 		Short: "Add a new flag to the manifest",
 		Long: `Add a new flag to the manifest file with the specified configuration.
 
+Interactive Mode:
+  When flags are omitted, the command prompts interactively for missing values:
+  - Flag type (defaults to boolean if not specified)
+  - Default value (required)
+  - Description (optional, press Enter to skip)
+  
+  Use --no-input to disable interactive prompts (required for CI/automation).
+
 Examples:
+  # Interactive mode - prompts for type, value, and description
+  openfeature manifest add new-feature
+
   # Add a boolean flag (default type)
   openfeature manifest add new-feature --default-value false
 
@@ -39,7 +48,10 @@ Examples:
   openfeature manifest add discount-rate --type float --default-value 0.15
 
   # Add an object flag
-  openfeature manifest add config --type object --default-value '{"key":"value"}'`,
+  openfeature manifest add config --type object --default-value '{"key":"value"}'
+  
+  # Disable interactive prompts (for automation)
+  openfeature manifest add my-flag --default-value true --no-input`,
 		Args: cobra.ExactArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "manifest.add")
@@ -47,17 +59,21 @@ Examples:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flagName := args[0]
 			manifestPath := config.GetManifestPath(cmd)
-			noInput := config.GetNoInput(cmd)
-
-			// Automatically disable prompting if stdin is not a terminal (e.g., in tests or CI)
-			if !noInput && !term.IsTerminal(int(os.Stdin.Fd())) {
-				noInput = true
-			}
+			noInput := config.ShouldDisableInteractivePrompts(cmd)
 
 			// Get flag configuration from command flags
 			flagType, _ := cmd.Flags().GetString("type")
 			defaultValueStr, _ := cmd.Flags().GetString("default-value")
 			description, _ := cmd.Flags().GetString("description")
+
+			// Handle flag type: prompt if not changed and not --no-input
+			if !cmd.Flags().Changed("type") && !noInput {
+				selectedType, err := promptForFlagType(flagName)
+				if err != nil {
+					return fmt.Errorf("failed to get flag type: %w", err)
+				}
+				flagType = selectedType
+			}
 
 			// Parse flag type
 			parsedType, err := parseFlagTypeString(flagType)
@@ -212,4 +228,22 @@ func parseDefaultValue(value string, flagType flagset.FlagType) (interface{}, er
 	default:
 		return nil, fmt.Errorf("unsupported flag type: %v", flagType)
 	}
+}
+
+// promptForFlagType prompts the user to select a flag type
+func promptForFlagType(flagName string) (string, error) {
+	prompt := fmt.Sprintf("Select type for flag '%s'", flagName)
+	options := []string{"boolean", "string", "integer", "float", "object"}
+
+	selectedType, err := pterm.DefaultInteractiveSelect.
+		WithOptions(options).
+		WithDefaultOption("boolean").
+		WithFilter(false).
+		Show(prompt)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to prompt for flag type: %w", err)
+	}
+
+	return selectedType, nil
 }
