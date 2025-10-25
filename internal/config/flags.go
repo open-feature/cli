@@ -1,8 +1,11 @@
 package config
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/term"
 )
 
 // Flag name constants to avoid duplication
@@ -153,4 +156,17 @@ func AddManifestAddFlags(cmd *cobra.Command) {
 // AddManifestListFlags adds the manifest list command specific flags
 func AddManifestListFlags(cmd *cobra.Command) {
 	// Currently no specific flags for list command, but function exists for consistency
+}
+
+// ShouldDisableInteractivePrompts returns true if interactive prompts should be disabled
+// This happens when:
+// - The --no-input flag is set, OR
+// - stdin is not a terminal (e.g., in tests, CI, or when input is piped)
+func ShouldDisableInteractivePrompts(cmd *cobra.Command) bool {
+	noInput := GetNoInput(cmd)
+	if noInput {
+		return true
+	}
+	// Automatically disable prompting if stdin is not a terminal
+	return !term.IsTerminal(int(os.Stdin.Fd()))
 }
