@@ -15,11 +15,11 @@ import (
 
 func TestManifestAddCmd(t *testing.T) {
 	tests := []struct {
-		name           string
-		args           []string
+		name             string
+		args             []string
 		existingManifest string
-		expectedError  string
-		validateResult func(t *testing.T, fs afero.Fs)
+		expectedError    string
+		validateResult   func(t *testing.T, fs afero.Fs)
 	}{
 		{
 			name: "add boolean flag to empty manifest",
@@ -540,7 +540,7 @@ func TestManifestAddCmd_NoInputFlag(t *testing.T) {
 func TestManifestAddCmd_AutoDetectNonInteractive(t *testing.T) {
 	// This test verifies that when stdin is not a terminal (like in test environments),
 	// the command automatically behaves as if --no-input was set
-	
+
 	// Setup
 	fs := afero.NewMemMapFs()
 	filesystem.SetFileSystem(fs)
@@ -571,5 +571,3 @@ func TestManifestAddCmd_AutoDetectNonInteractive(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "--default-value is required")
 }
-
-
