@@ -25,12 +25,18 @@
 > Feel free to give it a shot and provide feedback, but expect breaking changes.
 
 [OpenFeature](https://openfeature.dev) is an open specification that provides a vendor-agnostic, community-driven API for feature flagging that works with your favorite feature flag management tool or in-house solution.
-<!-- x-hide-in-docs-end -->
 
 ## Overview
+<!-- x-hide-in-docs-end -->
 
 The OpenFeature CLI is a command-line tool designed to improve the developer experience when working with feature flags.
 It helps developers manage feature flags consistently across different environments and programming languages by providing powerful utilities for code generation, flag validation, and more.
+
+The CLI bridges the gap between feature flag management systems and your application code by generating strongly typed flag accessors from a flag manifest. This approach provides:
+
+- **Type Safety**: Generate strongly-typed flag accessors for your preferred language
+- **Developer Experience**: Reduce errors and improve IDE autocomplete support
+- **Language Support**: Generate code for TypeScript, JavaScript, React, Go, C#, and more
 
 ## Installation
 
@@ -121,24 +127,41 @@ Initialize a new flag manifest in your project.
 openfeature init
 ```
 
-See [here](./docs/commands/openfeature_init.md), for all available options.
+This command creates a `flags.json` file in your current directory with the proper schema reference.
+You can customize the manifest path using configuration options.
+
+See [here](./docs/commands/openfeature_init.md) for all available options.
 
 ### `generate`
 
 Generate strongly typed flag accessors for your project.
 
 ```bash
-# Available languages
+# List available languages
 openfeature generate
 
-# Basic usage
-openfeature generate [language]
+# Generate for a specific language
+openfeature generate typescript
 
 # With custom output directory
 openfeature generate typescript --output ./src/flags
 ```
 
-See [here](./docs/commands/openfeature_generate.md), for all available options.
+**Supported Languages:**
+
+| Language | Description |
+|----------|-------------|
+| `typescript` | TypeScript flag accessors |
+| `javascript` | JavaScript flag accessors |
+| `react` | React hooks for feature flags |
+| `go` | Go flag accessors |
+| `csharp` | C# flag accessors |
+| `java` | Java flag accessors |
+| `python` | Python flag accessors |
+| `nestjs` | NestJS flag accessors |
+| `nodejs` | Node.js flag accessors |
+
+See [here](./docs/commands/openfeature_generate.md) for all available options.
 
 ### `version`
 
@@ -148,7 +171,7 @@ Print the version number of the OpenFeature CLI.
 openfeature version
 ```
 
-See [here](./docs/commands/openfeature_version.md), for all available options.
+See [here](./docs/commands/openfeature_version.md) for all available options.
 
 ## Flag Manifest
 
@@ -158,16 +181,14 @@ The manifest file should be named `flags.json` and placed in the root of your pr
 
 ### Flag Manifest Structure
 
-The flag manifest file should follow the JSON schema defined [here](https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json).
+The flag manifest file should follow the [JSON schema](https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json) with the following properties:
 
-The schema defines the following properties:
-
-- `$schema`: The URL of the JSON schema for validation.
-- `flags`: An object containing the feature flags.
-  - `flagKey`: A unique key for the flag.
-    - `description`: A description of what the flag does.
-    - `type`: The type of the flag (e.g., `boolean`, `string`, `number`, `object`).
-    - `defaultValue`: The default value of the flag.
+- `$schema` - The URL of the JSON schema for validation
+- `flags` - An object containing the feature flags
+  - `flagKey` - A unique key for the flag
+    - `description` - A description of what the flag does
+    - `type` - The type of the flag (`boolean`, `string`, `number`, `object`)
+    - `defaultValue` - The default value of the flag
 
 ### Example Flag Manifest
 
@@ -186,7 +207,7 @@ The schema defines the following properties:
 
 ## Configuration
 
-The OpenFeature CLI uses an optional configuration file to override default settings and customize the behavior of the CLI.
+The OpenFeature CLI uses an optional configuration file to override default settings and customize behavior.
 This file can be in JSON or YAML format and should be named either `.openfeature.json` or `.openfeature.yaml`.
 
 ### Configuration File Structure
@@ -220,8 +241,10 @@ flowchart LR
   config --> args
 ```
 
-### Get Involved
+<!-- x-hide-in-docs-start -->
+## Get Involved
 
+- **GitHub Repository**: [open-feature/cli](https://github.com/open-feature/cli)
 - **CNCF Slack**: Join the conversation in the [#openfeature](https://cloud-native.slack.com/archives/C0344AANLA1) and [#openfeature-cli](https://cloud-native.slack.com/archives/C07DY4TUDK6) channel
 - **Regular Meetings**: Attend our [community calls](https://zoom-lfx.platform.linuxfoundation.org/meetings/openfeature)
 - **GitHub Issues**: Report bugs or request features in our [issue tracker](https://github.com/open-feature/cli/issues)
@@ -231,12 +254,12 @@ flowchart LR
 
 For more information, visit our [community page](https://openfeature.dev/community/).
 
-### Support the project
+## Support the project
 
 - Give this repo a ⭐️!
 - Share your experience and contribute back to the project
 
-### Thanks to everyone who has already contributed
+## Thanks to everyone who has already contributed
 
 <a href="https://github.com/open-feature/cli/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=open-feature/cli" alt="Pictures of the folks who have contributed to the project" />
