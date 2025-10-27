@@ -9,7 +9,8 @@ Add a new flag to the manifest
 Add a new flag to the manifest file with the specified configuration.
 
 Interactive Mode:
-  When flags are omitted, the command prompts interactively for missing values:
+  When the flag key or other values are omitted, the command prompts interactively for missing values:
+  - Flag key (if not provided as argument)
   - Flag type (defaults to boolean if not specified)
   - Default value (required)
   - Description (optional, press Enter to skip)
@@ -17,7 +18,10 @@ Interactive Mode:
   Use --no-input to disable interactive prompts (required for CI/automation).
 
 Examples:
-  # Interactive mode - prompts for type, value, and description
+  # Interactive mode - prompts for key, type, value, and description
+  openfeature manifest add
+
+  # Interactive mode with key - prompts for type, value, and description
   openfeature manifest add new-feature
 
   # Add a boolean flag (default type)
@@ -39,7 +43,7 @@ Examples:
   openfeature manifest add my-flag --default-value true --no-input
 
 ```
-openfeature manifest add [flag-name] [flags]
+openfeature manifest add [flag-key] [flags]
 ```
 
 ### Options
