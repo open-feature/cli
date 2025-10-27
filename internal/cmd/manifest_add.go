@@ -19,12 +19,13 @@ import (
 
 func GetManifestAddCmd() *cobra.Command {
 	manifestAddCmd := &cobra.Command{
-		Use:   "add [flag-name]",
+		Use:   "add [flag-key]",
 		Short: "Add a new flag to the manifest",
 		Long: `Add a new flag to the manifest file with the specified configuration.
 
 Interactive Mode:
-  When flags are omitted, the command prompts interactively for missing values:
+  When the flag key or other values are omitted, the command prompts interactively for missing values:
+  - Flag key (if not provided as argument)
   - Flag type (defaults to boolean if not specified)
   - Default value (required)
   - Description (optional, press Enter to skip)
@@ -32,7 +33,10 @@ Interactive Mode:
   Use --no-input to disable interactive prompts (required for CI/automation).
 
 Examples:
-  # Interactive mode - prompts for type, value, and description
+  # Interactive mode - prompts for key, type, value, and description
+  openfeature manifest add
+
+  # Interactive mode with key - prompts for type, value, and description
   openfeature manifest add new-feature
 
   # Add a boolean flag (default type)
@@ -52,14 +56,38 @@ Examples:
   
   # Disable interactive prompts (for automation)
   openfeature manifest add my-flag --default-value true --no-input`,
-		Args: cobra.ExactArgs(1),
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) > 1 {
+				return fmt.Errorf("too many arguments: expected 0 or 1 flag-key, got %d\n\nUsage: %s", len(args), cmd.Use)
+			}
+			return nil
+		},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "manifest.add")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			flagName := args[0]
 			manifestPath := config.GetManifestPath(cmd)
 			noInput := config.ShouldDisableInteractivePrompts(cmd)
+
+			// Handle flag key: use argument if provided, otherwise prompt if interactive mode
+			var flagName string
+			if len(args) > 0 {
+				flagName = args[0]
+			} else {
+				if noInput {
+					return errors.New("flag-key argument is required when --no-input is set")
+				}
+				// Prompt for flag key
+				promptText := "Enter flag key (e.g., 'my-feature', 'enable-new-ui')"
+				keyInput, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(promptText)
+				if err != nil {
+					return fmt.Errorf("failed to prompt for flag key: %w", err)
+				}
+				flagName = strings.TrimSpace(keyInput)
+				if flagName == "" {
+					return errors.New("flag key cannot be empty")
+				}
+			}
 
 			// Get flag configuration from command flags
 			flagType, _ := cmd.Flags().GetString("type")
@@ -158,11 +186,6 @@ Examples:
 			pterm.Success.Printfln("Flag '%s' added successfully to %s", flagName, manifestPath)
 			logger.Default.Debug(fmt.Sprintf("Added flag: name=%s, type=%s, defaultValue=%v, description=%s",
 				flagName, flagType, defaultValue, description))
-
-			// Display all current flags
-			displayFlagList(fs, manifestPath)
-			pterm.Println("Use the 'generate' command to update type-safe clients with the new flag.")
-			pterm.Println()
 
 			return nil
 		},
