@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.9](https://github.com/open-feature/cli/compare/v0.3.8...v0.3.9) (2025-10-28)
+
+
+### 🐛 Bug Fixes
+
+* add buildx to release pipeline ([002c982](https://github.com/open-feature/cli/commit/002c98254cec39ba226fe42a8d8582790867554d))
+
 ## [0.3.8](https://github.com/open-feature/cli/compare/v0.3.7...v0.3.8) (2025-10-28)
 
 
