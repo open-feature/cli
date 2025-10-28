@@ -1,7 +1,7 @@
 FROM alpine:3.22
 
-COPY ./openfeature usr/local/bin/openfeature
+ARG TARGETARCH
 
-RUN chmod +x /usr/local/bin/openfeature
+COPY --chmod=755 linux/${TARGETARCH}/openfeature /usr/local/bin/openfeature
 
 ENTRYPOINT ["/usr/local/bin/openfeature"]
