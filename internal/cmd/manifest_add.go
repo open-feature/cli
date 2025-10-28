@@ -19,11 +19,26 @@ import (
 
 func GetManifestAddCmd() *cobra.Command {
 	manifestAddCmd := &cobra.Command{
-		Use:   "add [flag-name]",
+		Use:   "add [flag-key]",
 		Short: "Add a new flag to the manifest",
 		Long: `Add a new flag to the manifest file with the specified configuration.
 
+Interactive Mode:
+  When the flag key or other values are omitted, the command prompts interactively for missing values:
+  - Flag key (if not provided as argument)
+  - Flag type (defaults to boolean if not specified)
+  - Default value (required)
+  - Description (optional, press Enter to skip)
+  
+  Use --no-input to disable interactive prompts (required for CI/automation).
+
 Examples:
+  # Interactive mode - prompts for key, type, value, and description
+  openfeature manifest add
+
+  # Interactive mode with key - prompts for type, value, and description
+  openfeature manifest add new-feature
+
   # Add a boolean flag (default type)
   openfeature manifest add new-feature --default-value false
 
@@ -37,23 +52,55 @@ Examples:
   openfeature manifest add discount-rate --type float --default-value 0.15
 
   # Add an object flag
-  openfeature manifest add config --type object --default-value '{"key":"value"}'`,
-		Args: cobra.ExactArgs(1),
+  openfeature manifest add config --type object --default-value '{"key":"value"}'
+  
+  # Disable interactive prompts (for automation)
+  openfeature manifest add my-flag --default-value true --no-input`,
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) > 1 {
+				return fmt.Errorf("too many arguments: expected 0 or 1 flag-key, got %d\n\nUsage: %s", len(args), cmd.Use)
+			}
+			return nil
+		},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "manifest.add")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			flagName := args[0]
 			manifestPath := config.GetManifestPath(cmd)
+			noInput := config.ShouldDisableInteractivePrompts(cmd)
+
+			// Handle flag key: use argument if provided, otherwise prompt if interactive mode
+			var flagName string
+			if len(args) > 0 {
+				flagName = args[0]
+			} else {
+				if noInput {
+					return errors.New("flag-key argument is required when --no-input is set")
+				}
+				// Prompt for flag key
+				promptText := "Enter flag key (e.g., 'my-feature', 'enable-new-ui')"
+				keyInput, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(promptText)
+				if err != nil {
+					return fmt.Errorf("failed to prompt for flag key: %w", err)
+				}
+				flagName = strings.TrimSpace(keyInput)
+				if flagName == "" {
+					return errors.New("flag key cannot be empty")
+				}
+			}
 
 			// Get flag configuration from command flags
 			flagType, _ := cmd.Flags().GetString("type")
 			defaultValueStr, _ := cmd.Flags().GetString("default-value")
 			description, _ := cmd.Flags().GetString("description")
 
-			// Validate that default-value is provided
-			if !cmd.Flags().Changed("default-value") {
-				return errors.New("--default-value is required")
+			// Handle flag type: prompt if not changed and not --no-input
+			if !cmd.Flags().Changed("type") && !noInput {
+				selectedType, err := promptForFlagType(flagName)
+				if err != nil {
+					return fmt.Errorf("failed to get flag type: %w", err)
+				}
+				flagType = selectedType
 			}
 
 			// Parse flag type
@@ -62,10 +109,36 @@ Examples:
 				return fmt.Errorf("invalid flag type: %w", err)
 			}
 
-			// Parse and validate default value
-			defaultValue, err := parseDefaultValue(defaultValueStr, parsedType)
-			if err != nil {
-				return fmt.Errorf("invalid default value for type %s: %w", flagType, err)
+			// Handle default-value: prompt if missing and not --no-input
+			var defaultValue interface{}
+			if !cmd.Flags().Changed("default-value") {
+				if noInput {
+					return errors.New("--default-value is required")
+				}
+				// Prompt for default value
+				defaultValue, err = promptForDefaultValue(&flagset.Flag{
+					Key:  flagName,
+					Type: parsedType,
+				})
+				if err != nil {
+					return fmt.Errorf("failed to get default value: %w", err)
+				}
+			} else {
+				// Parse and validate default value from flag
+				defaultValue, err = parseDefaultValue(defaultValueStr, parsedType)
+				if err != nil {
+					return fmt.Errorf("invalid default value for type %s: %w", flagType, err)
+				}
+			}
+
+			// Handle description: prompt if missing and not --no-input
+			if !cmd.Flags().Changed("description") && !noInput {
+				promptText := fmt.Sprintf("Enter description for flag '%s' (press Enter to skip)", flagName)
+				descInput, err := pterm.DefaultInteractiveTextInput.WithDefaultText("").Show(promptText)
+				if err != nil {
+					return fmt.Errorf("failed to prompt for description: %w", err)
+				}
+				description = descInput
 			}
 
 			// Load existing manifest
@@ -113,11 +186,6 @@ Examples:
 			pterm.Success.Printfln("Flag '%s' added successfully to %s", flagName, manifestPath)
 			logger.Default.Debug(fmt.Sprintf("Added flag: name=%s, type=%s, defaultValue=%v, description=%s",
 				flagName, flagType, defaultValue, description))
-
-			// Display all current flags
-			displayFlagList(fs, manifestPath)
-			pterm.Println("Use the 'generate' command to update type-safe clients with the new flag.")
-			pterm.Println()
 
 			return nil
 		},
@@ -183,4 +251,22 @@ func parseDefaultValue(value string, flagType flagset.FlagType) (interface{}, er
 	default:
 		return nil, fmt.Errorf("unsupported flag type: %v", flagType)
 	}
+}
+
+// promptForFlagType prompts the user to select a flag type
+func promptForFlagType(flagName string) (string, error) {
+	prompt := fmt.Sprintf("Select type for flag '%s'", flagName)
+	options := []string{"boolean", "string", "integer", "float", "object"}
+
+	selectedType, err := pterm.DefaultInteractiveSelect.
+		WithOptions(options).
+		WithDefaultOption("boolean").
+		WithFilter(false).
+		Show(prompt)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to prompt for flag type: %w", err)
+	}
+
+	return selectedType, nil
 }

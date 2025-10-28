@@ -15,11 +15,11 @@ import (
 
 func TestManifestAddCmd(t *testing.T) {
 	tests := []struct {
-		name           string
-		args           []string
+		name             string
+		args             []string
 		existingManifest string
-		expectedError  string
-		validateResult func(t *testing.T, fs afero.Fs)
+		expectedError    string
+		validateResult   func(t *testing.T, fs afero.Fs)
 	}{
 		{
 			name: "add boolean flag to empty manifest",
@@ -176,6 +176,7 @@ func TestManifestAddCmd(t *testing.T) {
 			name: "error on missing default value",
 			args: []string{
 				"add", "new-flag",
+				"--no-input",
 			},
 			existingManifest: `{
 				"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
@@ -364,7 +365,7 @@ func TestManifestAddCmd_CreateNewManifest(t *testing.T) {
 	assert.Equal(t, "The first flag in a new manifest", flag["description"])
 }
 
-func TestManifestAddCmd_DisplaysListAfterAdd(t *testing.T) {
+func TestManifestAddCmd_DisplaysSuccessMessage(t *testing.T) {
 	// Setup
 	fs := afero.NewMemMapFs()
 	filesystem.SetFileSystem(fs)
@@ -388,18 +389,9 @@ func TestManifestAddCmd_DisplaysListAfterAdd(t *testing.T) {
 	defer pterm.DisableOutput()
 
 	buf := &bytes.Buffer{}
-	oldStdout := pterm.DefaultTable.Writer
-	oldSection := pterm.DefaultSection.Writer
-	oldInfo := pterm.Info.Writer
 	oldSuccess := pterm.Success.Writer
-	pterm.DefaultTable.Writer = buf
-	pterm.DefaultSection.Writer = buf
-	pterm.Info.Writer = buf
 	pterm.Success.Writer = buf
 	defer func() {
-		pterm.DefaultTable.Writer = oldStdout
-		pterm.DefaultSection.Writer = oldSection
-		pterm.Info.Writer = oldInfo
 		pterm.Success.Writer = oldSuccess
 	}()
 
@@ -418,12 +410,200 @@ func TestManifestAddCmd_DisplaysListAfterAdd(t *testing.T) {
 	err = cmd.Execute()
 	require.NoError(t, err)
 
-	// Validate output contains list of all flags
+	// Validate the flag was actually added to the manifest
+	content, err := afero.ReadFile(fs, "flags.json")
+	require.NoError(t, err)
+
+	var manifest map[string]interface{}
+	err = json.Unmarshal(content, &manifest)
+	require.NoError(t, err)
+
+	flags := manifest["flags"].(map[string]interface{})
+	assert.Len(t, flags, 2, "Should have 2 flags total")
+	assert.Contains(t, flags, "existing-flag", "Should still contain existing flag")
+	assert.Contains(t, flags, "new-flag", "Should contain newly added flag")
+
+	// Validate success message is displayed
 	output := buf.String()
-	assert.Contains(t, output, "existing-flag", "Output should contain existing flag")
-	assert.Contains(t, output, "new-flag", "Output should contain newly added flag")
-	assert.Contains(t, output, "(2)", "Output should show total count of 2 flags")
-	assert.Contains(t, output, "string", "Output should show flag types")
-	assert.Contains(t, output, "boolean", "Output should show flag types")
+	assert.Contains(t, output, "new-flag", "Output should contain the flag name")
+	assert.Contains(t, output, "added successfully", "Output should contain success message")
+	assert.Contains(t, output, "flags.json", "Output should contain the manifest path")
 }
 
+func TestManifestAddCmd_NoInputFlag(t *testing.T) {
+	tests := []struct {
+		name           string
+		args           []string
+		expectedError  string
+		validateResult func(t *testing.T, fs afero.Fs)
+	}{
+		{
+			name: "no-input with all flags provided succeeds",
+			args: []string{
+				"add", "test-flag",
+				"--default-value", "true",
+				"--description", "Test flag",
+				"--no-input",
+			},
+			validateResult: func(t *testing.T, fs afero.Fs) {
+				content, err := afero.ReadFile(fs, "flags.json")
+				require.NoError(t, err)
+
+				var manifest map[string]interface{}
+				err = json.Unmarshal(content, &manifest)
+				require.NoError(t, err)
+
+				flags := manifest["flags"].(map[string]interface{})
+				assert.Contains(t, flags, "test-flag")
+
+				flag := flags["test-flag"].(map[string]interface{})
+				assert.Equal(t, "boolean", flag["flagType"])
+				assert.Equal(t, true, flag["defaultValue"])
+				assert.Equal(t, "Test flag", flag["description"])
+			},
+		},
+		{
+			name: "no-input with missing default-value fails",
+			args: []string{
+				"add", "test-flag",
+				"--no-input",
+			},
+			expectedError: "--default-value is required",
+		},
+		{
+			name: "no-input with description omitted succeeds",
+			args: []string{
+				"add", "test-flag",
+				"--default-value", "false",
+				"--no-input",
+			},
+			validateResult: func(t *testing.T, fs afero.Fs) {
+				content, err := afero.ReadFile(fs, "flags.json")
+				require.NoError(t, err)
+
+				var manifest map[string]interface{}
+				err = json.Unmarshal(content, &manifest)
+				require.NoError(t, err)
+
+				flags := manifest["flags"].(map[string]interface{})
+				assert.Contains(t, flags, "test-flag")
+
+				flag := flags["test-flag"].(map[string]interface{})
+				assert.Equal(t, "boolean", flag["flagType"])
+				assert.Equal(t, false, flag["defaultValue"])
+				// Description should be empty when not provided with --no-input
+				desc, exists := flag["description"]
+				if exists {
+					assert.Equal(t, "", desc)
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup
+			fs := afero.NewMemMapFs()
+			filesystem.SetFileSystem(fs)
+
+			// Create empty manifest
+			existingManifest := `{
+				"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
+				"flags": {}
+			}`
+			err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+			require.NoError(t, err)
+
+			// Create command and execute
+			cmd := GetManifestCmd()
+			config.AddRootFlags(cmd)
+
+			// Set args with manifest path
+			args := append(tt.args, "-m", "flags.json")
+			cmd.SetArgs(args)
+
+			// Execute command
+			err = cmd.Execute()
+
+			// Validate
+			if tt.expectedError != "" {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedError)
+			} else {
+				assert.NoError(t, err)
+				if tt.validateResult != nil {
+					tt.validateResult(t, fs)
+				}
+			}
+		})
+	}
+}
+
+func TestManifestAddCmd_AutoDetectNonInteractive(t *testing.T) {
+	// This test verifies that when stdin is not a terminal (like in test environments),
+	// the command automatically behaves as if --no-input was set
+
+	// Setup
+	fs := afero.NewMemMapFs()
+	filesystem.SetFileSystem(fs)
+
+	// Create empty manifest
+	existingManifest := `{
+		"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
+		"flags": {}
+	}`
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	require.NoError(t, err)
+
+	// Create command and execute
+	cmd := GetManifestCmd()
+	config.AddRootFlags(cmd)
+
+	// Test without --no-input flag, but in non-interactive environment (test)
+	// This should behave the same as with --no-input
+	cmd.SetArgs([]string{
+		"add", "test-flag",
+		"-m", "flags.json",
+	})
+
+	// Execute command
+	err = cmd.Execute()
+
+	// Should fail with the same error as --no-input since stdin is not a terminal
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "--default-value is required")
+}
+
+func TestManifestAddCmd_NoFlagKeyArgument(t *testing.T) {
+	// Setup
+	fs := afero.NewMemMapFs()
+	filesystem.SetFileSystem(fs)
+
+	// Create empty manifest
+	existingManifest := `{
+		"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
+		"flags": {}
+	}`
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	require.NoError(t, err)
+
+	// Create command and execute
+	cmd := GetManifestCmd()
+	config.AddRootFlags(cmd)
+
+	// Test with no flag key argument and --no-input
+	// This should fail with a clear error message
+	cmd.SetArgs([]string{
+		"add",
+		"--default-value", "true",
+		"--no-input",
+		"-m", "flags.json",
+	})
+
+	// Execute command
+	err = cmd.Execute()
+
+	// Should fail indicating flag-key is required in no-input mode
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "flag-key argument is required when --no-input is set")
+}
