@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.8](https://github.com/open-feature/cli/compare/v0.3.7...v0.3.8) (2025-10-28)
+
+
+### 🐛 Bug Fixes
+
+* fix invalid gorelease configuration preventing new releases ([#175](https://github.com/open-feature/cli/issues/175)) ([e20442d](https://github.com/open-feature/cli/commit/e20442de78510d92980fb46d4fd28779e80c3b70))
+
 ## [0.3.7](https://github.com/open-feature/cli/compare/v0.3.6...v0.3.7) (2025-10-28)
 
 
