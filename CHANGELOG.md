@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.3.7](https://github.com/open-feature/cli/compare/v0.3.6...v0.3.7) (2025-10-28)
+
+
+### ✨ New Features
+
+* add interactive prompting to manifest add command ([#174](https://github.com/open-feature/cli/issues/174)) ([9d8b2ce](https://github.com/open-feature/cli/commit/9d8b2cea4f930b0091e064fd176366a63d65e3aa))
+* adds ability to access original flag keys post-generation ([#167](https://github.com/open-feature/cli/issues/167)) ([fe326f6](https://github.com/open-feature/cli/commit/fe326f6b8838f897ba3309fe09e6284758d2d8b9))
+* manifest command group for adding and listing flags in manifest ([#168](https://github.com/open-feature/cli/issues/168)) ([3d3f7a6](https://github.com/open-feature/cli/commit/3d3f7a667d4dc05a0ac9d8cf9108e19cda240465))
+
+
+### 📚 Documentation
+
+* fix typo in the readme ([96d37f1](https://github.com/open-feature/cli/commit/96d37f1219deb36c4265566be6c108344da9d9eb))
+* update README.md formatting for openfeature.dev website docs ([#172](https://github.com/open-feature/cli/issues/172)) ([cd4b29f](https://github.com/open-feature/cli/commit/cd4b29f82870c8cd3e81288affbd1a6f347f9849))
+
 ## [0.3.6](https://github.com/open-feature/cli/compare/v0.3.5...v0.3.6) (2025-08-29)
 
 
