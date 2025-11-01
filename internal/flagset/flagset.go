@@ -158,8 +158,8 @@ func LoadFromSourceFlags(data []byte) (*[]Flag, error) {
 
 	var sourceFlagsArray []SourceFlag
 
-	if err := json.Unmarshal(data, &sourceWithWrapper); err == nil && len(sourceWithWrapper.Flags) > 0 {
-		// Successfully unmarshaled as object with flags property
+	if err := json.Unmarshal(data, &sourceWithWrapper); err == nil && sourceWithWrapper.Flags != nil {
+		// Successfully unmarshaled as object with flags property (even if empty)
 		sourceFlagsArray = sourceWithWrapper.Flags
 	} else {
 		// Try to unmarshal as a direct array of flags (for backward compatibility)

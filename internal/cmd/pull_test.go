@@ -111,6 +111,6 @@ func TestPull(t *testing.T) {
 		// Run command
 		err := cmd.Execute()
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "Received error response from flag source")
+		assert.Contains(t, err.Error(), "received error response from flag source")
 	})
 }

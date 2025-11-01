@@ -1,0 +1,6 @@
+# oapi-codegen configuration for sync API client generation
+package: syncclient
+generate:
+  - client
+  - models
+output: internal/api/client/sync_client.gen.go
