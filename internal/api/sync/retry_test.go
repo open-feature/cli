@@ -1,4 +1,4 @@
-package push
+package sync
 
 import (
 	"context"
@@ -237,7 +237,7 @@ func TestRetryLogic(t *testing.T) {
 			Post("/api/v1/manifest/flags").
 			AddMatcher(func(req *http.Request, _ *gock.Request) (bool, error) {
 				var body map[string]interface{}
-				json.NewDecoder(req.Body).Decode(&body)
+				_ = json.NewDecoder(req.Body).Decode(&body)
 				return body["key"] == "flag1", nil
 			}).
 			Reply(500).
@@ -252,7 +252,7 @@ func TestRetryLogic(t *testing.T) {
 			Post("/api/v1/manifest/flags").
 			AddMatcher(func(req *http.Request, _ *gock.Request) (bool, error) {
 				var body map[string]interface{}
-				json.NewDecoder(req.Body).Decode(&body)
+				_ = json.NewDecoder(req.Body).Decode(&body)
 				return body["key"] == "flag1", nil
 			}).
 			Reply(201).
@@ -268,7 +268,7 @@ func TestRetryLogic(t *testing.T) {
 			Post("/api/v1/manifest/flags").
 			AddMatcher(func(req *http.Request, _ *gock.Request) (bool, error) {
 				var body map[string]interface{}
-				json.NewDecoder(req.Body).Decode(&body)
+				_ = json.NewDecoder(req.Body).Decode(&body)
 				return body["key"] == "flag2", nil
 			}).
 			Reply(201).

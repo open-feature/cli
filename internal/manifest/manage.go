@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/open-feature/cli/internal/api/push"
+	"github.com/open-feature/cli/internal/api/sync"
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/logger"
@@ -185,9 +185,9 @@ func loadFlagsFromData(data []byte) (*flagset.Flagset, error) {
 // This function performs a smart push: it fetches remote flags first,
 // compares them with local flags, and intelligently creates or updates
 // flags as needed. Returns a PushResult with details of what was changed.
-func SaveToRemote(url string, flags *flagset.Flagset, authToken string) (*push.PushResult, error) {
+func SaveToRemote(url string, flags *flagset.Flagset, authToken string) (*sync.PushResult, error) {
 	// Use the generated OpenAPI client for type-safe API calls
-	client, err := push.NewClient(url, authToken)
+	client, err := sync.NewClient(url, authToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create push client: %w", err)
 	}

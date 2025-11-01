@@ -71,8 +71,8 @@ generate-schema:
 generate-api:
 	@echo "Generating API clients from OpenAPI specs..."
 	@go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest \
-		--config api/v1/push-codegen.yaml \
-		api/v1/push.yaml > internal/api/client/push_client.gen.go
+		--config api/v1/sync-codegen.yaml \
+		api/v1/sync.yaml > internal/api/client/sync_client.gen.go
 	@echo "API clients generated successfully!"
 
 .PHONY: generate

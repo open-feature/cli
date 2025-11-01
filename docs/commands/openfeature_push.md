@@ -19,7 +19,7 @@ remote destination. It performs a smart push by:
 This approach ensures idempotent operations and prevents conflicts.
 
 The pushed data follows the Manifest Management API OpenAPI specification defined at:
-api/v1/push.yaml
+api/v1/sync.yaml
 
 The API uses individual flag endpoints:
 - POST /api/v1/manifest/flags - Creates new flags

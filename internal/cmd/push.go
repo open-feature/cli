@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/open-feature/cli/internal/api/push"
+	"github.com/open-feature/cli/internal/api/sync"
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/pterm/pterm"
@@ -30,7 +30,7 @@ remote destination. It performs a smart push by:
 This approach ensures idempotent operations and prevents conflicts.
 
 The pushed data follows the Manifest Management API OpenAPI specification defined at:
-api/v1/push.yaml
+api/v1/sync.yaml
 
 The API uses individual flag endpoints:
 - POST /api/v1/manifest/flags - Creates new flags
@@ -122,7 +122,7 @@ For local file operations, use standard shell commands like cp or mv.`,
 }
 
 // displayPushResults renders the push operation results with color-coded output
-func displayPushResults(result *push.PushResult, destination string) {
+func displayPushResults(result *sync.PushResult, destination string) {
 	totalChanges := len(result.Created) + len(result.Updated)
 
 	if totalChanges == 0 {

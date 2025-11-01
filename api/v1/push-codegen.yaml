@@ -1,6 +1,0 @@
-# oapi-codegen configuration for push API client generation
-package: pushclient
-generate:
-  - client
-  - models
-output: internal/api/client/push_client.gen.go

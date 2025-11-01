@@ -1,5 +1,5 @@
-// Package push provides a wrapper around the generated OpenAPI client for push operations
-package push
+// Package sync provides a wrapper around the generated OpenAPI client for sync operations
+package sync
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 	"time"
 
 	goretry "github.com/kriscoleman/GoRetry"
-	pushclient "github.com/open-feature/cli/internal/api/client"
+	syncclient "github.com/open-feature/cli/internal/api/client"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/logger"
 )
 
 // Client wraps the generated OpenAPI client with convenience methods
 type Client struct {
-	apiClient *pushclient.ClientWithResponses
+	apiClient *syncclient.ClientWithResponses
 	authToken string
 }
 
@@ -59,7 +59,7 @@ func isTransientHTTPError(err error) bool {
 	return goretry.DefaultTransientErrorFunc(err)
 }
 
-// NewClient creates a new push client
+// NewClient creates a new sync client
 func NewClient(baseURL string, authToken string) (*Client, error) {
 	// Create a custom HTTP client with timeout
 	httpClient := &http.Client{
@@ -67,24 +67,24 @@ func NewClient(baseURL string, authToken string) (*Client, error) {
 	}
 
 	// Add authentication if provided
-	var opts []pushclient.ClientOption
-	opts = append(opts, pushclient.WithHTTPClient(httpClient))
+	var opts []syncclient.ClientOption
+	opts = append(opts, syncclient.WithHTTPClient(httpClient))
 
 	if authToken != "" {
-		opts = append(opts, pushclient.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
+		opts = append(opts, syncclient.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
 			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", authToken))
 			return nil
 		}))
 	}
 
 	// Add standard headers
-	opts = append(opts, pushclient.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
+	opts = append(opts, syncclient.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
 		req.Header.Set("Accept", "application/json")
-		req.Header.Set("User-Agent", "openfeature-cli/push")
+		req.Header.Set("User-Agent", "openfeature-cli/sync")
 		return nil
 	}))
 
-	apiClient, err := pushclient.NewClientWithResponses(baseURL, opts...)
+	apiClient, err := syncclient.NewClientWithResponses(baseURL, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create API client: %w", err)
 	}
@@ -189,23 +189,23 @@ func (c *Client) PushFlags(ctx context.Context, localFlags *flagset.Flagset, rem
 }
 
 // convertFlagToAPIBody converts internal flag to POST API body format
-func (c *Client) convertFlagToAPIBody(flag flagset.Flag) (pushclient.PostApiV1ManifestFlagsJSONRequestBody, error) {
+func (c *Client) convertFlagToAPIBody(flag flagset.Flag) (syncclient.PostApiV1ManifestFlagsJSONRequestBody, error) {
 	// Convert flag type to API enum
-	flagType := pushclient.PostApiV1ManifestFlagsJSONBodyType(flag.Type.String())
+	flagType := syncclient.PostApiV1ManifestFlagsJSONBodyType(flag.Type.String())
 
 	// Marshal and unmarshal the defaultValue through JSON to properly set the union type
 	defaultValueJSON, err := json.Marshal(flag.DefaultValue)
 	if err != nil {
-		return pushclient.PostApiV1ManifestFlagsJSONRequestBody{}, fmt.Errorf("failed to marshal defaultValue: %w", err)
+		return syncclient.PostApiV1ManifestFlagsJSONRequestBody{}, fmt.Errorf("failed to marshal defaultValue: %w", err)
 	}
 
-	var defaultValue pushclient.FlagDefaultValue
+	var defaultValue syncclient.FlagDefaultValue
 	if err := json.Unmarshal(defaultValueJSON, &defaultValue); err != nil {
-		return pushclient.PostApiV1ManifestFlagsJSONRequestBody{}, fmt.Errorf("failed to unmarshal defaultValue: %w", err)
+		return syncclient.PostApiV1ManifestFlagsJSONRequestBody{}, fmt.Errorf("failed to unmarshal defaultValue: %w", err)
 	}
 
 	// Create the request body
-	body := pushclient.PostApiV1ManifestFlagsJSONRequestBody{
+	body := syncclient.PostApiV1ManifestFlagsJSONRequestBody{
 		Key:          flag.Key,
 		Type:         flagType,
 		DefaultValue: defaultValue,
@@ -220,23 +220,23 @@ func (c *Client) convertFlagToAPIBody(flag flagset.Flag) (pushclient.PostApiV1Ma
 }
 
 // convertFlagToPutBody converts internal flag to PUT API body format
-func (c *Client) convertFlagToPutBody(flag flagset.Flag) (pushclient.PutApiV1ManifestFlagsKeyJSONRequestBody, error) {
+func (c *Client) convertFlagToPutBody(flag flagset.Flag) (syncclient.PutApiV1ManifestFlagsKeyJSONRequestBody, error) {
 	// Convert flag type to API enum
-	flagType := pushclient.PutApiV1ManifestFlagsKeyJSONBodyType(flag.Type.String())
+	flagType := syncclient.PutApiV1ManifestFlagsKeyJSONBodyType(flag.Type.String())
 
 	// Marshal and unmarshal the defaultValue through JSON to properly set the union type
 	defaultValueJSON, err := json.Marshal(flag.DefaultValue)
 	if err != nil {
-		return pushclient.PutApiV1ManifestFlagsKeyJSONRequestBody{}, fmt.Errorf("failed to marshal defaultValue: %w", err)
+		return syncclient.PutApiV1ManifestFlagsKeyJSONRequestBody{}, fmt.Errorf("failed to marshal defaultValue: %w", err)
 	}
 
-	var defaultValue pushclient.FlagDefaultValue
+	var defaultValue syncclient.FlagDefaultValue
 	if err := json.Unmarshal(defaultValueJSON, &defaultValue); err != nil {
-		return pushclient.PutApiV1ManifestFlagsKeyJSONRequestBody{}, fmt.Errorf("failed to unmarshal defaultValue: %w", err)
+		return syncclient.PutApiV1ManifestFlagsKeyJSONRequestBody{}, fmt.Errorf("failed to unmarshal defaultValue: %w", err)
 	}
 
 	// Create the request body
-	body := pushclient.PutApiV1ManifestFlagsKeyJSONRequestBody{
+	body := syncclient.PutApiV1ManifestFlagsKeyJSONRequestBody{
 		Key:          flag.Key,
 		Type:         flagType,
 		DefaultValue: &defaultValue,
@@ -264,7 +264,7 @@ func (c *Client) handleFlagResponse(resp *http.Response, body []byte, flagKey st
 	// Build error message
 	var message string
 	// Try to parse error response for better error messages
-	var errorResp pushclient.ErrorResponse
+	var errorResp syncclient.ErrorResponse
 	if err := json.Unmarshal(body, &errorResp); err == nil {
 		message = fmt.Sprintf("failed to %s flag %s (status %d): %s", operation, flagKey, resp.StatusCode, errorResp.Error.Message)
 	} else {
