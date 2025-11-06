@@ -34,7 +34,7 @@ func TestPush(t *testing.T) {
 
 		err := cmd.Execute()
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "flag source URL is required")
+		assert.Contains(t, err.Error(), "provider URL is required")
 	})
 
 	t.Run("smart push creates new flags", func(t *testing.T) {
@@ -70,7 +70,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "http://localhost:8080/openfeature/v0/manifest",
+			"--provider", "http://localhost:8080/openfeature/v0/manifest",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -121,7 +121,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/openfeature/v0/manifest",
+			"--provider", "https://api.example.com/openfeature/v0/manifest",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -188,7 +188,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/openfeature/v0/manifest",
+			"--provider", "https://api.example.com/openfeature/v0/manifest",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -232,7 +232,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/openfeature/v0/manifest",
+			"--provider", "https://api.example.com/openfeature/v0/manifest",
 			"--auth-token", "secret-token",
 			"--manifest", "flags.json",
 		}
@@ -275,7 +275,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com",
+			"--provider", "https://api.example.com",
 			"--dry-run",
 			"--manifest", "flags.json",
 		}
@@ -295,7 +295,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "file:///local/path/flags.json",
+			"--provider", "file:///local/path/flags.json",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -312,7 +312,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "ftp://example.com/flags",
+			"--provider", "ftp://example.com/flags",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -341,7 +341,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/openfeature/v0/manifest",
+			"--provider", "https://api.example.com/openfeature/v0/manifest",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -379,7 +379,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/openfeature/v0/manifest",
+			"--provider", "https://api.example.com/openfeature/v0/manifest",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -418,7 +418,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/openfeature/v0/manifest",
+			"--provider", "https://api.example.com/openfeature/v0/manifest",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -481,7 +481,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/openfeature/v0/manifest",
+			"--provider", "https://api.example.com/openfeature/v0/manifest",
 			"--manifest", "flags.json",
 		}
 		cmd.SetArgs(args)
@@ -497,7 +497,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/flags",
+			"--provider", "https://api.example.com/flags",
 			"--manifest", "nonexistent.json",
 		}
 		cmd.SetArgs(args)
@@ -526,7 +526,7 @@ func TestPush(t *testing.T) {
 		cmd := GetPushCmd()
 
 		args := []string{
-			"--flag-source-url", "https://api.example.com/flags",
+			"--provider", "https://api.example.com/flags",
 			"--manifest", "invalid.json",
 		}
 		cmd.SetArgs(args)

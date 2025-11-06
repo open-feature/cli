@@ -24,13 +24,13 @@ func GetInitCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			manifestPath := config.GetManifestPath(cmd)
 			override := config.GetOverride(cmd)
-			flagSourceUrl := config.GetFlagSourceUrl(cmd)
+			providerUrl := config.GetFlagSourceUrl(cmd)
 
 			if err := handleManifestCreation(manifestPath, override); err != nil {
 				return err
 			}
 
-			if err := handleConfigFile(flagSourceUrl, override); err != nil {
+			if err := handleConfigFile(providerUrl, override); err != nil {
 				return err
 			}
 
@@ -84,7 +84,7 @@ func handleManifestCreation(manifestPath string, override bool) error {
 	return nil
 }
 
-func handleConfigFile(flagSourceUrl string, override bool) error {
+func handleConfigFile(providerUrl string, override bool) error {
 	configPath := ".openfeature.yaml"
 	configExists, err := filesystem.Exists(configPath)
 	if err != nil {
@@ -92,15 +92,15 @@ func handleConfigFile(flagSourceUrl string, override bool) error {
 	}
 
 	if !configExists {
-		return writeConfigFile(flagSourceUrl, "Creating .openfeature.yaml configuration file")
+		return writeConfigFile(providerUrl, "Creating .openfeature.yaml configuration file")
 	}
 
-	if flagSourceUrl == "" {
+	if providerUrl == "" {
 		return nil // no config to write
 	}
 
 	if override {
-		return writeConfigFile(flagSourceUrl, "Updating flag source URL in .openfeature.yaml")
+		return writeConfigFile(providerUrl, "Updating provider URL in .openfeature.yaml")
 	}
 
 	shouldOverride, err := confirmOverride("configuration file", configPath)
@@ -108,22 +108,22 @@ func handleConfigFile(flagSourceUrl string, override bool) error {
 		return fmt.Errorf("failed to get user confirmation: %w", err)
 	}
 	if shouldOverride {
-		return writeConfigFile(flagSourceUrl, "Updating flag source URL in .openfeature.yaml")
+		return writeConfigFile(providerUrl, "Updating provider URL in .openfeature.yaml")
 	}
 
 	logger.Default.Info("Configuration file was not modified.")
 	return nil
 }
 
-func writeConfigFile(flagSourceUrl, message string) error {
-	pterm.Info.Println(message, pterm.LightWhite(flagSourceUrl))
-	template := getConfigTemplate(flagSourceUrl)
+func writeConfigFile(providerUrl, message string) error {
+	pterm.Info.Println(message, pterm.LightWhite(providerUrl))
+	template := getConfigTemplate(providerUrl)
 	return filesystem.WriteFile(".openfeature.yaml", []byte(template))
 }
 
 type configTemplateData struct {
-	FlagSourceURL    string
-	HasFlagSourceURL bool
+	ProviderURL    string
+	HasProviderURL bool
 }
 
 const configTemplateText = `# OpenFeature CLI Configuration
@@ -134,11 +134,11 @@ const configTemplateText = `# OpenFeature CLI Configuration
 # Path to your flag manifest file (default: "flags.json")
 # manifest: "flags.json"
 
-# URL of your flag source for the 'pull' command
-# Supports http://, https://, and file:// protocols
-{{if .HasFlagSourceURL}}flagSourceURL: {{.FlagSourceURL}}{{else}}# flagSourceUrl: "https://your-flag-service.com/api/flags"{{end}}
+# URL of your flag provider for the 'pull' and 'push' commands
+# Supports http://, https://, and file:// protocols (file:// only for pull)
+{{if .HasProviderURL}}provider: {{.ProviderURL}}{{else}}# provider: "https://your-flag-service.com/api/flags"{{end}}
 
-# Authentication token for remote flag sources (if required)
+# Authentication token for remote flag providers (if required)
 # authToken: "your-bearer-token"
 
 # Enable debug logging (default: false)
@@ -151,36 +151,41 @@ const configTemplateText = `# OpenFeature CLI Configuration
 # Override global settings for specific commands
 
 # pull:
-#   flag-source-url: "https://api.example.com/flags"
+#   provider: "https://api.example.com/flags"
 #   auth-token: "pull-specific-token"
 #   no-prompt: false
 
+# push:
+#   provider: "https://api.example.com/flags"
+#   auth-token: "push-specific-token"
+#   dry-run: false
+
 # generate:
 #   output: "generated"
-#   
+#
 #   # Language-specific generator options
 #   go:
 #     output: "go/flags"
 #     package-name: "openfeature"
-#   
+#
 #   typescript:
 #     output: "ts/flags"
-#   
+#
 #   csharp:
 #     output: "csharp/flags"
 #     namespace: "OpenFeature"
-#   
+#
 #   java:
 #     output: "java/flags"
 #     package-name: "com.example.openfeature"
 `
 
-func getConfigTemplate(flagSourceUrl string) string {
+func getConfigTemplate(providerUrl string) string {
 	tmpl := template.Must(template.New("config").Parse(configTemplateText))
 
 	data := configTemplateData{
-		FlagSourceURL:    flagSourceUrl,
-		HasFlagSourceURL: flagSourceUrl != "",
+		ProviderURL:    providerUrl,
+		HasProviderURL: providerUrl != "",
 	}
 
 	var buf bytes.Buffer

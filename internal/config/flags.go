@@ -18,7 +18,8 @@ const (
 	CSharpNamespaceName   = "namespace"
 	OverrideFlagName      = "override"
 	JavaPackageFlagName   = "package-name"
-	FlagSourceUrlFlagName = "flag-source-url"
+	ProviderFlagName      = "provider"
+	FlagSourceUrlFlagName = "flag-source-url" // Deprecated: use ProviderFlagName instead
 	AuthTokenFlagName     = "auth-token"
 	NoPromptFlagName      = "no-prompt"
 	DryRunFlagName        = "dry-run"
@@ -66,20 +67,26 @@ func AddJavaGenerateFlags(cmd *cobra.Command) {
 // AddInitFlags adds the init command specific flags
 func AddInitFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool(OverrideFlagName, false, "Override an existing configuration")
-	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag source")
+	cmd.Flags().String(ProviderFlagName, "", "The URL of the flag provider")
+	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag source (deprecated: use --provider instead)")
+	_ = cmd.Flags().MarkDeprecated(FlagSourceUrlFlagName, "use --provider instead")
 }
 
 // AddPullFlags adds the pull command specific flags
 func AddPullFlags(cmd *cobra.Command) {
-	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag source")
-	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag source")
+	cmd.Flags().String(ProviderFlagName, "", "The URL of the flag provider")
+	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag source (deprecated: use --provider instead)")
+	_ = cmd.Flags().MarkDeprecated(FlagSourceUrlFlagName, "use --provider instead")
+	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag provider")
 	cmd.Flags().Bool(NoPromptFlagName, false, "Disable interactive prompts for missing default values")
 }
 
 // AddPushFlags adds the push command specific flags
 func AddPushFlags(cmd *cobra.Command) {
-	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag destination")
-	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag destination")
+	cmd.Flags().String(ProviderFlagName, "", "The URL of the flag provider")
+	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag destination (deprecated: use --provider instead)")
+	_ = cmd.Flags().MarkDeprecated(FlagSourceUrlFlagName, "use --provider instead")
+	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag provider")
 	cmd.Flags().Bool(DryRunFlagName, false, "Preview changes without pushing")
 }
 
@@ -127,18 +134,34 @@ func GetOverride(cmd *cobra.Command) bool {
 
 // getConfigValueWithFallback is a helper function that attempts to get a value from Viper config
 // if the provided value is empty. This reduces duplication for flag source/destination URLs.
-func getConfigValueWithFallback(value string, configKey string) string {
+// It checks both the new and legacy config keys, with the new key taking precedence.
+func getConfigValueWithFallback(value string, newConfigKey string, legacyConfigKey string) string {
 	if value != "" {
 		return value
 	}
-	// Viper is already configured in initializeConfig, just retrieve the value
-	return viper.GetString(configKey)
+	// Check the new config key first
+	if configValue := viper.GetString(newConfigKey); configValue != "" {
+		return configValue
+	}
+	// Fall back to legacy config key for backward compatibility
+	return viper.GetString(legacyConfigKey)
 }
 
 // GetFlagSourceUrl gets the flag source URL from the given command
+// It checks the new --provider flag first, then falls back to the deprecated --flag-source-url flag
+// for backward compatibility. Finally, it checks the config file for both keys.
 func GetFlagSourceUrl(cmd *cobra.Command) string {
+	// Check new flag first
+	provider, _ := cmd.Flags().GetString(ProviderFlagName)
+	if provider != "" {
+		return provider
+	}
+
+	// Fall back to deprecated flag for backward compatibility
 	flagSourceUrl, _ := cmd.Flags().GetString(FlagSourceUrlFlagName)
-	return getConfigValueWithFallback(flagSourceUrl, "flagSourceUrl")
+
+	// Use the fallback helper which checks both config keys
+	return getConfigValueWithFallback(flagSourceUrl, "provider", "flagSourceUrl")
 }
 
 // GetAuthToken gets the auth token from the given command
