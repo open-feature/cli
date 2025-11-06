@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.10](https://github.com/open-feature/cli/compare/v0.3.9...v0.3.10) (2025-11-06)
+
+
+### ✨ New Features
+
+* push command ([#170](https://github.com/open-feature/cli/issues/170)) ([95785d8](https://github.com/open-feature/cli/commit/95785d8ec862179fccca36df325bb218b567b9ec))
+
 ## [0.3.9](https://github.com/open-feature/cli/compare/v0.3.8...v0.3.9) (2025-10-28)
 
 
