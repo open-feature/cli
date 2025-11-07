@@ -69,13 +69,13 @@ func GetCompareCmd() *cobra.Command {
 			// Render differences based on the output format
 			switch manifest.OutputFormat(outputFormat) {
 			case manifest.OutputFormatFlat:
-				return renderFlatDiff(changes, cmd)
+				return renderFlatDiff(changes, ignorePatterns, cmd)
 			case manifest.OutputFormatJSON:
-				return renderJSONDiff(changes, cmd)
+				return renderJSONDiff(changes, ignorePatterns, cmd)
 			case manifest.OutputFormatYAML:
-				return renderYAMLDiff(changes, cmd)
+				return renderYAMLDiff(changes, ignorePatterns, cmd)
 			default:
-				return renderTreeDiff(changes, cmd)
+				return renderTreeDiff(changes, ignorePatterns, cmd)
 			}
 		},
 	}
@@ -112,7 +112,7 @@ func loadManifest(path string) (*manifest.Manifest, error) {
 }
 
 // renderTreeDiff renders changes with tree-structured inline differences
-func renderTreeDiff(changes []manifest.Change, cmd *cobra.Command) error {
+func renderTreeDiff(changes []manifest.Change, ignorePatterns []string, cmd *cobra.Command) error {
 	pterm.Info.Printf("Found %d difference(s) between manifests:\n\n", len(changes))
 
 	// Group changes by type for easier reading
@@ -165,7 +165,7 @@ func renderTreeDiff(changes []manifest.Change, cmd *cobra.Command) error {
 			pterm.FgYellow.Printf("  ~ %s\n", flagName)
 
 			// Show field-level diff
-			fieldChanges := getFieldChanges(change.OldValue, change.NewValue)
+			fieldChanges := getFieldChanges(flagName, change.OldValue, change.NewValue, ignorePatterns)
 			if len(fieldChanges) > 0 {
 				for _, fc := range fieldChanges {
 					fmt.Printf("    • %s: %s → %s\n", fc.Field, fc.OldValue, fc.NewValue)
@@ -192,8 +192,8 @@ type fieldChange struct {
 	NewValue string
 }
 
-// getFieldChanges extracts field-level changes between two flag objects
-func getFieldChanges(oldVal, newVal any) []fieldChange {
+// getFieldChanges extracts field-level changes between two flag objects, filtering out ignored and unknown fields
+func getFieldChanges(flagName string, oldVal, newVal any, ignorePatterns []string) []fieldChange {
 	var changes []fieldChange
 
 	// Convert to maps
@@ -215,6 +215,17 @@ func getFieldChanges(oldVal, newVal any) []fieldChange {
 
 	// Compare each field
 	for field := range allFields {
+		// Check if this field should be ignored
+		fieldPath := fmt.Sprintf("flags.%s.%s", flagName, field)
+		if manifest.ShouldIgnorePathForTest(fieldPath, ignorePatterns) {
+			continue
+		}
+
+		// Check if this is a known property
+		if !manifest.IsKnownPropertyForTest(fieldPath, flagName) {
+			continue
+		}
+
 		oldFieldVal, oldExists := oldMap[field]
 		newFieldVal, newExists := newMap[field]
 
@@ -286,7 +297,7 @@ func formatFieldValue(val any) string {
 }
 
 // renderFlatDiff renders changes in a flat format
-func renderFlatDiff(changes []manifest.Change, cmd *cobra.Command) error {
+func renderFlatDiff(changes []manifest.Change, ignorePatterns []string, cmd *cobra.Command) error {
 	pterm.Info.Printf("Found %d difference(s) between manifests:\n\n", len(changes))
 
 	for _, change := range changes {
@@ -305,7 +316,7 @@ func renderFlatDiff(changes []manifest.Change, cmd *cobra.Command) error {
 }
 
 // renderJSONDiff renders changes in JSON format
-func renderJSONDiff(changes []manifest.Change, cmd *cobra.Command) error {
+func renderJSONDiff(changes []manifest.Change, ignorePatterns []string, cmd *cobra.Command) error {
 	// Create a structured response that can be easily consumed by tools
 	type structuredOutput struct {
 		TotalChanges  int               `json:"totalChanges" yaml:"totalChanges"`
@@ -341,7 +352,7 @@ func renderJSONDiff(changes []manifest.Change, cmd *cobra.Command) error {
 }
 
 // renderYAMLDiff renders changes in YAML format
-func renderYAMLDiff(changes []manifest.Change, cmd *cobra.Command) error {
+func renderYAMLDiff(changes []manifest.Change, ignorePatterns []string, cmd *cobra.Command) error {
 	// Use the same structured output type as JSON but with YAML tags
 	type structuredOutput struct {
 		TotalChanges  int               `json:"totalChanges" yaml:"totalChanges"`

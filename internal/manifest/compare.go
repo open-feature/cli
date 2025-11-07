@@ -153,6 +153,11 @@ func isKnownProperty(path, flagKey string) bool {
 	return knownFlagProperties[propertyName]
 }
 
+// IsKnownPropertyForTest checks if a path is a known property (exported for testing/rendering)
+func IsKnownPropertyForTest(path, flagKey string) bool {
+	return isKnownProperty(path, flagKey)
+}
+
 // flattenToMap recursively flattens a nested structure into a map of path->value
 func flattenToMap(obj any, prefix string) map[string]any {
 	result := make(map[string]any)
@@ -209,6 +214,11 @@ func shouldIgnorePath(path string, ignorePatterns []string) bool {
 	return false
 }
 
+// ShouldIgnorePathForTest checks if a path should be ignored (exported for testing/rendering)
+func ShouldIgnorePathForTest(path string, ignorePatterns []string) bool {
+	return shouldIgnorePath(path, ignorePatterns)
+}
+
 // matchesPattern checks if a path matches a given pattern
 // Supports:
 // - Full paths with globs: flags.*.description
@@ -229,7 +239,7 @@ func matchesPattern(path, pattern string) bool {
 		}
 
 		// Try matching with wildcard support
-		if matchesWithDoublestar(path, pattern) {
+		if matchesPathSegments(path, pattern) {
 			return true
 		}
 
@@ -291,8 +301,8 @@ func matchesSubsequence(pathParts, patternParts []string) bool {
 	return true
 }
 
-// matchesWithDoublestar handles patterns with * wildcards matching any segment
-func matchesWithDoublestar(path, pattern string) bool {
+// matchesPathSegments handles patterns with * wildcards matching any single segment
+func matchesPathSegments(path, pattern string) bool {
 	pathParts := strings.Split(path, ".")
 	patternParts := strings.Split(pattern, ".")
 
@@ -304,15 +314,10 @@ func matchesWithDoublestar(path, pattern string) bool {
 	// Match each pattern part against corresponding path part
 	pathIdx := 0
 	for patternIdx, patternPart := range patternParts {
-		switch patternPart {
-		case "*":
+		if patternPart == "*" {
 			// Wildcard matches any single segment
 			pathIdx++
-		case "**":
-			// Double wildcard matches any number of segments
-			// This is complex, so we'll keep it simple for now
-			return false
-		default:
+		} else {
 			// Exact match required
 			if pathIdx >= len(pathParts) || pathParts[pathIdx] != patternPart {
 				return false
