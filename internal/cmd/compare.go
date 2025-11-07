@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/open-feature/cli/internal/config"
@@ -17,7 +19,17 @@ func GetCompareCmd() *cobra.Command {
 	compareCmd := &cobra.Command{
 		Use:   "compare",
 		Short: "Compare two feature flag manifests",
-		Long:  "Compare two OpenFeature flag manifests and display the differences in a structured format.",
+		Long: `Compare two OpenFeature flag manifests and display the differences in a structured format.
+
+By default, shows what HAS changed in the manifest compared to the target (receiving perspective).
+Use --reverse to show what WILL change when the manifest is pushed to the target (sending perspective).
+
+Examples:
+  # Show what changed in local compared to main (default)
+  openfeature compare --manifest local.json --against main.json
+
+  # Preview what will change when pushing to remote
+  openfeature compare --manifest local.json --against remote.json --reverse`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "compare")
 		},
@@ -26,6 +38,8 @@ func GetCompareCmd() *cobra.Command {
 			sourcePath := config.GetManifestPath(cmd)
 			targetPath, _ := cmd.Flags().GetString("against")
 			outputFormat, _ := cmd.Flags().GetString("output")
+			ignorePatterns, _ := cmd.Flags().GetStringArray("ignore")
+			reverse, _ := cmd.Flags().GetBool("reverse")
 
 			// Validate flags
 			if sourcePath == "" || targetPath == "" {
@@ -49,8 +63,19 @@ func GetCompareCmd() *cobra.Command {
 				return fmt.Errorf("error loading target manifest: %w", err)
 			}
 
-			// Compare manifests
-			changes, err := manifest.Compare(sourceManifest, targetManifest)
+			// Compare manifests with ignore patterns
+			// By default: Compare(target, source) shows what HAS changed (target is old, source is new)
+			// With --reverse: Compare(source, target) shows what WILL change (source is old, target is new)
+			var changes []manifest.Change
+			if reverse {
+				changes, err = manifest.Compare(sourceManifest, targetManifest, manifest.CompareOptions{
+					IgnorePatterns: ignorePatterns,
+				})
+			} else {
+				changes, err = manifest.Compare(targetManifest, sourceManifest, manifest.CompareOptions{
+					IgnorePatterns: ignorePatterns,
+				})
+			}
 			if err != nil {
 				return fmt.Errorf("error comparing manifests: %w", err)
 			}
@@ -79,6 +104,12 @@ func GetCompareCmd() *cobra.Command {
 	compareCmd.Flags().StringP("against", "a", "", "Path to the target manifest file to compare against")
 	compareCmd.Flags().StringP("output", "o", string(manifest.OutputFormatTree),
 		fmt.Sprintf("Output format. Valid formats: %s", strings.Join(manifest.GetValidOutputFormats(), ", ")))
+	compareCmd.Flags().StringArrayP("ignore", "i", []string{},
+		"Field pattern to ignore during comparison (can be specified multiple times). "+
+			"Supports shorthand (e.g., 'description') and full paths with wildcards (e.g., 'flags.*.description', 'metadata.*')")
+	compareCmd.Flags().Bool("reverse", false,
+		"Reverse comparison direction. Shows what WILL change when manifest is pushed to target (sending perspective) "+
+			"instead of what HAS changed in manifest compared to target (receiving perspective)")
 
 	// Mark required flags
 	_ = compareCmd.MarkFlagRequired("against")
@@ -156,24 +187,126 @@ func renderTreeDiff(changes []manifest.Change, cmd *cobra.Command) error {
 			flagName := strings.TrimPrefix(change.Path, "flags.")
 			pterm.FgYellow.Printf("  ~ %s\n", flagName)
 
-			// Marshall the values
-			oldJSON, _ := json.MarshalIndent(change.OldValue, "", "  ")
-			newJSON, _ := json.MarshalIndent(change.NewValue, "", "  ")
-
-			// Print the diff
-			fmt.Println("    Before:")
-			for _, line := range strings.Split(string(oldJSON), "\n") {
-				fmt.Printf("      %s\n", line)
-			}
-
-			fmt.Println("    After:")
-			for _, line := range strings.Split(string(newJSON), "\n") {
-				fmt.Printf("      %s\n", line)
+			// Show field-level diff
+			fieldChanges := getFieldChanges(flagName, change.OldValue, change.NewValue)
+			if len(fieldChanges) > 0 {
+				for _, fc := range fieldChanges {
+					fmt.Printf("    • %s: %s → %s\n", fc.Field, fc.OldValue, fc.NewValue)
+				}
+			} else {
+				// Fallback to full object display if we can't parse
+				oldJSON, _ := json.MarshalIndent(change.OldValue, "      ", "  ")
+				newJSON, _ := json.MarshalIndent(change.NewValue, "      ", "  ")
+				fmt.Println("    Before:")
+				fmt.Printf("      %s\n", oldJSON)
+				fmt.Println("    After:")
+				fmt.Printf("      %s\n", newJSON)
 			}
 		}
 	}
 
 	return nil
+}
+
+// fieldChange represents a change to a specific field
+type fieldChange struct {
+	Field    string
+	OldValue string
+	NewValue string
+}
+
+// getFieldChanges extracts field-level changes between two flag objects
+func getFieldChanges(flagName string, oldVal, newVal any) []fieldChange {
+	var changes []fieldChange
+
+	// Convert to maps
+	oldMap, oldOk := oldVal.(map[string]any)
+	newMap, newOk := newVal.(map[string]any)
+
+	if !oldOk || !newOk {
+		return changes // Return empty if not maps
+	}
+
+	// Get all unique field names
+	allFields := make(map[string]bool)
+	for field := range oldMap {
+		allFields[field] = true
+	}
+	for field := range newMap {
+		allFields[field] = true
+	}
+
+	// Compare each field
+	// Note: Fields are already filtered at the Compare() level, so we don't need to filter here
+	for field := range allFields {
+		oldFieldVal, oldExists := oldMap[field]
+		newFieldVal, newExists := newMap[field]
+
+		// Field was added
+		if !oldExists && newExists {
+			changes = append(changes, fieldChange{
+				Field:    field,
+				OldValue: "(not set)",
+				NewValue: formatFieldValue(newFieldVal),
+			})
+			continue
+		}
+
+		// Field was removed
+		if oldExists && !newExists {
+			changes = append(changes, fieldChange{
+				Field:    field,
+				OldValue: formatFieldValue(oldFieldVal),
+				NewValue: "(removed)",
+			})
+			continue
+		}
+
+		// Field changed
+		if !reflect.DeepEqual(oldFieldVal, newFieldVal) {
+			changes = append(changes, fieldChange{
+				Field:    field,
+				OldValue: formatFieldValue(oldFieldVal),
+				NewValue: formatFieldValue(newFieldVal),
+			})
+		}
+	}
+
+	// Sort changes by field name for consistent output
+	sort.Slice(changes, func(i, j int) bool {
+		return changes[i].Field < changes[j].Field
+	})
+
+	return changes
+}
+
+// formatFieldValue converts a value to a human-readable string for field-level diff display
+func formatFieldValue(val any) string {
+	if val == nil {
+		return "null"
+	}
+
+	switch v := val.(type) {
+	case string:
+		return fmt.Sprintf("%q", v)
+	case bool:
+		return fmt.Sprintf("%t", v)
+	case float64:
+		// Check if it's actually an integer
+		if v == float64(int64(v)) {
+			return fmt.Sprintf("%d", int64(v))
+		}
+		return fmt.Sprintf("%g", v)
+	case map[string]any, []any:
+		// For complex types, marshal to compact JSON
+		jsonBytes, err := json.Marshal(v)
+		if err != nil {
+			return fmt.Sprintf("%v", v)
+		}
+		return string(jsonBytes)
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }
 
 // renderFlatDiff renders changes in a flat format
