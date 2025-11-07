@@ -36,10 +36,10 @@ openfeature pull [flags]
 ### Options
 
 ```
-      --auth-token string        The auth token for the flag source
-      --flag-source-url string   The URL of the flag source
-  -h, --help                     help for pull
-      --no-prompt                Disable interactive prompts for missing default values
+      --auth-token string     The auth token for the flag provider
+  -h, --help                  help for pull
+      --no-prompt             Disable interactive prompts for missing default values
+      --provider-url string   The URL of the flag provider
 ```
 
 ### Options inherited from parent commands

@@ -15,9 +15,9 @@ openfeature init [flags]
 ### Options
 
 ```
-      --flag-source-url string   The URL of the flag source
-  -h, --help                     help for init
-      --override                 Override an existing configuration
+  -h, --help                  help for init
+      --override              Override an existing configuration
+      --provider-url string   The URL of the flag provider
 ```
 
 ### Options inherited from parent commands

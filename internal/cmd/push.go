@@ -43,30 +43,30 @@ specified by the OpenFeature flag manifest schema.
 Note: The file:// scheme is not supported for push operations.
 For local file operations, use standard shell commands like cp or mv.`,
 		Example: `  # Push flags to a remote HTTPS endpoint (smart push: creates and updates as needed)
-  openfeature push --flag-source-url https://api.example.com --auth-token secret-token
+  openfeature push --provider-url https://api.example.com --auth-token secret-token
 
   # Push flags to an HTTP endpoint (development)
-  openfeature push --flag-source-url http://localhost:8080
+  openfeature push --provider-url http://localhost:8080
 
   # Dry run to preview what would be sent
-  openfeature push --flag-source-url https://api.example.com --dry-run`,
+  openfeature push --provider-url https://api.example.com --dry-run`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "push")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get configuration values
-			flagSourceUrl := config.GetFlagSourceUrl(cmd)
+			providerURL := config.GetFlagSourceUrl(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			authToken := config.GetAuthToken(cmd)
 			dryRun := config.GetDryRun(cmd)
 
 			// Validate destination URL is provided
-			if flagSourceUrl == "" {
-				return fmt.Errorf("flag source URL is required. Please provide --flag-source-url")
+			if providerURL == "" {
+				return fmt.Errorf("provider URL is required. Please provide --provider-url")
 			}
 
 			// Parse and validate URL
-			parsedURL, err := url.Parse(flagSourceUrl)
+			parsedURL, err := url.Parse(providerURL)
 			if err != nil {
 				return fmt.Errorf("invalid source URL: %w", err)
 			}
@@ -86,13 +86,13 @@ For local file operations, use standard shell commands like cp or mv.`,
 			case "http", "https":
 				// Perform smart push (fetches remote, compares, and creates/updates as needed)
 				// In dry run mode, performs comparison but skips actual API calls
-				result, err := manifest.SaveToRemote(flagSourceUrl, flags, authToken, dryRun)
+				result, err := manifest.SaveToRemote(providerURL, flags, authToken, dryRun)
 				if err != nil {
 					return fmt.Errorf("error pushing flags to remote destination: %w", err)
 				}
 
 				// Display the results
-				displayPushResults(result, flagSourceUrl, dryRun)
+				displayPushResults(result, providerURL, dryRun)
 			default:
 				return fmt.Errorf("unsupported URL scheme: %s. Supported schemes are http:// and https://", parsedURL.Scheme)
 			}
@@ -189,7 +189,7 @@ func displayPushResults(result *sync.PushResult, destination string, dryRun bool
 			fmt.Println()
 
 			// Show flag details
-			flagJSON, _ := json.MarshalIndent(map[string]interface{}{
+			flagJSON, _ := json.MarshalIndent(map[string]any{
 				"type":         flag.Type.String(),
 				"defaultValue": flag.DefaultValue,
 			}, "    ", "  ")

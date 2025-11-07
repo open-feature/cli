@@ -21,7 +21,7 @@ func setupTest(t *testing.T) afero.Fs {
 }
 
 func TestPull(t *testing.T) {
-	t.Run("pull no flag source url", func(t *testing.T) {
+	t.Run("pull no provider url", func(t *testing.T) {
 		setupTest(t)
 		cmd := GetPullCmd()
 
@@ -35,10 +35,10 @@ func TestPull(t *testing.T) {
 		// Run command
 		err := cmd.Execute()
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "flagSourceUrl not set in config")
+		assert.Contains(t, err.Error(), "provider URL not set in config")
 	})
 
-	t.Run("pull with flag source url", func(t *testing.T) {
+	t.Run("pull with provider url", func(t *testing.T) {
 		fs := setupTest(t)
 		defer gock.Off()
 
@@ -74,7 +74,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - use base URL only
 		args := []string{
 			"pull",
-			"--flag-source-url", "https://example.com",
+			"--provider-url", "https://example.com",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -124,7 +124,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - use base URL only
 		args := []string{
 			"pull",
-			"--flag-source-url", "https://example.com",
+			"--provider-url", "https://example.com",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -165,7 +165,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - URL with .json extension
 		args := []string{
 			"pull",
-			"--flag-source-url", "https://example.com/flags.json",
+			"--provider-url", "https://example.com/flags.json",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -218,7 +218,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - URL with .yaml extension
 		args := []string{
 			"pull",
-			"--flag-source-url", "https://example.com/flags.yaml",
+			"--provider-url", "https://example.com/flags.yaml",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -271,7 +271,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - URL with .yml extension
 		args := []string{
 			"pull",
-			"--flag-source-url", "https://example.com/config.yml",
+			"--provider-url", "https://example.com/config.yml",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -325,7 +325,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - base URL without file extension
 		args := []string{
 			"pull",
-			"--flag-source-url", "https://api.example.com",
+			"--provider-url", "https://api.example.com",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -347,5 +347,59 @@ func TestPull(t *testing.T) {
 		flags := manifestFlags["flags"].(map[string]interface{})
 		_, exists := flags["syncApiFlag"]
 		assert.True(t, exists, "Flag syncApiFlag should exist in manifest")
+	})
+
+	t.Run("backward compatibility with deprecated --flag-source-url", func(t *testing.T) {
+		fs := setupTest(t)
+		defer gock.Off()
+
+		// Mock response in OpenAPI ManifestEnvelope format
+		manifestResponse := map[string]any{
+			"flags": []map[string]any{
+				{
+					"key":          "backwardCompatFlag",
+					"type":         "boolean",
+					"defaultValue": true,
+					"description":  "Test backward compatibility",
+				},
+			},
+		}
+
+		// Mock the sync API endpoint
+		gock.New("https://example.com").
+			Get("/openfeature/v0/manifest").
+			Reply(200).
+			JSON(manifestResponse)
+
+		cmd := GetPullCmd()
+
+		// global flag exists on root only.
+		config.AddRootFlags(cmd)
+
+		// Use the deprecated flag to test backward compatibility
+		args := []string{
+			"pull",
+			"--flag-source-url", "https://example.com",
+			"--manifest", "manifest/path.json",
+		}
+
+		cmd.SetArgs(args)
+
+		// Run command - should work but show deprecation warning
+		err := cmd.Execute()
+		assert.NoError(t, err)
+
+		// Verify the manifest was written correctly
+		content, err := afero.ReadFile(fs, "manifest/path.json")
+		assert.NoError(t, err)
+
+		var manifestFlags map[string]interface{}
+		err = json.Unmarshal(content, &manifestFlags)
+		assert.NoError(t, err)
+
+		// Verify the flag exists in the manifest
+		flags := manifestFlags["flags"].(map[string]interface{})
+		_, exists := flags["backwardCompatFlag"]
+		assert.True(t, exists, "Flag backwardCompatFlag should exist in manifest")
 	})
 }

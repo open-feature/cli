@@ -40,25 +40,25 @@ openfeature push [flags]
 
 ```
   # Push flags to a remote HTTPS endpoint (smart push: creates and updates as needed)
-  openfeature push --flag-source-url https://api.example.com --auth-token secret-token
+  openfeature push --provider-url https://api.example.com --auth-token secret-token
 
   # Push flags to an HTTP endpoint (development)
-  openfeature push --flag-source-url http://localhost:8080
+  openfeature push --provider-url http://localhost:8080
 
   # Dry run to preview what would be sent
-  openfeature push --flag-source-url https://api.example.com --dry-run
+  openfeature push --provider-url https://api.example.com --dry-run
 ```
 
 ### Options
 
 ```
-      --auth-token string        The auth token for the flag destination
-      --debug                    Enable debug logging
-      --dry-run                  Preview changes without pushing
-      --flag-source-url string   The URL of the flag destination
-  -h, --help                     help for push
-  -m, --manifest string          Path to the flag manifest (default "flags.json")
-      --no-input                 Disable interactive prompts
+      --auth-token string     The auth token for the flag provider
+      --debug                 Enable debug logging
+      --dry-run               Preview changes without pushing
+  -h, --help                  help for push
+  -m, --manifest string       Path to the flag manifest (default "flags.json")
+      --no-input              Disable interactive prompts
+      --provider-url string   The URL of the flag provider
 ```
 
 ### SEE ALSO
