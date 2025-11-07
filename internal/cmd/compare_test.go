@@ -68,7 +68,10 @@ func captureStdout(f func()) string {
 	os.Stdout = old
 
 	var buf bytes.Buffer
-	_, _ = io.Copy(&buf, r)
+	_, err := io.Copy(&buf, r)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "captureStdout: error copying output: %v\n", err)
+	}
 	return buf.String()
 }
 
