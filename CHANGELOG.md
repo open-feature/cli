@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.11](https://github.com/open-feature/cli/compare/v0.3.10...v0.3.11) (2025-11-07)
+
+
+### ✨ New Features
+
+* improve compare command ([#182](https://github.com/open-feature/cli/issues/182)) ([a3c8d07](https://github.com/open-feature/cli/commit/a3c8d07f2346e7a7b0c218f253ebf9ad47613ee4))
+
 ## [0.3.10](https://github.com/open-feature/cli/compare/v0.3.9...v0.3.10) (2025-11-06)
 
 
