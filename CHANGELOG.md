@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.12](https://github.com/open-feature/cli/compare/v0.3.11...v0.3.12) (2025-11-07)
+
+
+### 🐛 Bug Fixes
+
+* correct compare order ([#184](https://github.com/open-feature/cli/issues/184)) ([8b8f23d](https://github.com/open-feature/cli/commit/8b8f23df14b2464c0fff3c34480a28a4bb7b1834))
+
+
+### 🔄 Refactoring
+
+* rename flag-source-url to provider-url for consistency ([#181](https://github.com/open-feature/cli/issues/181)) ([79b362e](https://github.com/open-feature/cli/commit/79b362e70f42a29574b1e92f0ccac5d1d6082337))
+
 ## [0.3.11](https://github.com/open-feature/cli/compare/v0.3.10...v0.3.11) (2025-11-07)
 
 
