@@ -15,9 +15,10 @@ openfeature compare [flags]
 ### Options
 
 ```
-  -a, --against string   Path to the target manifest file to compare against
-  -h, --help             help for compare
-  -o, --output string    Output format. Valid formats: tree, flat, json, yaml (default "tree")
+  -a, --against string       Path to the target manifest file to compare against
+  -h, --help                 help for compare
+  -i, --ignore stringArray   Field pattern to ignore during comparison (can be specified multiple times). Supports shorthand (e.g., 'description') and full paths with wildcards (e.g., 'flags.*.description', 'metadata.*')
+  -o, --output string        Output format. Valid formats: tree, flat, json, yaml (default "tree")
 ```
 
 ### Options inherited from parent commands
