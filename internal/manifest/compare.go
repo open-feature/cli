@@ -33,15 +33,15 @@ func Compare(oldManifest, newManifest *Manifest, opts CompareOptions) ([]Change,
 				changes = append(changes, Change{
 					Type:     "change",
 					Path:     fmt.Sprintf("flags.%s", key),
-					OldValue: oldFlag,
-					NewValue: newFlag,
+					OldValue: filterFlagFields(oldFlag, key, opts.IgnorePatterns),
+					NewValue: filterFlagFields(newFlag, key, opts.IgnorePatterns),
 				})
 			}
 		} else {
 			changes = append(changes, Change{
 				Type:     "add",
 				Path:     fmt.Sprintf("flags.%s", key),
-				NewValue: newFlag,
+				NewValue: filterFlagFields(newFlag, key, opts.IgnorePatterns),
 			})
 		}
 	}
@@ -52,7 +52,7 @@ func Compare(oldManifest, newManifest *Manifest, opts CompareOptions) ([]Change,
 			changes = append(changes, Change{
 				Type:     "remove",
 				Path:     fmt.Sprintf("flags.%s", key),
-				OldValue: oldFlag,
+				OldValue: filterFlagFields(oldFlag, key, opts.IgnorePatterns),
 			})
 		}
 	}
@@ -206,6 +206,62 @@ func ShouldIgnorePath(path string, ignorePatterns []string) bool {
 		}
 	}
 	return false
+}
+
+// filterFlagFields returns a filtered copy of the flag with ignored and unknown fields removed
+func filterFlagFields(flag any, flagKey string, ignorePatterns []string) any {
+	flagMap, ok := flag.(map[string]any)
+	if !ok {
+		return flag
+	}
+
+	filtered := make(map[string]any)
+
+	for field, value := range flagMap {
+		fieldPath := fmt.Sprintf("flags.%s.%s", flagKey, field)
+
+		// Skip if ignored
+		if ShouldIgnorePath(fieldPath, ignorePatterns) {
+			continue
+		}
+
+		// Skip if unknown property
+		if !IsKnownProperty(fieldPath, flagKey) {
+			continue
+		}
+
+		// For nested objects, recursively filter
+		if nestedMap, ok := value.(map[string]any); ok {
+			filtered[field] = filterNestedFields(nestedMap, fieldPath, ignorePatterns)
+		} else {
+			filtered[field] = value
+		}
+	}
+
+	return filtered
+}
+
+// filterNestedFields recursively filters nested map structures
+func filterNestedFields(nested map[string]any, parentPath string, ignorePatterns []string) map[string]any {
+	filtered := make(map[string]any)
+
+	for key, value := range nested {
+		path := fmt.Sprintf("%s.%s", parentPath, key)
+
+		// Skip if ignored
+		if ShouldIgnorePath(path, ignorePatterns) {
+			continue
+		}
+
+		// Recursively handle nested objects
+		if nestedMap, ok := value.(map[string]any); ok {
+			filtered[key] = filterNestedFields(nestedMap, path, ignorePatterns)
+		} else {
+			filtered[key] = value
+		}
+	}
+
+	return filtered
 }
 
 // matchesPattern checks if a path matches a given pattern

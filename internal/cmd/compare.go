@@ -75,7 +75,7 @@ func GetCompareCmd() *cobra.Command {
 			case manifest.OutputFormatYAML:
 				return renderYAMLDiff(changes, cmd)
 			default:
-				return renderTreeDiff(changes, ignorePatterns, cmd)
+				return renderTreeDiff(changes, cmd)
 			}
 		},
 	}
@@ -112,7 +112,7 @@ func loadManifest(path string) (*manifest.Manifest, error) {
 }
 
 // renderTreeDiff renders changes with tree-structured inline differences
-func renderTreeDiff(changes []manifest.Change, ignorePatterns []string, cmd *cobra.Command) error {
+func renderTreeDiff(changes []manifest.Change, cmd *cobra.Command) error {
 	pterm.Info.Printf("Found %d difference(s) between manifests:\n\n", len(changes))
 
 	// Group changes by type for easier reading
@@ -165,7 +165,7 @@ func renderTreeDiff(changes []manifest.Change, ignorePatterns []string, cmd *cob
 			pterm.FgYellow.Printf("  ~ %s\n", flagName)
 
 			// Show field-level diff
-			fieldChanges := getFieldChanges(flagName, change.OldValue, change.NewValue, ignorePatterns)
+			fieldChanges := getFieldChanges(flagName, change.OldValue, change.NewValue)
 			if len(fieldChanges) > 0 {
 				for _, fc := range fieldChanges {
 					fmt.Printf("    • %s: %s → %s\n", fc.Field, fc.OldValue, fc.NewValue)
@@ -192,8 +192,8 @@ type fieldChange struct {
 	NewValue string
 }
 
-// getFieldChanges extracts field-level changes between two flag objects, filtering out ignored and unknown fields
-func getFieldChanges(flagName string, oldVal, newVal any, ignorePatterns []string) []fieldChange {
+// getFieldChanges extracts field-level changes between two flag objects
+func getFieldChanges(flagName string, oldVal, newVal any) []fieldChange {
 	var changes []fieldChange
 
 	// Convert to maps
@@ -214,18 +214,8 @@ func getFieldChanges(flagName string, oldVal, newVal any, ignorePatterns []strin
 	}
 
 	// Compare each field
+	// Note: Fields are already filtered at the Compare() level, so we don't need to filter here
 	for field := range allFields {
-		// Check if this field should be ignored
-		fieldPath := fmt.Sprintf("flags.%s.%s", flagName, field)
-		if manifest.ShouldIgnorePath(fieldPath, ignorePatterns) {
-			continue
-		}
-
-		// Check if this is a known property
-		if !manifest.IsKnownProperty(fieldPath, flagName) {
-			continue
-		}
-
 		oldFieldVal, oldExists := oldMap[field]
 		newFieldVal, newExists := newMap[field]
 
