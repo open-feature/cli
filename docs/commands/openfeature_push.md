@@ -52,13 +52,13 @@ openfeature push [flags]
 ### Options
 
 ```
-      --auth-token string   The auth token for the flag provider
-      --debug               Enable debug logging
-      --dry-run             Preview changes without pushing
-  -h, --help                help for push
-  -m, --manifest string     Path to the flag manifest (default "flags.json")
-      --no-input            Disable interactive prompts
-      --provider string     The URL of the flag provider
+      --auth-token string     The auth token for the flag provider
+      --debug                 Enable debug logging
+      --dry-run               Preview changes without pushing
+  -h, --help                  help for push
+  -m, --manifest string       Path to the flag manifest (default "flags.json")
+      --no-input              Disable interactive prompts
+      --provider-url string   The URL of the flag provider
 ```
 
 ### SEE ALSO

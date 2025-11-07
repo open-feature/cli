@@ -18,7 +18,7 @@ const (
 	CSharpNamespaceName   = "namespace"
 	OverrideFlagName      = "override"
 	JavaPackageFlagName   = "package-name"
-	ProviderFlagName      = "provider"
+	ProviderURLFlagName   = "provider-url"
 	FlagSourceUrlFlagName = "flag-source-url" // Deprecated: use ProviderFlagName instead
 	AuthTokenFlagName     = "auth-token"
 	NoPromptFlagName      = "no-prompt"
@@ -67,14 +67,14 @@ func AddJavaGenerateFlags(cmd *cobra.Command) {
 // AddInitFlags adds the init command specific flags
 func AddInitFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool(OverrideFlagName, false, "Override an existing configuration")
-	cmd.Flags().String(ProviderFlagName, "", "The URL of the flag provider")
+	cmd.Flags().String(ProviderURLFlagName, "", "The URL of the flag provider")
 	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag source (deprecated: use --provider-url instead)")
 	_ = cmd.Flags().MarkDeprecated(FlagSourceUrlFlagName, "use --provider-url instead")
 }
 
 // AddPullFlags adds the pull command specific flags
 func AddPullFlags(cmd *cobra.Command) {
-	cmd.Flags().String(ProviderFlagName, "", "The URL of the flag provider")
+	cmd.Flags().String(ProviderURLFlagName, "", "The URL of the flag provider")
 	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag source (deprecated: use --provider-url instead)")
 	_ = cmd.Flags().MarkDeprecated(FlagSourceUrlFlagName, "use --provider-url instead")
 	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag provider")
@@ -83,7 +83,7 @@ func AddPullFlags(cmd *cobra.Command) {
 
 // AddPushFlags adds the push command specific flags
 func AddPushFlags(cmd *cobra.Command) {
-	cmd.Flags().String(ProviderFlagName, "", "The URL of the flag provider")
+	cmd.Flags().String(ProviderURLFlagName, "", "The URL of the flag provider")
 	cmd.Flags().String(FlagSourceUrlFlagName, "", "The URL of the flag destination (deprecated: use --provider-url instead)")
 	_ = cmd.Flags().MarkDeprecated(FlagSourceUrlFlagName, "use --provider-url instead")
 	cmd.Flags().String(AuthTokenFlagName, "", "The auth token for the flag provider")
@@ -152,7 +152,7 @@ func getConfigValueWithFallback(value string, newConfigKey string, legacyConfigK
 // for backward compatibility. Finally, it checks the config file for both keys.
 func GetFlagSourceUrl(cmd *cobra.Command) string {
 	// Check new flag first
-	provider, _ := cmd.Flags().GetString(ProviderFlagName)
+	provider, _ := cmd.Flags().GetString(ProviderURLFlagName)
 	if provider != "" {
 		return provider
 	}
