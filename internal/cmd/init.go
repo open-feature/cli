@@ -84,7 +84,7 @@ func handleManifestCreation(manifestPath string, override bool) error {
 	return nil
 }
 
-func handleConfigFile(providerUrl string, override bool) error {
+func handleConfigFile(providerURL string, override bool) error {
 	configPath := ".openfeature.yaml"
 	configExists, err := filesystem.Exists(configPath)
 	if err != nil {
@@ -92,15 +92,15 @@ func handleConfigFile(providerUrl string, override bool) error {
 	}
 
 	if !configExists {
-		return writeConfigFile(providerUrl, "Creating .openfeature.yaml configuration file")
+		return writeConfigFile(providerURL, "Creating .openfeature.yaml configuration file")
 	}
 
-	if providerUrl == "" {
+	if providerURL == "" {
 		return nil // no config to write
 	}
 
 	if override {
-		return writeConfigFile(providerUrl, "Updating provider URL in .openfeature.yaml")
+		return writeConfigFile(providerURL, "Updating provider URL in .openfeature.yaml")
 	}
 
 	shouldOverride, err := confirmOverride("configuration file", configPath)
@@ -108,16 +108,16 @@ func handleConfigFile(providerUrl string, override bool) error {
 		return fmt.Errorf("failed to get user confirmation: %w", err)
 	}
 	if shouldOverride {
-		return writeConfigFile(providerUrl, "Updating provider URL in .openfeature.yaml")
+		return writeConfigFile(providerURL, "Updating provider URL in .openfeature.yaml")
 	}
 
 	logger.Default.Info("Configuration file was not modified.")
 	return nil
 }
 
-func writeConfigFile(providerUrl, message string) error {
-	pterm.Info.Println(message, pterm.LightWhite(providerUrl))
-	template := getConfigTemplate(providerUrl)
+func writeConfigFile(providerURL, message string) error {
+	pterm.Info.Println(message, pterm.LightWhite(providerURL))
+	template := getConfigTemplate(providerURL)
 	return filesystem.WriteFile(".openfeature.yaml", []byte(template))
 }
 
@@ -180,12 +180,12 @@ const configTemplateText = `# OpenFeature CLI Configuration
 #     package-name: "com.example.openfeature"
 `
 
-func getConfigTemplate(providerUrl string) string {
+func getConfigTemplate(providerURL string) string {
 	tmpl := template.Must(template.New("config").Parse(configTemplateText))
 
 	data := configTemplateData{
-		ProviderURL:    providerUrl,
-		HasProviderURL: providerUrl != "",
+		ProviderURL:    providerURL,
+		HasProviderURL: providerURL != "",
 	}
 
 	var buf bytes.Buffer

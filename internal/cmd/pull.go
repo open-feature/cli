@@ -42,17 +42,17 @@ Why pull from a remote source:
 			return initializeConfig(cmd, "pull")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			providerUrl := config.GetFlagSourceUrl(cmd)
+			providerURL := config.GetFlagSourceUrl(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			authToken := config.GetAuthToken(cmd)
 			noPrompt := config.GetNoPrompt(cmd)
 
-			if providerUrl == "" {
+			if providerURL == "" {
 				return fmt.Errorf("provider URL not set in config. Please provide --provider-url or set 'provider' in .openfeature.yaml")
 			}
 
 			// fetch the flags from the remote source
-			parsedURL, err := url.Parse(providerUrl)
+			parsedURL, err := url.Parse(providerURL)
 			if err != nil {
 				return fmt.Errorf("invalid URL: %w", err)
 			}
@@ -69,14 +69,14 @@ Why pull from a remote source:
 				urlContainsAFileExtension := manifest.URLLooksLikeAFile(parsedURL.String())
 				if urlContainsAFileExtension {
 					// Use direct HTTP requests for pulling flags from file-like URLs
-					loadedFlags, err := manifest.LoadFromRemote(providerUrl, authToken)
+					loadedFlags, err := manifest.LoadFromRemote(providerURL, authToken)
 					if err != nil {
 						return fmt.Errorf("error fetching flags from remote source: %w", err)
 					}
 					flags = loadedFlags
 				} else {
 					// Use the sync API client for pulling flags
-					loadedFlags, err := manifest.LoadFromSyncAPI(providerUrl, authToken)
+					loadedFlags, err := manifest.LoadFromSyncAPI(providerURL, authToken)
 					if err != nil {
 						return fmt.Errorf("error fetching flags from remote source: %w", err)
 					}
@@ -101,7 +101,7 @@ Why pull from a remote source:
 				}
 			}
 
-			pterm.Success.Printfln("Successfully fetched flags from %s", providerUrl)
+			pterm.Success.Printfln("Successfully fetched flags from %s", providerURL)
 			if err := manifest.Write(manifestPath, *flags); err != nil {
 				return fmt.Errorf("error writing manifest: %w", err)
 			}
