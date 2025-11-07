@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,6 +29,11 @@ func TestGetCompareCmd(t *testing.T) {
 	// Verify ignore flag
 	ignoreFlag := cmd.Flag("ignore")
 	assert.NotNil(t, ignoreFlag)
+
+	// Verify reverse flag
+	reverseFlag := cmd.Flag("reverse")
+	assert.NotNil(t, reverseFlag)
+	assert.Equal(t, "false", reverseFlag.DefValue)
 }
 
 func TestCompareManifests(t *testing.T) {
@@ -159,5 +165,86 @@ func TestCompareWithIgnoreFlag(t *testing.T) {
 		// Verify that the output DOES contain description field changes when not ignored
 		assert.Contains(t, output, "• description:",
 			"Output should show description field changes when it's not ignored")
+	})
+}
+
+func TestCompareWithReverseFlag(t *testing.T) {
+	// Test that the --reverse flag properly reverses the comparison direction
+
+	t.Run("without_reverse_flag", func(t *testing.T) {
+		output := captureStdout(func() {
+			rootCmd := GetRootCmd()
+
+			rootCmd.SetArgs([]string{
+				"compare",
+				"--manifest", "testdata/source_manifest.json",
+				"--against", "testdata/target_manifest.json",
+				"--output", "json",
+			})
+
+			err := rootCmd.Execute()
+			assert.NoError(t, err, "Command should execute without reverse flag")
+		})
+
+		// Without --reverse: Compare(target, source) shows what HAS changed
+		// source has maxItems, target doesn't → should show as addition
+		// target has welcomeMessage, source doesn't → should show as removal
+		assert.Contains(t, output, `"path": "flags.maxItems"`,
+			"Should include maxItems in changes")
+		assert.Contains(t, output, `"path": "flags.welcomeMessage"`,
+			"Should include welcomeMessage in changes")
+		assert.Contains(t, output, `"additions"`,
+			"Should have additions section")
+		assert.Contains(t, output, `"removals"`,
+			"Should have removals section")
+
+		// Verify maxItems is in additions and welcomeMessage is in removals
+		// by checking that the path appears in the right section
+		additionsStart := strings.Index(output, `"additions"`)
+		removalsStart := strings.Index(output, `"removals"`)
+		maxItemsPos := strings.Index(output, `"path": "flags.maxItems"`)
+		welcomeMessagePos := strings.Index(output, `"path": "flags.welcomeMessage"`)
+
+		assert.True(t, maxItemsPos > additionsStart && maxItemsPos < removalsStart,
+			"maxItems should be in additions section")
+		assert.True(t, welcomeMessagePos > removalsStart,
+			"welcomeMessage should be in removals section")
+	})
+
+	t.Run("with_reverse_flag", func(t *testing.T) {
+		output := captureStdout(func() {
+			rootCmd := GetRootCmd()
+
+			rootCmd.SetArgs([]string{
+				"compare",
+				"--manifest", "testdata/source_manifest.json",
+				"--against", "testdata/target_manifest.json",
+				"--output", "json",
+				"--reverse",
+			})
+
+			err := rootCmd.Execute()
+			assert.NoError(t, err, "Command should execute with reverse flag")
+		})
+
+		// With --reverse: Compare(source, target) shows what WILL change
+		// source has maxItems, target doesn't → should show as removal
+		// target has welcomeMessage, source doesn't → should show as addition
+		assert.Contains(t, output, `"path": "flags.maxItems"`,
+			"Should include maxItems in changes")
+		assert.Contains(t, output, `"path": "flags.welcomeMessage"`,
+			"Should include welcomeMessage in changes")
+
+		// Verify maxItems is in removals and welcomeMessage is in additions
+		// by checking that the path appears in the right section
+		additionsStart := strings.Index(output, `"additions"`)
+		removalsStart := strings.Index(output, `"removals"`)
+		maxItemsPos := strings.Index(output, `"path": "flags.maxItems"`)
+		welcomeMessagePos := strings.Index(output, `"path": "flags.welcomeMessage"`)
+
+		assert.True(t, maxItemsPos > removalsStart,
+			"maxItems should be in removals section with --reverse")
+		assert.True(t, welcomeMessagePos > additionsStart && welcomeMessagePos < removalsStart,
+			"welcomeMessage should be in additions section with --reverse")
 	})
 }
