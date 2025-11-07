@@ -3,7 +3,6 @@ package manifest
 import (
 	"fmt"
 	"maps"
-	"path/filepath"
 	"reflect"
 	"strings"
 )
@@ -110,12 +109,12 @@ func flagHasChanges(oldFlag, newFlag any, flagKey string, ignorePatterns []strin
 	// Check each path for differences (skipping ignored paths and unknown properties)
 	for path := range allPaths {
 		// Skip paths that should be ignored
-		if shouldIgnorePath(path, ignorePatterns) {
+		if ShouldIgnorePath(path, ignorePatterns) {
 			continue
 		}
 
 		// Skip unknown properties (only compare known schema properties)
-		if !isKnownProperty(path, flagKey) {
+		if !IsKnownProperty(path, flagKey) {
 			continue
 		}
 
@@ -131,8 +130,8 @@ func flagHasChanges(oldFlag, newFlag any, flagKey string, ignorePatterns []strin
 	return false
 }
 
-// isKnownProperty checks if a path represents a known schema property
-func isKnownProperty(path, flagKey string) bool {
+// IsKnownProperty checks if a path represents a known schema property
+func IsKnownProperty(path, flagKey string) bool {
 	// Extract the property name from the path
 	// Path format: flags.<flagKey>.<property> or flags.<flagKey>.<nested>.<property>
 	prefix := fmt.Sprintf("flags.%s.", flagKey)
@@ -151,11 +150,6 @@ func isKnownProperty(path, flagKey string) bool {
 
 	// Check if it's a known property
 	return knownFlagProperties[propertyName]
-}
-
-// IsKnownPropertyForTest checks if a path is a known property (exported for testing/rendering)
-func IsKnownPropertyForTest(path, flagKey string) bool {
-	return isKnownProperty(path, flagKey)
 }
 
 // flattenToMap recursively flattens a nested structure into a map of path->value
@@ -204,19 +198,14 @@ func isSimpleType(v any) bool {
 	}
 }
 
-// shouldIgnorePath checks if a path should be ignored based on the ignore patterns
-func shouldIgnorePath(path string, ignorePatterns []string) bool {
+// ShouldIgnorePath checks if a path should be ignored based on the ignore patterns
+func ShouldIgnorePath(path string, ignorePatterns []string) bool {
 	for _, pattern := range ignorePatterns {
 		if matchesPattern(path, pattern) {
 			return true
 		}
 	}
 	return false
-}
-
-// ShouldIgnorePathForTest checks if a path should be ignored (exported for testing/rendering)
-func ShouldIgnorePathForTest(path string, ignorePatterns []string) bool {
-	return shouldIgnorePath(path, ignorePatterns)
 }
 
 // matchesPattern checks if a path matches a given pattern
@@ -232,12 +221,6 @@ func matchesPattern(path, pattern string) bool {
 
 	// If pattern contains a dot, treat it as a path pattern
 	if strings.Contains(pattern, ".") {
-		// Try direct filepath.Match first
-		matched, err := filepath.Match(pattern, path)
-		if err == nil && matched {
-			return true
-		}
-
 		// Try matching with wildcard support
 		if matchesPathSegments(path, pattern) {
 			return true

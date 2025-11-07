@@ -69,11 +69,11 @@ func GetCompareCmd() *cobra.Command {
 			// Render differences based on the output format
 			switch manifest.OutputFormat(outputFormat) {
 			case manifest.OutputFormatFlat:
-				return renderFlatDiff(changes, ignorePatterns, cmd)
+				return renderFlatDiff(changes, cmd)
 			case manifest.OutputFormatJSON:
-				return renderJSONDiff(changes, ignorePatterns, cmd)
+				return renderJSONDiff(changes, cmd)
 			case manifest.OutputFormatYAML:
-				return renderYAMLDiff(changes, ignorePatterns, cmd)
+				return renderYAMLDiff(changes, cmd)
 			default:
 				return renderTreeDiff(changes, ignorePatterns, cmd)
 			}
@@ -217,12 +217,12 @@ func getFieldChanges(flagName string, oldVal, newVal any, ignorePatterns []strin
 	for field := range allFields {
 		// Check if this field should be ignored
 		fieldPath := fmt.Sprintf("flags.%s.%s", flagName, field)
-		if manifest.ShouldIgnorePathForTest(fieldPath, ignorePatterns) {
+		if manifest.ShouldIgnorePath(fieldPath, ignorePatterns) {
 			continue
 		}
 
 		// Check if this is a known property
-		if !manifest.IsKnownPropertyForTest(fieldPath, flagName) {
+		if !manifest.IsKnownProperty(fieldPath, flagName) {
 			continue
 		}
 
@@ -297,7 +297,7 @@ func formatFieldValue(val any) string {
 }
 
 // renderFlatDiff renders changes in a flat format
-func renderFlatDiff(changes []manifest.Change, ignorePatterns []string, cmd *cobra.Command) error {
+func renderFlatDiff(changes []manifest.Change, cmd *cobra.Command) error {
 	pterm.Info.Printf("Found %d difference(s) between manifests:\n\n", len(changes))
 
 	for _, change := range changes {
@@ -316,7 +316,7 @@ func renderFlatDiff(changes []manifest.Change, ignorePatterns []string, cmd *cob
 }
 
 // renderJSONDiff renders changes in JSON format
-func renderJSONDiff(changes []manifest.Change, ignorePatterns []string, cmd *cobra.Command) error {
+func renderJSONDiff(changes []manifest.Change, cmd *cobra.Command) error {
 	// Create a structured response that can be easily consumed by tools
 	type structuredOutput struct {
 		TotalChanges  int               `json:"totalChanges" yaml:"totalChanges"`
@@ -352,7 +352,7 @@ func renderJSONDiff(changes []manifest.Change, ignorePatterns []string, cmd *cob
 }
 
 // renderYAMLDiff renders changes in YAML format
-func renderYAMLDiff(changes []manifest.Change, ignorePatterns []string, cmd *cobra.Command) error {
+func renderYAMLDiff(changes []manifest.Change, cmd *cobra.Command) error {
 	// Use the same structured output type as JSON but with YAML tags
 	type structuredOutput struct {
 		TotalChanges  int               `json:"totalChanges" yaml:"totalChanges"`
