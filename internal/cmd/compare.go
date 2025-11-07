@@ -19,7 +19,17 @@ func GetCompareCmd() *cobra.Command {
 	compareCmd := &cobra.Command{
 		Use:   "compare",
 		Short: "Compare two feature flag manifests",
-		Long:  "Compare two OpenFeature flag manifests and display the differences in a structured format.",
+		Long: `Compare two OpenFeature flag manifests and display the differences in a structured format.
+
+By default, shows what HAS changed in the manifest compared to the target (receiving perspective).
+Use --reverse to show what WILL change when the manifest is pushed to the target (sending perspective).
+
+Examples:
+  # Show what changed in local compared to main (default)
+  openfeature compare --manifest local.json --against main.json
+
+  # Preview what will change when pushing to remote
+  openfeature compare --manifest local.json --against remote.json --reverse`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "compare")
 		},
@@ -29,6 +39,7 @@ func GetCompareCmd() *cobra.Command {
 			targetPath, _ := cmd.Flags().GetString("against")
 			outputFormat, _ := cmd.Flags().GetString("output")
 			ignorePatterns, _ := cmd.Flags().GetStringArray("ignore")
+			reverse, _ := cmd.Flags().GetBool("reverse")
 
 			// Validate flags
 			if sourcePath == "" || targetPath == "" {
@@ -53,9 +64,18 @@ func GetCompareCmd() *cobra.Command {
 			}
 
 			// Compare manifests with ignore patterns
-			changes, err := manifest.Compare(sourceManifest, targetManifest, manifest.CompareOptions{
-				IgnorePatterns: ignorePatterns,
-			})
+			// By default: Compare(target, source) shows what HAS changed (target is old, source is new)
+			// With --reverse: Compare(source, target) shows what WILL change (source is old, target is new)
+			var changes []manifest.Change
+			if reverse {
+				changes, err = manifest.Compare(sourceManifest, targetManifest, manifest.CompareOptions{
+					IgnorePatterns: ignorePatterns,
+				})
+			} else {
+				changes, err = manifest.Compare(targetManifest, sourceManifest, manifest.CompareOptions{
+					IgnorePatterns: ignorePatterns,
+				})
+			}
 			if err != nil {
 				return fmt.Errorf("error comparing manifests: %w", err)
 			}
@@ -87,6 +107,9 @@ func GetCompareCmd() *cobra.Command {
 	compareCmd.Flags().StringArrayP("ignore", "i", []string{},
 		"Field pattern to ignore during comparison (can be specified multiple times). "+
 			"Supports shorthand (e.g., 'description') and full paths with wildcards (e.g., 'flags.*.description', 'metadata.*')")
+	compareCmd.Flags().Bool("reverse", false,
+		"Reverse comparison direction. Shows what WILL change when manifest is pushed to target (sending perspective) "+
+			"instead of what HAS changed in manifest compared to target (receiving perspective)")
 
 	// Mark required flags
 	_ = compareCmd.MarkFlagRequired("against")
