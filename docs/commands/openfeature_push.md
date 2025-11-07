@@ -40,13 +40,13 @@ openfeature push [flags]
 
 ```
   # Push flags to a remote HTTPS endpoint (smart push: creates and updates as needed)
-  openfeature push --provider https://api.example.com --auth-token secret-token
+  openfeature push --provider-url https://api.example.com --auth-token secret-token
 
   # Push flags to an HTTP endpoint (development)
-  openfeature push --provider http://localhost:8080
+  openfeature push --provider-url http://localhost:8080
 
   # Dry run to preview what would be sent
-  openfeature push --provider https://api.example.com --dry-run
+  openfeature push --provider-url https://api.example.com --dry-run
 ```
 
 ### Options

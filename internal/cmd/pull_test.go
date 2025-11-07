@@ -74,7 +74,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - use base URL only
 		args := []string{
 			"pull",
-			"--provider", "https://example.com",
+			"--provider-url", "https://example.com",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -124,7 +124,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - use base URL only
 		args := []string{
 			"pull",
-			"--provider", "https://example.com",
+			"--provider-url", "https://example.com",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -165,7 +165,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - URL with .json extension
 		args := []string{
 			"pull",
-			"--provider", "https://example.com/flags.json",
+			"--provider-url", "https://example.com/flags.json",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -218,7 +218,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - URL with .yaml extension
 		args := []string{
 			"pull",
-			"--provider", "https://example.com/flags.yaml",
+			"--provider-url", "https://example.com/flags.yaml",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -271,7 +271,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - URL with .yml extension
 		args := []string{
 			"pull",
-			"--provider", "https://example.com/config.yml",
+			"--provider-url", "https://example.com/config.yml",
 			"--manifest", "manifest/path.json",
 		}
 
@@ -325,7 +325,7 @@ func TestPull(t *testing.T) {
 		// Prepare command arguments - base URL without file extension
 		args := []string{
 			"pull",
-			"--provider", "https://api.example.com",
+			"--provider-url", "https://api.example.com",
 			"--manifest", "manifest/path.json",
 		}
 

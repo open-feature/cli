@@ -43,13 +43,13 @@ specified by the OpenFeature flag manifest schema.
 Note: The file:// scheme is not supported for push operations.
 For local file operations, use standard shell commands like cp or mv.`,
 		Example: `  # Push flags to a remote HTTPS endpoint (smart push: creates and updates as needed)
-  openfeature push --provider https://api.example.com --auth-token secret-token
+  openfeature push --provider-url https://api.example.com --auth-token secret-token
 
   # Push flags to an HTTP endpoint (development)
-  openfeature push --provider http://localhost:8080
+  openfeature push --provider-url http://localhost:8080
 
   # Dry run to preview what would be sent
-  openfeature push --provider https://api.example.com --dry-run`,
+  openfeature push --provider-url https://api.example.com --dry-run`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "push")
 		},
@@ -62,7 +62,7 @@ For local file operations, use standard shell commands like cp or mv.`,
 
 			// Validate destination URL is provided
 			if providerUrl == "" {
-				return fmt.Errorf("provider URL is required. Please provide --provider")
+				return fmt.Errorf("provider URL is required. Please provide --provider-url")
 			}
 
 			// Parse and validate URL

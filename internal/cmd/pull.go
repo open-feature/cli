@@ -48,7 +48,7 @@ Why pull from a remote source:
 			noPrompt := config.GetNoPrompt(cmd)
 
 			if providerUrl == "" {
-				return fmt.Errorf("provider URL not set in config. Please provide --provider or set 'provider' in .openfeature.yaml")
+				return fmt.Errorf("provider URL not set in config. Please provide --provider-url or set 'provider' in .openfeature.yaml")
 			}
 
 			// fetch the flags from the remote source
