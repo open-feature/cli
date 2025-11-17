@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.13](https://github.com/open-feature/cli/compare/v0.3.12...v0.3.13) (2025-11-17)
+
+
+### 🧹 Chore
+
+* update copyright to OpenFeature Maintainers ([#187](https://github.com/open-feature/cli/issues/187)) ([b255228](https://github.com/open-feature/cli/commit/b2552286a1d2bdb22640c1e26d7fc7dc2a5640d7))
+
 ## [0.3.12](https://github.com/open-feature/cli/compare/v0.3.11...v0.3.12) (2025-11-07)
 
 
