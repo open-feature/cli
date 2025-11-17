@@ -15,6 +15,26 @@ permissions:
   checks: write
 
 jobs:
+  format-check:
+    name: check formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: Check Go formatting
+        run: |
+          unformatted=$(go fmt ./...)
+          if [ -n "$unformatted" ]; then
+            echo "::error ::The following files need formatting. Please run 'go fmt ./...' or 'make fmt'"
+            echo "$unformatted"
+            exit 1
+          fi
+          echo "✅ All Go files are properly formatted"
+
   golangci:
     name: lint
     runs-on: ubuntu-latest

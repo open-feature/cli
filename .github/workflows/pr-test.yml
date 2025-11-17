@@ -24,8 +24,8 @@ jobs:
       - name: Run tests
         run: go test ./...
 
-  docs-check:
-    name: Validate docs
+  generated-files-check:
+    name: Validate generated files
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,11 +36,44 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
-      - run: make generate-docs
-      - name: Check no diff
+      - name: Generate OpenAPI client
+        run: make generate-api
+      - name: Check OpenAPI client is up-to-date
+        run: |
+          if [ ! -z "$(git status --porcelain internal/api/client/)" ]; then
+            echo "::error ::OpenAPI client generation produced diff. Run 'make generate-api' and commit results."
+            git diff internal/api/client/
+            exit 1
+          fi
+
+      - name: Generate documentation
+        run: make generate-docs
+      - name: Check documentation is up-to-date
+        run: |
+          if [ ! -z "$(git status --porcelain docs/)" ]; then
+            echo "::error ::Documentation generation produced diff. Run 'make generate-docs' and commit results."
+            git diff docs/
+            exit 1
+          fi
+
+      - name: Generate schema
+        run: make generate-schema
+      - name: Check schema is up-to-date
+        run: |
+          if [ ! -z "$(git status --porcelain schema/)" ]; then
+            echo "::error ::Schema generation produced diff. Run 'make generate-schema' and commit results."
+            git diff schema/
+            exit 1
+          fi
+
+      - name: Final check for any uncommitted changes
         run: |
           if [ ! -z "$(git status --porcelain)" ]; then
-            echo "::error file=Makefile::Doc generation produced diff. Run 'make generate-docs' and commit results."
+            echo "::error ::Generation produced uncommitted changes. Please run 'make generate' and commit all changes."
+            echo "Changed files:"
+            git status --porcelain
+            echo ""
+            echo "Diff:"
             git diff
             exit 1
           fi
