@@ -20,11 +20,11 @@ func (s stringer) String() string {
 }
 
 type (
-	evaluationValue[T any]   func(context.Context, openfeature.EvaluationContext) (T, error)
+	evaluationValue[T any]   func(context.Context, openfeature.EvaluationContext) T
 	evaluationDetails[T any] func(context.Context, openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[T], error)
 )
 
-var client openfeature.IClient = nil
+var client = openfeature.NewDefaultClient()
 
 // DiscountPercentage - Discount percentage applied to purchases.
 var DiscountPercentage = struct {
@@ -38,8 +38,8 @@ var DiscountPercentage = struct {
 	ValueWithDetails evaluationDetails[float64]
 }{
 	Stringer: stringer("discountPercentage"),
-	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (float64, error) {
-		return client.FloatValue(ctx, "discountPercentage", 0.15, evalCtx)
+	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) float64 {
+		return client.Float(ctx, "discountPercentage", 0.15, evalCtx)
 	},
 	ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[float64], error) {
 		return client.FloatValueDetails(ctx, "discountPercentage", 0.15, evalCtx)
@@ -58,8 +58,8 @@ var EnableFeatureA = struct {
 	ValueWithDetails evaluationDetails[bool]
 }{
 	Stringer: stringer("enableFeatureA"),
-	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (bool, error) {
-		return client.BooleanValue(ctx, "enableFeatureA", false, evalCtx)
+	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) bool {
+		return client.Boolean(ctx, "enableFeatureA", false, evalCtx)
 	},
 	ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[bool], error) {
 		return client.BooleanValueDetails(ctx, "enableFeatureA", false, evalCtx)
@@ -78,8 +78,8 @@ var GreetingMessage = struct {
 	ValueWithDetails evaluationDetails[string]
 }{
 	Stringer: stringer("greetingMessage"),
-	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (string, error) {
-		return client.StringValue(ctx, "greetingMessage", "Hello there!", evalCtx)
+	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) string {
+		return client.String(ctx, "greetingMessage", "Hello there!", evalCtx)
 	},
 	ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[string], error) {
 		return client.StringValueDetails(ctx, "greetingMessage", "Hello there!", evalCtx)
@@ -98,8 +98,8 @@ var ThemeCustomization = struct {
 	ValueWithDetails evaluationDetails[any]
 }{
 	Stringer: stringer("themeCustomization"),
-	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (any, error) {
-		return client.ObjectValue(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}, evalCtx)
+	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) any {
+		return client.Object(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}, evalCtx)
 	},
 	ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[any], error) {
 		return client.ObjectValueDetails(ctx, "themeCustomization", map[string]any{"primaryColor": "#007bff", "secondaryColor": "#6c757d"}, evalCtx)
@@ -118,14 +118,10 @@ var UsernameMaxLength = struct {
 	ValueWithDetails evaluationDetails[int64]
 }{
 	Stringer: stringer("usernameMaxLength"),
-	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (int64, error) {
-		return client.IntValue(ctx, "usernameMaxLength", 50, evalCtx)
+	Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) int64 {
+		return client.Int(ctx, "usernameMaxLength", 50, evalCtx)
 	},
 	ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[int64], error) {
 		return client.IntValueDetails(ctx, "usernameMaxLength", 50, evalCtx)
 	},
-}
-
-func init() {
-	client = openfeature.NewDefaultClient()
 }

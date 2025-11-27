@@ -63,38 +63,55 @@ func run() error {
 	// Set the provider and wait for it to be ready
 	err := openfeature.SetProviderAndWait(provider)
 	if err != nil {
-		return fmt.Errorf("Failed to set provider: %w", err)
+		return fmt.Errorf("failed to set provider: %w", err)
 	}
 
 	ctx := context.Background()
 	evalCtx := openfeature.NewEvaluationContext("someid", map[string]any{})
 
 	// Use the generated code for all flag evaluations
-	enableFeatureA, err := generated.EnableFeatureA.Value(ctx, evalCtx)
+	enableFeatureA := generated.EnableFeatureA.Value(ctx, evalCtx)
+	if enableFeatureA != false {
+		return fmt.Errorf("error evaluating %s flag. want: %v, got: %v", generated.EnableFeatureA, false, enableFeatureA)
+	}
+	_, err = generated.EnableFeatureA.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Error evaluating boolean flag: %w", err)
 	}
 	fmt.Printf("enableFeatureA: %v\n", enableFeatureA)
 
-	discount, err := generated.DiscountPercentage.Value(ctx, evalCtx)
+	discount := generated.DiscountPercentage.Value(ctx, evalCtx)
+	if discount != 0.15 {
+		return fmt.Errorf("error evaluating %s flag. want: %v, got: %v", generated.DiscountPercentage, 0.15, discount)
+	}
+	_, err = generated.DiscountPercentage.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Failed to get discount: %w", err)
 	}
 	fmt.Printf("Discount Percentage: %.2f\n", discount)
 
-	greetingMessage, err := generated.GreetingMessage.Value(ctx, evalCtx)
+	greetingMessage := generated.GreetingMessage.Value(ctx, evalCtx)
+	if greetingMessage != "Hello there!" {
+		return fmt.Errorf("error evaluating %s flag. want: %v, got: %v", generated.GreetingMessage, "Hello there!", greetingMessage)
+	}
+	_, err = generated.GreetingMessage.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Error evaluating string flag: %w", err)
 	}
 	fmt.Printf("greetingMessage: %v\n", greetingMessage)
 
-	usernameMaxLength, err := generated.UsernameMaxLength.Value(ctx, evalCtx)
+	usernameMaxLength := generated.UsernameMaxLength.Value(ctx, evalCtx)
+	if usernameMaxLength != 50 {
+		return fmt.Errorf("error evaluating %s flag. want: %v, got: %v", generated.UsernameMaxLength, 50, usernameMaxLength)
+	}
+	_, err = generated.UsernameMaxLength.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Error evaluating int flag: %v\n", err)
 	}
 	fmt.Printf("usernameMaxLength: %v\n", usernameMaxLength)
 
-	themeCustomization, err := generated.ThemeCustomization.Value(ctx, evalCtx)
+	themeCustomization := generated.ThemeCustomization.Value(ctx, evalCtx)
+	_, err = generated.ThemeCustomization.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Error evaluating int flag: %v\n", err)
 	}
@@ -108,6 +125,6 @@ func run() error {
 	fmt.Printf("themeCustomization flag key: %s\n", generated.ThemeCustomization.String())
 
 	fmt.Println("Generated Go code compiles successfully!")
-	
+
 	return nil
 }

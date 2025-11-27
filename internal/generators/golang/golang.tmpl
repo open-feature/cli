@@ -19,7 +19,7 @@ func (s stringer) String() string {
 }
 
 type (
-	evaluationValue[T any]   func(context.Context, openfeature.EvaluationContext) (T, error)
+	evaluationValue[T any]   func(context.Context, openfeature.EvaluationContext) T
 	evaluationDetails[T any] func(context.Context, openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[T], error)
 )
 
@@ -38,15 +38,11 @@ var {{ .Key | ToPascal }} = struct {
 	ValueWithDetails evaluationDetails[{{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}]
 }{
 		Stringer: stringer({{ .Key | Quote }}),
-	 Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) ({{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}, error) {
-	     return client.{{ .Type | OpenFeatureType }}Value(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
+	 Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) {{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}} {
+	     return client.{{ .Type | OpenFeatureType }}(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
 	 },
 	 ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[{{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}], error){
 	     return client.{{ .Type | OpenFeatureType }}ValueDetails(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
 	 },
 }
 {{- end}}
-
-func init() {
-	client = openfeature.NewDefaultClient()
-}
