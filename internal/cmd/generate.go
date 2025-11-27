@@ -331,7 +331,7 @@ func getGenerateGoCmd() *cobra.Command {
 				OutputPath: outputPath,
 				Custom: golang.Params{
 					GoPackage:  goPackageName,
-					CliVersion: Version,
+					CLIVersion: Version,
 				},
 			}
 
