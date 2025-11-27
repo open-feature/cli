@@ -21,7 +21,7 @@ type GolangGenerator struct {
 
 type Params struct {
 	GoPackage  string
-	CliVersion string
+	CLIVersion string
 }
 
 //go:embed golang.tmpl
