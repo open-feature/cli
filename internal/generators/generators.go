@@ -3,10 +3,9 @@ package generators
 import (
 	"bytes"
 	"fmt"
+	"maps"
 	"path/filepath"
 	"text/template"
-
-	"maps"
 
 	"github.com/open-feature/cli/internal/filesystem"
 	"github.com/open-feature/cli/internal/flagset"
@@ -23,7 +22,8 @@ const (
 )
 
 type CommonGenerator struct {
-	Flagset *flagset.Flagset
+	Flagset   *flagset.Flagset
+	Formatter func([]byte) ([]byte, error)
 }
 
 type Params[T any] struct {
@@ -63,8 +63,16 @@ func (g *CommonGenerator) GenerateFile(customFunc template.FuncMap, tmpl string,
 		return fmt.Errorf("error executing template: %v", err)
 	}
 
+	output := buf.Bytes()
+	if g.Formatter != nil {
+		output, err = g.Formatter(output)
+		if err != nil {
+			return fmt.Errorf("error executing formatter: %w", err)
+		}
+	}
+
 	fullPath := filepath.Join(params.OutputPath, name)
-	if err := filesystem.WriteFile(fullPath, buf.Bytes()); err != nil {
+	if err := filesystem.WriteFile(fullPath, output); err != nil {
 		logger.Default.FileFailed(fullPath, err)
 		return err
 	}

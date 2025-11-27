@@ -31,7 +31,7 @@ func TestGenerate(t *testing.T) {
 			command:        "go",
 			manifestGolden: "testdata/success_manifest.golden",
 			outputGolden:   "testdata/success_go.golden",
-			outputFile:     "testpackage.go",
+			outputFile:     "testpackage_gen.go",
 			packageName:    "testpackage",
 		},
 		{
