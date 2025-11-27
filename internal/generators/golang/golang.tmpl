@@ -23,7 +23,7 @@ type (
 	evaluationDetails[T any] func(context.Context, openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[T], error)
 )
 
-var client openfeature.IClient = nil
+var client = openfeature.NewDefaultClient()
 
 {{- range .Flagset.Flags }}
 // {{ .Key | ToPascal }} - {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
