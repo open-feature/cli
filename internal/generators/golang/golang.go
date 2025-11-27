@@ -140,7 +140,7 @@ func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
 		OutputPath: params.OutputPath,
 		Custom: Params{
 			GoPackage:  params.Custom.GoPackage,
-			CliVersion: params.Custom.CliVersion,
+			CLIVersion: params.Custom.CLIVersion,
 		},
 	}
 
