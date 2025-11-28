@@ -26,15 +26,17 @@ type (
 var client = openfeature.NewDefaultClient()
 
 {{- range .Flagset.Flags }}
-// {{ .Key | ToPascal }} - {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
+// {{ .Key | ToPascal }} returns the value of the "{{ .Key }}" feature flag.
+// {{ if .Description }}{{ .Description }}{{ end }}
+//
+// The flag is a type of {{ .Type }} and defaults to {{ .DefaultValue }}.
 var {{ .Key | ToPascal }} = struct {
 	fmt.Stringer
-	// Value returns the value of the flag {{ .Key | ToPascal }},
-	// as well as the evaluation error, if present.
+	// Value returns the value of the [{{ .Key | ToPascal }}] flag.
 	Value evaluationValue[{{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}]
 
-	// ValueWithDetails returns the value of the flag {{ .Key | ToPascal }},
-	// the evaluation error, if any, and the evaluation details.
+	// ValueWithDetails returns the evaluation details of the [{{ .Key | ToPascal }}] flag
+  // and the evaluation error, if any.
 	ValueWithDetails evaluationDetails[{{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}]
 }{
 		Stringer: stringer({{ .Key | Quote }}),

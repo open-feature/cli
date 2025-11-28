@@ -26,15 +26,17 @@ type (
 
 var client = openfeature.NewDefaultClient()
 
-// DiscountPercentage - Discount percentage applied to purchases.
+// DiscountPercentage returns the value of the "discountPercentage" feature flag.
+// Discount percentage applied to purchases.
+//
+// The flag is a type of float and defaults to 0.15.
 var DiscountPercentage = struct {
 	fmt.Stringer
-	// Value returns the value of the flag DiscountPercentage,
-	// as well as the evaluation error, if present.
+	// Value returns the value of the [DiscountPercentage] flag.
 	Value evaluationValue[float64]
 
-	// ValueWithDetails returns the value of the flag DiscountPercentage,
-	// the evaluation error, if any, and the evaluation details.
+	// ValueWithDetails returns the evaluation details of the [DiscountPercentage] flag
+	// and the evaluation error, if any.
 	ValueWithDetails evaluationDetails[float64]
 }{
 	Stringer: stringer("discountPercentage"),
@@ -46,15 +48,17 @@ var DiscountPercentage = struct {
 	},
 }
 
-// EnableFeatureA - Controls whether Feature A is enabled.
+// EnableFeatureA returns the value of the "enableFeatureA" feature flag.
+// Controls whether Feature A is enabled.
+//
+// The flag is a type of boolean and defaults to false.
 var EnableFeatureA = struct {
 	fmt.Stringer
-	// Value returns the value of the flag EnableFeatureA,
-	// as well as the evaluation error, if present.
+	// Value returns the value of the [EnableFeatureA] flag.
 	Value evaluationValue[bool]
 
-	// ValueWithDetails returns the value of the flag EnableFeatureA,
-	// the evaluation error, if any, and the evaluation details.
+	// ValueWithDetails returns the evaluation details of the [EnableFeatureA] flag
+	// and the evaluation error, if any.
 	ValueWithDetails evaluationDetails[bool]
 }{
 	Stringer: stringer("enableFeatureA"),
@@ -66,15 +70,17 @@ var EnableFeatureA = struct {
 	},
 }
 
-// GreetingMessage - The message to use for greeting users.
+// GreetingMessage returns the value of the "greetingMessage" feature flag.
+// The message to use for greeting users.
+//
+// The flag is a type of string and defaults to Hello there!.
 var GreetingMessage = struct {
 	fmt.Stringer
-	// Value returns the value of the flag GreetingMessage,
-	// as well as the evaluation error, if present.
+	// Value returns the value of the [GreetingMessage] flag.
 	Value evaluationValue[string]
 
-	// ValueWithDetails returns the value of the flag GreetingMessage,
-	// the evaluation error, if any, and the evaluation details.
+	// ValueWithDetails returns the evaluation details of the [GreetingMessage] flag
+	// and the evaluation error, if any.
 	ValueWithDetails evaluationDetails[string]
 }{
 	Stringer: stringer("greetingMessage"),
@@ -86,15 +92,17 @@ var GreetingMessage = struct {
 	},
 }
 
-// ThemeCustomization - Allows customization of theme colors.
+// ThemeCustomization returns the value of the "themeCustomization" feature flag.
+// Allows customization of theme colors.
+//
+// The flag is a type of object and defaults to map[primaryColor:#007bff secondaryColor:#6c757d].
 var ThemeCustomization = struct {
 	fmt.Stringer
-	// Value returns the value of the flag ThemeCustomization,
-	// as well as the evaluation error, if present.
+	// Value returns the value of the [ThemeCustomization] flag.
 	Value evaluationValue[any]
 
-	// ValueWithDetails returns the value of the flag ThemeCustomization,
-	// the evaluation error, if any, and the evaluation details.
+	// ValueWithDetails returns the evaluation details of the [ThemeCustomization] flag
+	// and the evaluation error, if any.
 	ValueWithDetails evaluationDetails[any]
 }{
 	Stringer: stringer("themeCustomization"),
@@ -106,15 +114,17 @@ var ThemeCustomization = struct {
 	},
 }
 
-// UsernameMaxLength - Maximum allowed length for usernames.
+// UsernameMaxLength returns the value of the "usernameMaxLength" feature flag.
+// Maximum allowed length for usernames.
+//
+// The flag is a type of integer and defaults to 50.
 var UsernameMaxLength = struct {
 	fmt.Stringer
-	// Value returns the value of the flag UsernameMaxLength,
-	// as well as the evaluation error, if present.
+	// Value returns the value of the [UsernameMaxLength] flag.
 	Value evaluationValue[int64]
 
-	// ValueWithDetails returns the value of the flag UsernameMaxLength,
-	// the evaluation error, if any, and the evaluation details.
+	// ValueWithDetails returns the evaluation details of the [UsernameMaxLength] flag
+	// and the evaluation error, if any.
 	ValueWithDetails evaluationDetails[int64]
 }{
 	Stringer: stringer("usernameMaxLength"),
