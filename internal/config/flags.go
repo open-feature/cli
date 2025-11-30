@@ -194,6 +194,11 @@ func AddManifestListFlags(cmd *cobra.Command) {
 	// Currently no specific flags for list command, but function exists for consistency
 }
 
+// AddManifestDeleteFlags adds the manifest delete command specific flags
+func AddManifestDeleteFlags(cmd *cobra.Command) {
+	// Currently no specific flags for delete command, but function exists for consistency
+}
+
 // ShouldDisableInteractivePrompts returns true if interactive prompts should be disabled
 // This happens when:
 // - The --no-input flag is set, OR
