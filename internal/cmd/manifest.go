@@ -21,6 +21,7 @@ func GetManifestCmd() *cobra.Command {
 	// Add subcommands
 	manifestCmd.AddCommand(GetManifestAddCmd())
 	manifestCmd.AddCommand(GetManifestListCmd())
+	manifestCmd.AddCommand(GetManifestDeleteCmd())
 
 	addStabilityInfo(manifestCmd)
 
