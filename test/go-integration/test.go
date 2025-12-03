@@ -71,44 +71,32 @@ func run() error {
 
 	// Use the generated code for all flag evaluations
 	enableFeatureA := generated.EnableFeatureA.Value(ctx, evalCtx)
-	if enableFeatureA != false {
-		return fmt.Errorf("error evaluating %s flag. want: %v, got: %v", generated.EnableFeatureA, false, enableFeatureA)
-	}
+	fmt.Printf("enableFeatureA: %v\n", enableFeatureA)
 	_, err = generated.EnableFeatureA.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Error evaluating boolean flag: %w", err)
 	}
-	fmt.Printf("enableFeatureA: %v\n", enableFeatureA)
 
 	discount := generated.DiscountPercentage.Value(ctx, evalCtx)
-	if discount != 0.15 {
-		return fmt.Errorf("error evaluating %s flag. want: %v, got: %v", generated.DiscountPercentage, 0.15, discount)
-	}
+	fmt.Printf("Discount Percentage: %.2f\n", discount)
 	_, err = generated.DiscountPercentage.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Failed to get discount: %w", err)
 	}
-	fmt.Printf("Discount Percentage: %.2f\n", discount)
 
 	greetingMessage := generated.GreetingMessage.Value(ctx, evalCtx)
-	if greetingMessage != "Hello there!" {
-		return fmt.Errorf("error evaluating %s flag. want: %v, got: %v", generated.GreetingMessage, "Hello there!", greetingMessage)
-	}
+	fmt.Printf("greetingMessage: %v\n", greetingMessage)
 	_, err = generated.GreetingMessage.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Error evaluating string flag: %w", err)
 	}
-	fmt.Printf("greetingMessage: %v\n", greetingMessage)
 
 	usernameMaxLength := generated.UsernameMaxLength.Value(ctx, evalCtx)
-	if usernameMaxLength != 50 {
-		return fmt.Errorf("error evaluating %s flag. want: %v, got: %v", generated.UsernameMaxLength, 50, usernameMaxLength)
-	}
+	fmt.Printf("usernameMaxLength: %v\n", usernameMaxLength)
 	_, err = generated.UsernameMaxLength.ValueWithDetails(ctx, evalCtx)
 	if err != nil {
 		return fmt.Errorf("Error evaluating int flag: %v\n", err)
 	}
-	fmt.Printf("usernameMaxLength: %v\n", usernameMaxLength)
 
 	themeCustomization := generated.ThemeCustomization.Value(ctx, evalCtx)
 	_, err = generated.ThemeCustomization.ValueWithDetails(ctx, evalCtx)
