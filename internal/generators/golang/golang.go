@@ -4,14 +4,15 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"go/format"
 	"maps"
 	"slices"
-	"sort"
 	"strings"
 	"text/template"
 
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
+	"golang.org/x/tools/imports"
 )
 
 type GolangGenerator struct {
@@ -19,7 +20,8 @@ type GolangGenerator struct {
 }
 
 type Params struct {
-	GoPackage string
+	GoPackage  string
+	CLIVersion string
 }
 
 //go:embed golang.tmpl
@@ -66,7 +68,7 @@ func supportImports(flags []flagset.Flag) []string {
 		res = append(res, "\"fmt\"")
 		res = append(res, "\"github.com/open-feature/go-sdk/openfeature\"")
 	}
-	sort.Strings(res)
+	slices.Sort(res)
 	return res
 }
 
@@ -137,16 +139,32 @@ func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
 	newParams := &generators.Params[any]{
 		OutputPath: params.OutputPath,
 		Custom: Params{
-			GoPackage: params.Custom.GoPackage,
+			GoPackage:  params.Custom.GoPackage,
+			CLIVersion: params.Custom.CLIVersion,
 		},
 	}
 
-	return g.CommonGenerator.GenerateFile(funcs, golangTmpl, newParams, params.Custom.GoPackage+".go")
+	filename := params.Custom.GoPackage + "_gen.go"
+	return g.GenerateFile(funcs, golangTmpl, newParams, filename)
 }
 
 // NewGenerator creates a generator for Go.
 func NewGenerator(fs *flagset.Flagset) *GolangGenerator {
-	return &GolangGenerator{
+	g := &GolangGenerator{
 		CommonGenerator: *generators.NewGenerator(fs, map[flagset.FlagType]bool{}),
 	}
+	g.Formatter = func(data []byte) ([]byte, error) {
+		data, err := format.Source(data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to format go code: %w", err)
+		}
+
+		data, err = imports.Process("", data, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to format imports: %w", err)
+		}
+		return data, nil
+	}
+
+	return g
 }
