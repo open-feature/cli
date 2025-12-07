@@ -9,7 +9,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/filesystem"
-
 	"github.com/spf13/afero"
 )
 
@@ -111,11 +110,12 @@ func TestGenerate(t *testing.T) {
 
 			// Add parameters specific to each generator
 			if tc.packageName != "" {
-				if tc.command == "csharp" {
+				switch tc.command {
+				case "csharp":
 					args = append(args, "--namespace", tc.packageName)
-				} else if tc.command == "go" {
+				case "go":
 					args = append(args, "--package-name", tc.packageName)
-				} else if tc.command == "java" {
+				case "java":
 					args = append(args, "--package-name", tc.packageName)
 				}
 			}

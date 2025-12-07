@@ -238,7 +238,6 @@ func (c *Client) PushFlags(ctx context.Context, localFlags *flagset.Flagset, rem
 
 			return c.handleFlagResponse(resp.HTTPResponse, resp.Body, flagKey, "create")
 		}, goretry.WithTransientErrorFunc(isTransientHTTPError))
-
 		if err != nil {
 			return nil, err
 		}
@@ -272,7 +271,6 @@ func (c *Client) PushFlags(ctx context.Context, localFlags *flagset.Flagset, rem
 
 			return c.handleFlagResponse(resp.HTTPResponse, resp.Body, flagKey, "update")
 		}, goretry.WithTransientErrorFunc(isTransientHTTPError))
-
 		if err != nil {
 			return nil, err
 		}

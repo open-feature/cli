@@ -13,8 +13,7 @@ type NestJsGenerator struct {
 	generators.CommonGenerator
 }
 
-type Params struct {
-}
+type Params struct{}
 
 //go:embed nestjs.tmpl
 var nestJsTmpl string
@@ -55,7 +54,7 @@ func (g *NestJsGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:     Params{},
 	}
 
-	return g.CommonGenerator.GenerateFile(funcs, nestJsTmpl, newParams, "openfeature-decorators.ts")
+	return g.GenerateFile(funcs, nestJsTmpl, newParams, "openfeature-decorators.ts")
 }
 
 // NewGenerator creates a generator for NestJS.

@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"dagger.io/dagger"
 	"fmt"
-	"github.com/open-feature/cli/test/integration"
 	"os"
 	"path/filepath"
+
+	"dagger.io/dagger"
+	"github.com/open-feature/cli/test/integration"
 )
 
 type Test struct {
@@ -20,6 +21,7 @@ func New(projectDir, testDir string) *Test {
 		TestDir:    testDir,
 	}
 }
+
 func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Container, error) {
 	source := client.Host().Directory(t.ProjectDir)
 	testFiles := client.Host().Directory(t.TestDir, dagger.HostDirectoryOpts{
@@ -51,9 +53,11 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 
 	return nodeContainer, nil
 }
+
 func (t *Test) Name() string {
 	return "nodejs"
 }
+
 func main() {
 	ctx := context.Background()
 

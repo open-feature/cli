@@ -13,7 +13,7 @@ import (
 var viperKey = "filesystem"
 
 type Config struct {
-	FlagSourceUrl string `yaml:"flagSourceUrl"`
+	FlagSourceURL string `yaml:"flagSourceUrl"`
 }
 
 // Get the filesystem interface from the viper configuration.

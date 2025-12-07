@@ -55,7 +55,7 @@ For local file operations, use standard shell commands like cp or mv.`,
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get configuration values
-			providerURL := config.GetFlagSourceUrl(cmd)
+			providerURL := config.GetFlagSourceURL(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			authToken := config.GetAuthToken(cmd)
 			dryRun := config.GetDryRun(cmd)
@@ -159,7 +159,7 @@ func displayPushResults(result *sync.PushResult, destination string, dryRun bool
 			fmt.Println()
 
 			// Show flag details
-			flagJSON, _ := json.MarshalIndent(map[string]interface{}{
+			flagJSON, _ := json.MarshalIndent(map[string]any{
 				"type":         flag.Type.String(),
 				"defaultValue": flag.DefaultValue,
 			}, "    ", "  ")

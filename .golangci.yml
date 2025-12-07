@@ -1,0 +1,51 @@
+---
+version: "2"
+
+formatters:
+  enable:
+    - gofumpt
+    - gci
+
+linters:
+  default: none
+  enable:
+    - copyloopvar
+    - dupword
+    - errcheck
+    - govet
+    - ineffassign
+    - intrange
+    - misspell
+    - modernize
+    - staticcheck
+    - unused
+    - usetesting
+  settings:
+    staticcheck:
+      checks:
+        - all
+    usetesting:
+      context-background: true
+      context-todo: true
+      os-chdir: true
+      os-mkdir-temp: true
+      os-setenv: true
+      os-temp-dir: true
+      os-create-temp: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - std-error-handling
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+run:
+  timeout: 3m
+  modules-download-mode: readonly
+
+output:
+  sort-order:
+    - file

@@ -8,9 +8,7 @@ import (
 
 	"github.com/h2non/gock"
 	"github.com/open-feature/cli/internal/filesystem"
-
 	"github.com/spf13/afero"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,11 +40,11 @@ func TestPush(t *testing.T) {
 		defer gock.Off()
 
 		// Mock GET request to fetch remote flags (returns empty list)
-		emptyFlags := []map[string]interface{}{}
+		emptyFlags := []map[string]any{}
 		gock.New("http://localhost:8080").
 			Get("/openfeature/v0/manifest").
 			Reply(200).
-			JSON(map[string]interface{}{
+			JSON(map[string]any{
 				"flags": emptyFlags,
 			})
 
@@ -59,8 +57,8 @@ func TestPush(t *testing.T) {
 				MatchType("application/json").
 				MatchHeader("Content-Type", "application/json").
 				Reply(201).
-				JSON(map[string]interface{}{
-					"flag": map[string]interface{}{
+				JSON(map[string]any{
+					"flag": map[string]any{
 						"key": flagKey,
 					},
 					"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -88,9 +86,9 @@ func TestPush(t *testing.T) {
 
 		// Mock GET request to fetch remote flags (all flags already exist)
 		flagKeys := []string{"enableFeatureA", "usernameMaxLength", "greetingMessage", "discountPercentage", "themeCustomization"}
-		remoteFlags := make([]map[string]interface{}, 0)
+		remoteFlags := make([]map[string]any, 0)
 		for _, flagKey := range flagKeys {
-			remoteFlags = append(remoteFlags, map[string]interface{}{
+			remoteFlags = append(remoteFlags, map[string]any{
 				"key":          flagKey,
 				"type":         "boolean",
 				"defaultValue": false,
@@ -99,7 +97,7 @@ func TestPush(t *testing.T) {
 		gock.New("https://api.example.com").
 			Get("/openfeature/v0/manifest").
 			Reply(200).
-			JSON(map[string]interface{}{
+			JSON(map[string]any{
 				"flags": remoteFlags,
 			})
 
@@ -110,8 +108,8 @@ func TestPush(t *testing.T) {
 				MatchType("application/json").
 				MatchHeader("Content-Type", "application/json").
 				Reply(200).
-				JSON(map[string]interface{}{
-					"flag": map[string]interface{}{
+				JSON(map[string]any{
+					"flag": map[string]any{
 						"key": flagKey,
 					},
 					"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -140,8 +138,8 @@ func TestPush(t *testing.T) {
 		gock.New("https://api.example.com").
 			Get("/openfeature/v0/manifest").
 			Reply(200).
-			JSON(map[string]interface{}{
-				"flags": []map[string]interface{}{
+			JSON(map[string]any{
+				"flags": []map[string]any{
 					{
 						"key":          "enableFeatureA",
 						"type":         "boolean",
@@ -162,8 +160,8 @@ func TestPush(t *testing.T) {
 				Put("/openfeature/v0/manifest/flags/" + flagKey).
 				MatchType("application/json").
 				Reply(200).
-				JSON(map[string]interface{}{
-					"flag": map[string]interface{}{
+				JSON(map[string]any{
+					"flag": map[string]any{
 						"key": flagKey,
 					},
 					"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -177,8 +175,8 @@ func TestPush(t *testing.T) {
 				Post("/openfeature/v0/manifest/flags").
 				MatchType("application/json").
 				Reply(201).
-				JSON(map[string]interface{}{
-					"flag": map[string]interface{}{
+				JSON(map[string]any{
+					"flag": map[string]any{
 						"key": flagKey,
 					},
 					"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -204,12 +202,12 @@ func TestPush(t *testing.T) {
 		defer gock.Off()
 
 		// Mock GET request with auth header
-		emptyFlags := []map[string]interface{}{}
+		emptyFlags := []map[string]any{}
 		gock.New("https://api.example.com").
 			Get("/openfeature/v0/manifest").
 			MatchHeader("Authorization", "Bearer secret-token").
 			Reply(200).
-			JSON(map[string]interface{}{
+			JSON(map[string]any{
 				"flags": emptyFlags,
 			})
 
@@ -221,8 +219,8 @@ func TestPush(t *testing.T) {
 				MatchType("application/json").
 				MatchHeader("Authorization", "Bearer secret-token").
 				Reply(201).
-				JSON(map[string]interface{}{
-					"flag": map[string]interface{}{
+				JSON(map[string]any{
+					"flag": map[string]any{
 						"key": flagKey,
 					},
 					"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -331,8 +329,8 @@ func TestPush(t *testing.T) {
 		gock.New("https://api.example.com").
 			Get("/openfeature/v0/manifest").
 			Reply(404).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Not Found",
 					"status":  404,
 				},
@@ -356,11 +354,11 @@ func TestPush(t *testing.T) {
 		defer gock.Off()
 
 		// Mock GET request (empty flags)
-		emptyFlags := []map[string]interface{}{}
+		emptyFlags := []map[string]any{}
 		gock.New("https://api.example.com").
 			Get("/openfeature/v0/manifest").
 			Reply(200).
-			JSON(map[string]interface{}{
+			JSON(map[string]any{
 				"flags": emptyFlags,
 			})
 
@@ -369,8 +367,8 @@ func TestPush(t *testing.T) {
 			Post("/openfeature/v0/manifest/flags").
 			Persist(). // Apply to all requests
 			Reply(404).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Not Found",
 					"status":  404,
 				},
@@ -395,11 +393,11 @@ func TestPush(t *testing.T) {
 		defer gock.Off()
 
 		// Mock GET request (empty flags)
-		emptyFlags := []map[string]interface{}{}
+		emptyFlags := []map[string]any{}
 		gock.New("https://api.example.com").
 			Get("/openfeature/v0/manifest").
 			Reply(200).
-			JSON(map[string]interface{}{
+			JSON(map[string]any{
 				"flags": emptyFlags,
 			})
 
@@ -408,8 +406,8 @@ func TestPush(t *testing.T) {
 			Post("/openfeature/v0/manifest/flags").
 			Persist(). // Apply to all requests
 			Reply(500).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Internal Server Error",
 					"status":  500,
 				},
@@ -434,11 +432,11 @@ func TestPush(t *testing.T) {
 		defer gock.Off()
 
 		// Mock GET request (empty flags)
-		emptyFlags := []map[string]interface{}{}
+		emptyFlags := []map[string]any{}
 		gock.New("https://api.example.com").
 			Get("/openfeature/v0/manifest").
 			Reply(200).
-			JSON(map[string]interface{}{
+			JSON(map[string]any{
 				"flags": emptyFlags,
 			})
 
@@ -451,7 +449,7 @@ func TestPush(t *testing.T) {
 			SetMatcher(gock.NewMatcher()).
 			AddMatcher(func(req *http.Request, ereq *gock.Request) (bool, error) {
 				// Verify the request has the required fields: key, type, defaultValue
-				var body map[string]interface{}
+				var body map[string]any
 				decoder := json.NewDecoder(req.Body)
 				if err := decoder.Decode(&body); err != nil {
 					return false, err
@@ -471,8 +469,8 @@ func TestPush(t *testing.T) {
 			}).
 			Persist().
 			Reply(201).
-			JSON(map[string]interface{}{
-				"flag": map[string]interface{}{
+			JSON(map[string]any{
+				"flag": map[string]any{
 					"key": "test",
 				},
 				"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -520,7 +518,7 @@ func TestPush(t *testing.T) {
 				}
 			}
 		}`
-		err := afero.WriteFile(fs, "invalid.json", []byte(invalidManifest), 0644)
+		err := afero.WriteFile(fs, "invalid.json", []byte(invalidManifest), 0o644)
 		assert.NoError(t, err)
 
 		cmd := GetPushCmd()
