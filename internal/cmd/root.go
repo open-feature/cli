@@ -6,7 +6,6 @@ import (
 
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/logger"
-
 	"github.com/spf13/cobra"
 )
 

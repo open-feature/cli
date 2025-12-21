@@ -42,7 +42,7 @@ Why pull from a remote source:
 			return initializeConfig(cmd, "pull")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			providerURL := config.GetFlagSourceUrl(cmd)
+			providerURL := config.GetFlagSourceURL(cmd)
 			manifestPath := config.GetManifestPath(cmd)
 			authToken := config.GetAuthToken(cmd)
 			noPrompt := config.GetNoPrompt(cmd)

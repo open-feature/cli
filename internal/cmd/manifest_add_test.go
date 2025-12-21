@@ -36,14 +36,14 @@ func TestManifestAddCmd(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
 				assert.Contains(t, flags, "new-feature")
 
-				flag := flags["new-feature"].(map[string]interface{})
+				flag := flags["new-feature"].(map[string]any)
 				assert.Equal(t, "boolean", flag["flagType"])
 				assert.Equal(t, true, flag["defaultValue"])
 				assert.Equal(t, "A new feature flag", flag["description"])
@@ -64,12 +64,12 @@ func TestManifestAddCmd(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
-				flag := flags["welcome-message"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
+				flag := flags["welcome-message"].(map[string]any)
 				assert.Equal(t, "string", flag["flagType"])
 				assert.Equal(t, "Hello World", flag["defaultValue"])
 			},
@@ -89,12 +89,12 @@ func TestManifestAddCmd(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
-				flag := flags["max-retries"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
+				flag := flags["max-retries"].(map[string]any)
 				assert.Equal(t, "integer", flag["flagType"])
 				// JSON unmarshaling converts numbers to float64
 				assert.Equal(t, float64(5), flag["defaultValue"])
@@ -115,12 +115,12 @@ func TestManifestAddCmd(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
-				flag := flags["discount-rate"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
+				flag := flags["discount-rate"].(map[string]any)
 				assert.Equal(t, "float", flag["flagType"])
 				assert.Equal(t, 0.15, flag["defaultValue"])
 			},
@@ -140,17 +140,17 @@ func TestManifestAddCmd(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
-				flag := flags["config"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
+				flag := flags["config"].(map[string]any)
 				assert.Equal(t, "object", flag["flagType"])
 
-				defaultVal := flag["defaultValue"].(map[string]interface{})
+				defaultVal := flag["defaultValue"].(map[string]any)
 				assert.Equal(t, "value", defaultVal["key"])
-				nested := defaultVal["nested"].(map[string]interface{})
+				nested := defaultVal["nested"].(map[string]any)
 				assert.Equal(t, float64(123), nested["prop"])
 			},
 		},
@@ -269,11 +269,11 @@ func TestManifestAddCmd(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
 				assert.Len(t, flags, 2)
 				assert.Contains(t, flags, "existing-flag")
 				assert.Contains(t, flags, "new-flag")
@@ -289,7 +289,7 @@ func TestManifestAddCmd(t *testing.T) {
 
 			// Create existing manifest if provided
 			if tt.existingManifest != "" {
-				err := afero.WriteFile(fs, "flags.json", []byte(tt.existingManifest), 0644)
+				err := afero.WriteFile(fs, "flags.json", []byte(tt.existingManifest), 0o644)
 				require.NoError(t, err)
 			}
 
@@ -348,7 +348,7 @@ func TestManifestAddCmd_CreateNewManifest(t *testing.T) {
 	content, err := afero.ReadFile(fs, "flags.json")
 	require.NoError(t, err)
 
-	var manifest map[string]interface{}
+	var manifest map[string]any
 	err = json.Unmarshal(content, &manifest)
 	require.NoError(t, err)
 
@@ -356,10 +356,10 @@ func TestManifestAddCmd_CreateNewManifest(t *testing.T) {
 	assert.Contains(t, manifest, "$schema")
 
 	// Check flag was added
-	flags := manifest["flags"].(map[string]interface{})
+	flags := manifest["flags"].(map[string]any)
 	assert.Contains(t, flags, "first-flag")
 
-	flag := flags["first-flag"].(map[string]interface{})
+	flag := flags["first-flag"].(map[string]any)
 	assert.Equal(t, "boolean", flag["flagType"])
 	assert.Equal(t, true, flag["defaultValue"])
 	assert.Equal(t, "The first flag in a new manifest", flag["description"])
@@ -381,7 +381,7 @@ func TestManifestAddCmd_DisplaysSuccessMessage(t *testing.T) {
 			}
 		}
 	}`
-	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0o644)
 	require.NoError(t, err)
 
 	// Enable pterm output and capture it
@@ -414,11 +414,11 @@ func TestManifestAddCmd_DisplaysSuccessMessage(t *testing.T) {
 	content, err := afero.ReadFile(fs, "flags.json")
 	require.NoError(t, err)
 
-	var manifest map[string]interface{}
+	var manifest map[string]any
 	err = json.Unmarshal(content, &manifest)
 	require.NoError(t, err)
 
-	flags := manifest["flags"].(map[string]interface{})
+	flags := manifest["flags"].(map[string]any)
 	assert.Len(t, flags, 2, "Should have 2 flags total")
 	assert.Contains(t, flags, "existing-flag", "Should still contain existing flag")
 	assert.Contains(t, flags, "new-flag", "Should contain newly added flag")
@@ -449,14 +449,14 @@ func TestManifestAddCmd_NoInputFlag(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
 				assert.Contains(t, flags, "test-flag")
 
-				flag := flags["test-flag"].(map[string]interface{})
+				flag := flags["test-flag"].(map[string]any)
 				assert.Equal(t, "boolean", flag["flagType"])
 				assert.Equal(t, true, flag["defaultValue"])
 				assert.Equal(t, "Test flag", flag["description"])
@@ -481,14 +481,14 @@ func TestManifestAddCmd_NoInputFlag(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
 				assert.Contains(t, flags, "test-flag")
 
-				flag := flags["test-flag"].(map[string]interface{})
+				flag := flags["test-flag"].(map[string]any)
 				assert.Equal(t, "boolean", flag["flagType"])
 				assert.Equal(t, false, flag["defaultValue"])
 				// Description should be empty when not provided with --no-input
@@ -511,7 +511,7 @@ func TestManifestAddCmd_NoInputFlag(t *testing.T) {
 				"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
 				"flags": {}
 			}`
-			err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+			err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0o644)
 			require.NoError(t, err)
 
 			// Create command and execute
@@ -552,7 +552,7 @@ func TestManifestAddCmd_AutoDetectNonInteractive(t *testing.T) {
 		"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
 		"flags": {}
 	}`
-	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0o644)
 	require.NoError(t, err)
 
 	// Create command and execute
@@ -584,7 +584,7 @@ func TestManifestAddCmd_NoFlagKeyArgument(t *testing.T) {
 		"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
 		"flags": {}
 	}`
-	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0o644)
 	require.NoError(t, err)
 
 	// Create command and execute
