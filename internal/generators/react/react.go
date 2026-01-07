@@ -55,7 +55,7 @@ func (g *ReactGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:       Params{},
 	}
 
-	return g.GenerateFile(funcs, reactTmpl, newParams.TemplatePath, newParams, "openfeature.ts")
+	return g.GenerateFile(funcs, reactTmpl, newParams, "openfeature.ts")
 }
 
 // NewGenerator creates a generator for React.

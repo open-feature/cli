@@ -146,7 +146,7 @@ func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
 	}
 
 	filename := params.Custom.GoPackage + "_gen.go"
-	return g.GenerateFile(funcs, golangTmpl, newParams.TemplatePath, newParams, filename)
+	return g.GenerateFile(funcs, golangTmpl, newParams, filename)
 }
 
 // NewGenerator creates a generator for Go.

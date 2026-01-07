@@ -55,7 +55,7 @@ func (g *NestJsGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:       Params{},
 	}
 
-	return g.GenerateFile(funcs, nestJsTmpl, newParams.TemplatePath, newParams, "openfeature-decorators.ts")
+	return g.GenerateFile(funcs, nestJsTmpl, newParams, "openfeature-decorators.ts")
 }
 
 // NewGenerator creates a generator for NestJS.
