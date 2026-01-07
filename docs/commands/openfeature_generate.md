@@ -11,8 +11,9 @@ openfeature generate [flags]
 ### Options
 
 ```
-  -h, --help            help for generate
-  -o, --output string   Path to where the generated files should be saved
+  -h, --help              help for generate
+  -o, --output string     Path to where the generated files should be saved
+  -t, --template string   Path to a custom template file. If not specified, the default template is used
 ```
 
 ### Options inherited from parent commands

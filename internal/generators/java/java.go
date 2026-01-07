@@ -137,11 +137,12 @@ func (g *JavaGenerator) Generate(params *generators.Params[Params]) error {
 	}
 
 	newParams := &generators.Params[any]{
-		OutputPath: params.OutputPath,
-		Custom:     params.Custom,
+		OutputPath:   params.OutputPath,
+		TemplatePath: params.TemplatePath,
+		Custom:       params.Custom,
 	}
 
-	return g.GenerateFile(funcs, javaTmpl, newParams, "OpenFeature.java")
+	return g.GenerateFile(funcs, javaTmpl, newParams.TemplatePath, newParams, "OpenFeature.java")
 }
 
 // NewGenerator creates a generator for Java.

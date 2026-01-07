@@ -148,11 +148,12 @@ func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
 	}
 
 	newParams := &generators.Params[any]{
-		OutputPath: params.OutputPath,
-		Custom:     Params{},
+		OutputPath:   params.OutputPath,
+		TemplatePath: params.TemplatePath,
+		Custom:       Params{},
 	}
 
-	return g.GenerateFile(funcs, pythonTmpl, newParams, "openfeature.py")
+	return g.GenerateFile(funcs, pythonTmpl, newParams.TemplatePath, newParams, "openfeature.py")
 }
 
 // NewGenerator creates a generator for Python.
