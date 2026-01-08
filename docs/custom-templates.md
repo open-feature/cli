@@ -34,6 +34,10 @@ The easiest way to create a custom template is to start from an existing one:
 
 3. Use the `--template` flag to generate code with your custom template
 
+## Template Syntax
+
+Custom templates use Go's [text/template](https://pkg.go.dev/text/template) package. Refer to the official documentation for the full syntax, including conditionals, loops, and pipelines.
+
 ## Template Data
 
 Templates have access to the following data structure:
