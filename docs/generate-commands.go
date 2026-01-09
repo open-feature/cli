@@ -109,7 +109,7 @@ func processCommandFile(cmd *cobra.Command, filePath string) {
 
 	// Only write the file if content was modified
 	if modifiedContent != string(content) {
-		err = os.WriteFile(filePath, []byte(modifiedContent), 0644)
+		err = os.WriteFile(filePath, []byte(modifiedContent), 0o644)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error writing file %s: %v\n", filePath, err)
 		}

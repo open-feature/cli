@@ -126,7 +126,7 @@ func TestManifestListCmd(t *testing.T) {
 
 			// Create manifest if provided
 			if tt.manifestContent != "" {
-				err := afero.WriteFile(fs, "flags.json", []byte(tt.manifestContent), 0644)
+				err := afero.WriteFile(fs, "flags.json", []byte(tt.manifestContent), 0o644)
 				require.NoError(t, err)
 			}
 
@@ -293,7 +293,7 @@ func TestDisplayFlagList(t *testing.T) {
 func TestFormatValue(t *testing.T) {
 	tests := []struct {
 		name     string
-		value    interface{}
+		value    any
 		expected string
 	}{
 		{
@@ -328,17 +328,17 @@ func TestFormatValue(t *testing.T) {
 		},
 		{
 			name:     "format object",
-			value:    map[string]interface{}{"key": "value"},
+			value:    map[string]any{"key": "value"},
 			expected: `{"key":"value"}`,
 		},
 		{
 			name:     "format large object",
-			value:    map[string]interface{}{"key1": "value1", "key2": "value2", "key3": "value3"},
+			value:    map[string]any{"key1": "value1", "key2": "value2", "key3": "value3"},
 			expected: "...",
 		},
 		{
 			name:     "format array",
-			value:    []interface{}{"a", "b", "c"},
+			value:    []any{"a", "b", "c"},
 			expected: `["a","b","c"]`,
 		},
 	}

@@ -110,7 +110,7 @@ Examples:
 			}
 
 			// Handle default-value: prompt if missing and not --no-input
-			var defaultValue interface{}
+			var defaultValue any
 			if !cmd.Flags().Changed("default-value") {
 				if noInput {
 					return errors.New("--default-value is required")
@@ -144,7 +144,6 @@ Examples:
 			// Load existing manifest
 			var fs *flagset.Flagset
 			exists, err := afero.Exists(filesystem.FileSystem(), manifestPath)
-
 			if err != nil {
 				return fmt.Errorf("failed to check manifest existence: %w", err)
 			}
@@ -217,7 +216,7 @@ func parseFlagTypeString(typeStr string) (flagset.FlagType, error) {
 }
 
 // parseDefaultValue parses and validates the default value based on flag type
-func parseDefaultValue(value string, flagType flagset.FlagType) (interface{}, error) {
+func parseDefaultValue(value string, flagType flagset.FlagType) (any, error) {
 	switch flagType {
 	case flagset.BoolType:
 		switch strings.ToLower(value) {
@@ -243,7 +242,7 @@ func parseDefaultValue(value string, flagType flagset.FlagType) (interface{}, er
 		}
 		return floatVal, nil
 	case flagset.ObjectType:
-		var jsonObj interface{}
+		var jsonObj any
 		if err := json.Unmarshal([]byte(value), &jsonObj); err != nil {
 			return nil, fmt.Errorf("invalid JSON object: %s", err.Error())
 		}
@@ -263,7 +262,6 @@ func promptForFlagType(flagName string) (string, error) {
 		WithDefaultOption("boolean").
 		WithFilter(false).
 		Show(prompt)
-
 	if err != nil {
 		return "", fmt.Errorf("failed to prompt for flag type: %w", err)
 	}

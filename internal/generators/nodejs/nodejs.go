@@ -13,8 +13,7 @@ type NodejsGenerator struct {
 	generators.CommonGenerator
 }
 
-type Params struct {
-}
+type Params struct{}
 
 //go:embed nodejs.tmpl
 var nodejsTmpl string
@@ -55,7 +54,7 @@ func (g *NodejsGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:     Params{},
 	}
 
-	return g.CommonGenerator.GenerateFile(funcs, nodejsTmpl, newParams, "openfeature.ts")
+	return g.GenerateFile(funcs, nodejsTmpl, newParams, "openfeature.ts")
 }
 
 // NewGenerator creates a generator for NodeJS.

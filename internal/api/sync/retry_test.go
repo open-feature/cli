@@ -1,7 +1,6 @@
 package sync
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -20,8 +19,8 @@ func TestRetryLogic(t *testing.T) {
 		gock.New("https://api.example.com").
 			Post("/openfeature/v0/manifest/flags").
 			Reply(500).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Internal Server Error",
 					"status":  500,
 				},
@@ -31,8 +30,8 @@ func TestRetryLogic(t *testing.T) {
 		gock.New("https://api.example.com").
 			Post("/openfeature/v0/manifest/flags").
 			Reply(500).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Internal Server Error",
 					"status":  500,
 				},
@@ -42,8 +41,8 @@ func TestRetryLogic(t *testing.T) {
 		gock.New("https://api.example.com").
 			Post("/openfeature/v0/manifest/flags").
 			Reply(201).
-			JSON(map[string]interface{}{
-				"flag": map[string]interface{}{
+			JSON(map[string]any{
+				"flag": map[string]any{
 					"key": "test-flag",
 				},
 				"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -52,7 +51,7 @@ func TestRetryLogic(t *testing.T) {
 		client, err := NewClient("https://api.example.com", "")
 		require.NoError(t, err)
 
-		ctx := context.Background()
+		ctx := t.Context()
 		localFlags := &flagset.Flagset{
 			Flags: []flagset.Flag{
 				{Key: "test-flag", Type: flagset.BoolType, DefaultValue: true},
@@ -79,8 +78,8 @@ func TestRetryLogic(t *testing.T) {
 				return true, nil
 			}).
 			Reply(400).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Bad Request",
 					"status":  400,
 				},
@@ -89,7 +88,7 @@ func TestRetryLogic(t *testing.T) {
 		client, err := NewClient("https://api.example.com", "")
 		require.NoError(t, err)
 
-		ctx := context.Background()
+		ctx := t.Context()
 		localFlags := &flagset.Flagset{
 			Flags: []flagset.Flag{
 				{Key: "test-flag", Type: flagset.BoolType, DefaultValue: true},
@@ -118,8 +117,8 @@ func TestRetryLogic(t *testing.T) {
 				return true, nil
 			}).
 			Reply(503).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Service Unavailable",
 					"status":  503,
 				},
@@ -128,7 +127,7 @@ func TestRetryLogic(t *testing.T) {
 		client, err := NewClient("https://api.example.com", "")
 		require.NoError(t, err)
 
-		ctx := context.Background()
+		ctx := t.Context()
 		localFlags := &flagset.Flagset{
 			Flags: []flagset.Flag{
 				{Key: "test-flag", Type: flagset.BoolType, DefaultValue: true},
@@ -149,8 +148,8 @@ func TestRetryLogic(t *testing.T) {
 		gock.New("https://api.example.com").
 			Put("/openfeature/v0/manifest/flags/existing-flag").
 			Reply(502).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Bad Gateway",
 					"status":  502,
 				},
@@ -160,8 +159,8 @@ func TestRetryLogic(t *testing.T) {
 		gock.New("https://api.example.com").
 			Put("/openfeature/v0/manifest/flags/existing-flag").
 			Reply(200).
-			JSON(map[string]interface{}{
-				"flag": map[string]interface{}{
+			JSON(map[string]any{
+				"flag": map[string]any{
 					"key": "existing-flag",
 				},
 				"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -170,7 +169,7 @@ func TestRetryLogic(t *testing.T) {
 		client, err := NewClient("https://api.example.com", "")
 		require.NoError(t, err)
 
-		ctx := context.Background()
+		ctx := t.Context()
 		localFlags := &flagset.Flagset{
 			Flags: []flagset.Flag{
 				{Key: "existing-flag", Type: flagset.BoolType, DefaultValue: true},
@@ -201,8 +200,8 @@ func TestRetryLogic(t *testing.T) {
 				return true, nil
 			}).
 			Reply(404).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Flag not found",
 					"status":  404,
 				},
@@ -211,7 +210,7 @@ func TestRetryLogic(t *testing.T) {
 		client, err := NewClient("https://api.example.com", "")
 		require.NoError(t, err)
 
-		ctx := context.Background()
+		ctx := t.Context()
 		localFlags := &flagset.Flagset{
 			Flags: []flagset.Flag{
 				{Key: "nonexistent-flag", Type: flagset.BoolType, DefaultValue: true},
@@ -236,13 +235,13 @@ func TestRetryLogic(t *testing.T) {
 		gock.New("https://api.example.com").
 			Post("/openfeature/v0/manifest/flags").
 			AddMatcher(func(req *http.Request, _ *gock.Request) (bool, error) {
-				var body map[string]interface{}
+				var body map[string]any
 				_ = json.NewDecoder(req.Body).Decode(&body)
 				return body["key"] == "flag1", nil
 			}).
 			Reply(500).
-			JSON(map[string]interface{}{
-				"error": map[string]interface{}{
+			JSON(map[string]any{
+				"error": map[string]any{
 					"message": "Internal Server Error",
 					"status":  500,
 				},
@@ -251,13 +250,13 @@ func TestRetryLogic(t *testing.T) {
 		gock.New("https://api.example.com").
 			Post("/openfeature/v0/manifest/flags").
 			AddMatcher(func(req *http.Request, _ *gock.Request) (bool, error) {
-				var body map[string]interface{}
+				var body map[string]any
 				_ = json.NewDecoder(req.Body).Decode(&body)
 				return body["key"] == "flag1", nil
 			}).
 			Reply(201).
-			JSON(map[string]interface{}{
-				"flag": map[string]interface{}{
+			JSON(map[string]any{
+				"flag": map[string]any{
 					"key": "flag1",
 				},
 				"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -267,13 +266,13 @@ func TestRetryLogic(t *testing.T) {
 		gock.New("https://api.example.com").
 			Post("/openfeature/v0/manifest/flags").
 			AddMatcher(func(req *http.Request, _ *gock.Request) (bool, error) {
-				var body map[string]interface{}
+				var body map[string]any
 				_ = json.NewDecoder(req.Body).Decode(&body)
 				return body["key"] == "flag2", nil
 			}).
 			Reply(201).
-			JSON(map[string]interface{}{
-				"flag": map[string]interface{}{
+			JSON(map[string]any{
+				"flag": map[string]any{
 					"key": "flag2",
 				},
 				"updatedAt": "2024-03-02T09:45:03.000Z",
@@ -282,7 +281,7 @@ func TestRetryLogic(t *testing.T) {
 		client, err := NewClient("https://api.example.com", "")
 		require.NoError(t, err)
 
-		ctx := context.Background()
+		ctx := t.Context()
 		localFlags := &flagset.Flagset{
 			Flags: []flagset.Flag{
 				{Key: "flag1", Type: flagset.BoolType, DefaultValue: true},
@@ -302,7 +301,7 @@ func TestRetryLogic(t *testing.T) {
 		client, err := NewClient("https://api.example.com", "")
 		require.NoError(t, err)
 
-		ctx := context.Background()
+		ctx := t.Context()
 		localFlags := &flagset.Flagset{
 			Flags: []flagset.Flag{
 				{Key: "new-flag", Type: flagset.BoolType, DefaultValue: true, Description: "New flag"},

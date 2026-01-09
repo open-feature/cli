@@ -7,9 +7,7 @@ import (
 	"github.com/h2non/gock"
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/filesystem"
-
 	"github.com/spf13/afero"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -88,7 +86,7 @@ func TestPull(t *testing.T) {
 		content, err := afero.ReadFile(fs, "manifest/path.json")
 		assert.NoError(t, err)
 
-		var manifestFlags map[string]interface{}
+		var manifestFlags map[string]any
 		err = json.Unmarshal(content, &manifestFlags)
 		assert.NoError(t, err)
 
@@ -96,7 +94,7 @@ func TestPull(t *testing.T) {
 		flags := manifestResponse["flags"].([]map[string]any)
 		for _, flag := range flags {
 			flagKey := flag["key"].(string)
-			_, exists := manifestFlags["flags"].(map[string]interface{})[flagKey]
+			_, exists := manifestFlags["flags"].(map[string]any)[flagKey]
 			assert.True(t, exists, "Flag %s should exist in manifest", flagKey)
 		}
 	})
@@ -179,12 +177,12 @@ func TestPull(t *testing.T) {
 		content, err := afero.ReadFile(fs, "manifest/path.json")
 		assert.NoError(t, err)
 
-		var manifestFlags map[string]interface{}
+		var manifestFlags map[string]any
 		err = json.Unmarshal(content, &manifestFlags)
 		assert.NoError(t, err)
 
 		// Verify the flag exists in the manifest
-		flags := manifestFlags["flags"].(map[string]interface{})
+		flags := manifestFlags["flags"].(map[string]any)
 		_, exists := flags["jsonFileFlag"]
 		assert.True(t, exists, "Flag jsonFileFlag should exist in manifest")
 	})
@@ -232,12 +230,12 @@ func TestPull(t *testing.T) {
 		content, err := afero.ReadFile(fs, "manifest/path.json")
 		assert.NoError(t, err)
 
-		var manifestFlags map[string]interface{}
+		var manifestFlags map[string]any
 		err = json.Unmarshal(content, &manifestFlags)
 		assert.NoError(t, err)
 
 		// Verify the flag exists in the manifest
-		flags := manifestFlags["flags"].(map[string]interface{})
+		flags := manifestFlags["flags"].(map[string]any)
 		_, exists := flags["yamlFileFlag"]
 		assert.True(t, exists, "Flag yamlFileFlag should exist in manifest")
 	})
@@ -285,12 +283,12 @@ func TestPull(t *testing.T) {
 		content, err := afero.ReadFile(fs, "manifest/path.json")
 		assert.NoError(t, err)
 
-		var manifestFlags map[string]interface{}
+		var manifestFlags map[string]any
 		err = json.Unmarshal(content, &manifestFlags)
 		assert.NoError(t, err)
 
 		// Verify the flag exists in the manifest
-		flags := manifestFlags["flags"].(map[string]interface{})
+		flags := manifestFlags["flags"].(map[string]any)
 		_, exists := flags["ymlFileFlag"]
 		assert.True(t, exists, "Flag ymlFileFlag should exist in manifest")
 	})
@@ -339,12 +337,12 @@ func TestPull(t *testing.T) {
 		content, err := afero.ReadFile(fs, "manifest/path.json")
 		assert.NoError(t, err)
 
-		var manifestFlags map[string]interface{}
+		var manifestFlags map[string]any
 		err = json.Unmarshal(content, &manifestFlags)
 		assert.NoError(t, err)
 
 		// Verify the flag exists in the manifest
-		flags := manifestFlags["flags"].(map[string]interface{})
+		flags := manifestFlags["flags"].(map[string]any)
 		_, exists := flags["syncApiFlag"]
 		assert.True(t, exists, "Flag syncApiFlag should exist in manifest")
 	})
@@ -393,12 +391,12 @@ func TestPull(t *testing.T) {
 		content, err := afero.ReadFile(fs, "manifest/path.json")
 		assert.NoError(t, err)
 
-		var manifestFlags map[string]interface{}
+		var manifestFlags map[string]any
 		err = json.Unmarshal(content, &manifestFlags)
 		assert.NoError(t, err)
 
 		// Verify the flag exists in the manifest
-		flags := manifestFlags["flags"].(map[string]interface{})
+		flags := manifestFlags["flags"].(map[string]any)
 		_, exists := flags["backwardCompatFlag"]
 		assert.True(t, exists, "Flag backwardCompatFlag should exist in manifest")
 	})
