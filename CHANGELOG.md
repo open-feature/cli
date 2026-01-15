@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.13](https://github.com/open-feature/cli/compare/v0.3.12...v0.3.13) (2026-01-15)
+
+
+### ✨ New Features
+
+* **cli:** support custom templates via `--template` flag ([#198](https://github.com/open-feature/cli/issues/198)) ([3549cf7](https://github.com/open-feature/cli/commit/3549cf7ea217e7f32d3719d7d9d67c81f8ab1580))
+
+
+### 🧹 Chore
+
+* add linter config file and fix findings ([#196](https://github.com/open-feature/cli/issues/196)) ([3311004](https://github.com/open-feature/cli/commit/33110049b72495e35cf121fa7b3ec577fcd04b73))
+* update copyright to OpenFeature Maintainers ([#187](https://github.com/open-feature/cli/issues/187)) ([b255228](https://github.com/open-feature/cli/commit/b2552286a1d2bdb22640c1e26d7fc7dc2a5640d7))
+* update go generator with go-sdk v1.17.0 ([#189](https://github.com/open-feature/cli/issues/189)) ([6cb2453](https://github.com/open-feature/cli/commit/6cb2453b8d9b3eac485dc6031e575b0a730bfa82))
+
+
+### 📚 Documentation
+
+* comprehensive documentation updates for OpenAPI patterns and contributor guide ([#179](https://github.com/open-feature/cli/issues/179)) ([ea5023b](https://github.com/open-feature/cli/commit/ea5023bc6f1fcc98cb085095ec02769bf92bc557))
+
 ## [0.3.12](https://github.com/open-feature/cli/compare/v0.3.11...v0.3.12) (2025-11-07)
 
 
