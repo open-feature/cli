@@ -15,9 +15,9 @@ help:
 	@echo "  generate-api             - Generate API clients from OpenAPI specs"
 	@echo "  generate-docs            - Generate documentation"
 	@echo "  generate-schema          - Generate schema"
-	@echo "  verify-generate          - Check if generated files are up to date"
+	@echo "  verify-generate          - Check if all generated files are up to date"
 	@echo "  fmt                      - Format Go code"
-	@echo "  ci                       - Run all CI checks locally (lint, test, verify-generate)"
+	@echo "  ci                       - Run all CI checks locally (fmt, lint, test, verify-generate)"
 
 .PHONY: build
 build:
@@ -110,15 +110,31 @@ lint-fix:
 	@echo "Linting with auto-fix completed successfully!"
 
 .PHONY: verify-generate
-verify-generate: generate
-	@echo "Checking for uncommitted changes after generation..."
-	@if [ ! -z "$$(git status --porcelain)" ]; then \
-		echo "Error: Generation produced diff. Please run 'make generate' and commit the results."; \
-		git diff; \
+verify-generate:
+	@echo "Checking if all generated files are up-to-date..."
+	@make generate-api > /dev/null 2>&1
+	@if [ ! -z "$$(git diff --name-only internal/api/client/)" ]; then \
+		echo "❌ OpenAPI client needs regeneration"; \
+		echo "   Run: make generate-api"; \
+		git diff --stat internal/api/client/; \
 		exit 1; \
 	fi
-	@echo "All generated files are up to date!"
+	@make generate-docs > /dev/null 2>&1
+	@if [ ! -z "$$(git diff --name-only docs/)" ]; then \
+		echo "❌ Documentation needs regeneration"; \
+		echo "   Run: make generate-docs"; \
+		git diff --stat docs/; \
+		exit 1; \
+	fi
+	@make generate-schema > /dev/null 2>&1
+	@if [ ! -z "$$(git diff --name-only schema/)" ]; then \
+		echo "❌ Schema needs regeneration"; \
+		echo "   Run: make generate-schema"; \
+		git diff --stat schema/; \
+		exit 1; \
+	fi
+	@echo "✅ All generated files are up-to-date!"
 
 .PHONY: ci
-ci: lint test verify-generate
-	@echo "All CI checks passed successfully!"
+ci: fmt lint test verify-generate
+	@echo "✅ All CI checks passed successfully!"

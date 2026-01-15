@@ -2,6 +2,71 @@
 
 Thank you for your interest in contributing to the OpenFeature CLI! This document provides guidelines and instructions to help you get started with contributing to the project. Whether you're fixing a bug, adding a new feature, or improving documentation, your contributions are greatly appreciated.
 
+## Development Setup
+
+1. **Prerequisites**:
+   - Go 1.23 or later
+   - Make
+   - golangci-lint (will be auto-installed by make commands)
+
+2. **Clone the repository**:
+   ```bash
+   git clone https://github.com/open-feature/cli.git
+   cd cli
+   ```
+
+3. **Build the project**:
+   ```bash
+   make build
+   ```
+
+4. **Run tests**:
+   ```bash
+   make test
+   ```
+
+5. **Run all CI checks locally**:
+   ```bash
+   make ci
+   ```
+
+   This will format code, run linting, execute tests, and verify all generated files are up-to-date.
+
+## Available Make Commands
+
+The project includes a comprehensive Makefile with the following commands:
+
+```bash
+make help                  # Show all available commands
+make build                 # Build the CLI binary
+make install               # Install the CLI to your system
+make lint                  # Run golangci-lint
+make lint-fix              # Run golangci-lint with auto-fix
+make test                  # Run unit tests
+make test-integration      # Run all integration tests
+make generate              # Generate all code (API clients, docs, schema)
+make generate-api          # Generate API clients from OpenAPI specs
+make generate-docs         # Generate documentation
+make generate-schema       # Generate schema
+make verify-generate       # Check if all generated files are up to date
+make fmt                   # Format Go code
+make ci                    # Run all CI checks locally (fmt, lint, test, verify-generate)
+```
+
+### Before Submitting a PR
+
+Run the following command to ensure your changes will pass CI:
+
+```bash
+make ci
+```
+
+This command will:
+- Format your code
+- Run the linter
+- Execute all tests
+- Verify all generated files are up-to-date
+
 ## Contributing New Generators
 
 We welcome contributions for new generators to extend the functionality of the OpenFeature CLI. Below are the steps to contribute a new generator:
@@ -62,6 +127,54 @@ make test-csharp-dagger
 
 For more information on the integration testing framework, see [Integration Testing](./docs/integration-testing.md).
 
+## Contributing to Remote Operations
+
+The CLI uses an OpenAPI-driven architecture for remote flag synchronization. If you're contributing to the remote operations (pull/push commands) or API specifications:
+
+### Modifying the OpenAPI Specification
+
+1. **Edit the specification**: Update the OpenAPI spec at `api/v0/sync.yaml`
+2. **Regenerate the client**: Run `make generate-api` to regenerate the client code
+3. **Update the wrapper**: Modify `internal/api/sync/client.go` if needed
+4. **Test your changes**: Add or update tests in `internal/api/sync/`
+
+### Adding New Remote Operations
+
+1. **Define in OpenAPI**: Add the new operation to `api/v0/sync.yaml`
+2. **Regenerate**: Run `make generate-api`
+3. **Implement wrapper method**: Add the method in `internal/api/sync/client.go`
+4. **Create/update command**: Add or modify commands in `internal/cmd/`
+5. **Add tests**: Include unit tests and integration tests
+6. **Update documentation**: Update relevant documentation including command docs
+
+### API Compatibility
+
+When modifying the OpenAPI specification:
+
+- **Backwards Compatibility**: Ensure changes don't break existing integrations
+- **Versioning**: Use proper API versioning (currently v0)
+- **Documentation**: Update the specification descriptions and examples
+- **Schema Validation**: Ensure all request/response schemas are properly defined
+
+For detailed information about the OpenAPI client pattern, see the [OpenAPI Client Pattern documentation](./docs/openapi-client-pattern.md).
+
+## CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration. The following workflows run automatically:
+
+### PR Validation Workflow
+- **Generated Files Check**: Ensures all generated files (OpenAPI client, docs, schema) are up-to-date
+- **Format Check**: Verifies all Go code is properly formatted
+- **Tests**: Runs all unit tests
+- **Integration Tests**: Runs language-specific integration tests
+
+### PR Test Workflow
+- **Unit Tests**: Runs all unit tests
+- **Integration Tests**: Runs Dagger-based integration tests for all supported languages
+
+### PR Lint Workflow
+- **golangci-lint**: Runs comprehensive linting with golangci-lint v1.64
+
 ## Setting Up Lefthook
 
 To streamline the setup of Git hooks for this project, we utilize [Lefthook](https://github.com/evilmartians/lefthook). Lefthook automates pre-commit and pre-push checks, ensuring consistent enforcement of best practices across the team. These checks include code formatting, documentation generation, and running tests.
@@ -92,8 +205,13 @@ The pre-commit hook is configured to run the following check:
 
 The pre-push hook is configured to run the following checks:
 
-1. **Documentation Generation**: Runs `make generate-docs` to ensure documentation is up-to-date. If any changes are detected, the push will be blocked until the changes are committed.
-2. **Tests**: Executes `make test` to verify that all tests pass. If any tests fail, the push will be blocked.
+1. **Generated Files Check**: Verifies all generated files are up-to-date:
+   - **OpenAPI Client**: Ensures `internal/api/client/` is current with the OpenAPI spec
+   - **Documentation**: Ensures `docs/` is current with the latest command structure
+   - **Schema**: Ensures `schema/` files are up-to-date
+2. **Tests**: Executes `make test` to verify that all tests pass
+
+If any of these checks fail, the push will be blocked. Run `make generate` to update all generated files and commit the changes.
 
 ### Running Hooks Manually
 

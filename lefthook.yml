@@ -8,13 +8,32 @@ pre-commit:
       stage_fixed: true
 pre-push:
   commands:
-    generate-docs:
+    check-generated-files:
       run: |
-        make generate-docs
-        if ! git diff --quiet; then
-          echo "Documentation is outdated. Please run 'make generate-docs' and commit the changes."
+        echo "Checking all generated files are up-to-date..."
+
+        # Check OpenAPI client
+        make generate-api
+        if ! git diff --quiet internal/api/client/; then
+          echo "❌ OpenAPI client is outdated. Please run 'make generate-api' and commit the changes."
           exit 1
         fi
+
+        # Check documentation
+        make generate-docs
+        if ! git diff --quiet docs/; then
+          echo "❌ Documentation is outdated. Please run 'make generate-docs' and commit the changes."
+          exit 1
+        fi
+
+        # Check schema
+        make generate-schema
+        if ! git diff --quiet schema/; then
+          echo "❌ Schema is outdated. Please run 'make generate-schema' and commit the changes."
+          exit 1
+        fi
+
+        echo "✅ All generated files are up-to-date"
       skip: false
     tests:
       run: make test
