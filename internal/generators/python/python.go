@@ -17,8 +17,7 @@ type PythonGenerator struct {
 	generators.CommonGenerator
 }
 
-type Params struct {
-}
+type Params struct{}
 
 //go:embed python.tmpl
 var pythonTmpl string
@@ -135,7 +134,6 @@ func formatNestedValue(value any) string {
 		}
 		return strings.ReplaceAll(string(jsonBytes), "null", "None")
 	}
-
 }
 
 func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
@@ -154,7 +152,7 @@ func (g *PythonGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:     Params{},
 	}
 
-	return g.CommonGenerator.GenerateFile(funcs, pythonTmpl, newParams, "openfeature.py")
+	return g.GenerateFile(funcs, pythonTmpl, newParams, "openfeature.py")
 }
 
 // NewGenerator creates a generator for Python.

@@ -199,7 +199,7 @@ This tool is particularly helpful for new contributors or those returning to the
 
 The pre-commit hook is configured to run the following check:
 
-1. **Code Formatting**: Ensures all files are properly formatted using `go fmt`. Any changes made by `go fmt` will be automatically staged.
+1. **Code Formatting**: Ensures all files are properly formatted using `golangci-lint fmt`. Any changes made by `golangci-lint fmt` will be automatically staged.
 
 ### Pre-Push Hook
 

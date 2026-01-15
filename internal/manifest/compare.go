@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"maps"
 	"reflect"
+	"slices"
 	"strings"
 )
 
@@ -66,8 +67,8 @@ func getKnownFlagProperties() map[string]bool {
 	props := make(map[string]bool)
 
 	// Extract fields from BaseFlag struct
-	t := reflect.TypeOf(BaseFlag{})
-	for i := 0; i < t.NumField(); i++ {
+	t := reflect.TypeFor[BaseFlag]()
+	for i := range t.NumField() {
 		field := t.Field(i)
 		jsonTag := field.Tag.Get("json")
 		if jsonTag != "" {
@@ -294,12 +295,7 @@ func matchesPattern(path, pattern string) bool {
 	} else {
 		// Shorthand pattern - matches field anywhere in path
 		// E.g., "description" matches "flags.myFlag.description"
-		pathParts := strings.Split(path, ".")
-		for _, part := range pathParts {
-			if part == pattern {
-				return true
-			}
-		}
+		return slices.Contains(strings.Split(path, "."), pattern)
 	}
 
 	return false

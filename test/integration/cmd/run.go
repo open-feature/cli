@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-
 	// Run the language-specific tests
 	fmt.Println("=== Running all integration tests ===")
 
@@ -28,7 +27,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error running Go integration test: %v\n", err)
 		os.Exit(1)
 	}
-	//Run the nodejs test
+	// Run the nodejs test
 	nodeCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/nodejs")
 	nodeCmd.Stdout = os.Stdout
 	nodeCmd.Stderr = os.Stderr

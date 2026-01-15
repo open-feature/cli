@@ -30,7 +30,7 @@ func openFeatureType(t flagset.FlagType) string {
 	case flagset.IntType:
 		return "Integer"
 	case flagset.FloatType:
-		return "Double" //using Double as per openfeature Java-SDK
+		return "Double" // using Double as per openfeature Java-SDK
 	case flagset.BoolType:
 		return "Boolean"
 	case flagset.StringType:
@@ -141,7 +141,7 @@ func (g *JavaGenerator) Generate(params *generators.Params[Params]) error {
 		Custom:     params.Custom,
 	}
 
-	return g.CommonGenerator.GenerateFile(funcs, javaTmpl, newParams, "OpenFeature.java")
+	return g.GenerateFile(funcs, javaTmpl, newParams, "OpenFeature.java")
 }
 
 // NewGenerator creates a generator for Java.

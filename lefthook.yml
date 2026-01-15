@@ -3,8 +3,8 @@
 # please refer to the relevant section in the contributing documentation (CONTRIBUTING.md).
 pre-commit:
   commands:
-    go-fmt:
-      run: go fmt ./...
+    golangci-lint-fmt:
+      run: golangci-lint fmt
       stage_fixed: true
 pre-push:
   commands:

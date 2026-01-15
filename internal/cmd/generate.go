@@ -298,7 +298,6 @@ func getGenerateJavaCmd() *cobra.Command {
 			logger.Default.GenerationComplete("Java")
 
 			return nil
-
 		},
 	}
 
@@ -331,7 +330,8 @@ func getGenerateGoCmd() *cobra.Command {
 			params := generators.Params[golang.Params]{
 				OutputPath: outputPath,
 				Custom: golang.Params{
-					GoPackage: goPackageName,
+					GoPackage:  goPackageName,
+					CLIVersion: Version,
 				},
 			}
 

@@ -24,13 +24,13 @@ func GetInitCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			manifestPath := config.GetManifestPath(cmd)
 			override := config.GetOverride(cmd)
-			providerUrl := config.GetFlagSourceUrl(cmd)
+			providerURL := config.GetFlagSourceURL(cmd)
 
 			if err := handleManifestCreation(manifestPath, override); err != nil {
 				return err
 			}
 
-			if err := handleConfigFile(providerUrl, override); err != nil {
+			if err := handleConfigFile(providerURL, override); err != nil {
 				return err
 			}
 

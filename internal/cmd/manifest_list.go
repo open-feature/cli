@@ -81,7 +81,7 @@ func displayFlagList(fs *flagset.Flagset, manifestPath string) {
 }
 
 // formatValue converts a value to a string representation suitable for display
-func formatValue(value interface{}) string {
+func formatValue(value any) string {
 	switch v := value.(type) {
 	case string:
 		if len(v) > 30 {
@@ -90,7 +90,7 @@ func formatValue(value interface{}) string {
 		return fmt.Sprintf("\"%s\"", v)
 	case bool, int, float64:
 		return fmt.Sprintf("%v", v)
-	case map[string]interface{}, []interface{}:
+	case map[string]any, []any:
 		jsonBytes, err := json.Marshal(v)
 		if err != nil {
 			return fmt.Sprintf("%v", v)

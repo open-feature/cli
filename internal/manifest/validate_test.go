@@ -20,7 +20,7 @@ func TestFormatValidationError_SortsByPath(t *testing.T) {
 	betaIdx := strings.Index(output, "flagPath: beta.flag")
 	zetaIdx := strings.Index(output, "flagPath: zeta.flag")
 
-	if !(alphaIdx < betaIdx && betaIdx < zetaIdx) {
+	if alphaIdx >= betaIdx || betaIdx >= zetaIdx {
 		t.Errorf("flag paths are not sorted: alphaIdx=%d, betaIdx=%d, zetaIdx=%d\nOutput:\n%s",
 			alphaIdx, betaIdx, zetaIdx, output)
 	}

@@ -85,8 +85,8 @@ generate: generate-api generate-docs generate-schema
 
 .PHONY: fmt
 fmt:
-	@echo "Running go fmt..."
-	@go fmt ./...
+	@echo "Running golangci-lint fmt..."
+	@golangci-lint fmt
 	@echo "Code formatted successfully!"
 
 .PHONY: lint
@@ -94,9 +94,9 @@ lint:
 	@echo "Running golangci-lint..."
 	@if ! command -v golangci-lint &> /dev/null; then \
 		echo "Installing golangci-lint..."; \
-		go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.0; \
+		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.7.1; \
 	fi
-	@golangci-lint run ./...
+	@golangci-lint run
 	@echo "Linting completed successfully!"
 
 .PHONY: lint-fix
@@ -104,9 +104,9 @@ lint-fix:
 	@echo "Running golangci-lint with auto-fix..."
 	@if ! command -v golangci-lint &> /dev/null; then \
 		echo "Installing golangci-lint..."; \
-		go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.0; \
+		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.7.1; \
 	fi
-	@golangci-lint run --fix ./...
+	@golangci-lint run --fix
 	@echo "Linting with auto-fix completed successfully!"
 
 .PHONY: verify-generate
