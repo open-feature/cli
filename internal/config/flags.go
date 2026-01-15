@@ -26,6 +26,7 @@ const (
 	TypeFlagName          = "type"
 	DefaultValueFlagName  = "default-value"
 	DescriptionFlagName   = "description"
+	TemplateFlagName      = "template"
 )
 
 // Default values for flags
@@ -47,6 +48,7 @@ func AddRootFlags(cmd *cobra.Command) {
 // AddGenerateFlags adds the common generate flags to the given command
 func AddGenerateFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringP(OutputFlagName, "o", DefaultOutputPath, "Path to where the generated files should be saved")
+	cmd.PersistentFlags().StringP(TemplateFlagName, "t", "", "Path to a custom template file. If not specified, the default template is used")
 }
 
 // AddGoGenerateFlags adds the go generator specific flags to the given command
@@ -118,6 +120,12 @@ func GetCSharpNamespace(cmd *cobra.Command) string {
 func GetJavaPackageName(cmd *cobra.Command) string {
 	javaPackageName, _ := cmd.Flags().GetString(JavaPackageFlagName)
 	return javaPackageName
+}
+
+// GetTemplatePath gets the custom template path from the given command
+func GetTemplatePath(cmd *cobra.Command) string {
+	templatePath, _ := cmd.Flags().GetString(TemplateFlagName)
+	return templatePath
 }
 
 // GetNoInput gets the no-input flag from the given command

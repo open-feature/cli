@@ -137,7 +137,8 @@ func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
 	}
 
 	newParams := &generators.Params[any]{
-		OutputPath: params.OutputPath,
+		OutputPath:   params.OutputPath,
+		TemplatePath: params.TemplatePath,
 		Custom: Params{
 			GoPackage:  params.Custom.GoPackage,
 			CLIVersion: params.Custom.CLIVersion,

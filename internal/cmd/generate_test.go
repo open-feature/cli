@@ -21,6 +21,7 @@ type generateTestCase struct {
 	outputPath     string // output directory (optional, defaults to "output")
 	outputFile     string // output file name
 	packageName    string // optional, used for Go (package-name), Java (package-name) and C# (namespace)
+	templateFile   string // optional, path to a custom template file
 }
 
 func TestGenerate(t *testing.T) {
@@ -77,6 +78,65 @@ func TestGenerate(t *testing.T) {
 			outputFile:     "OpenFeature.java",
 			packageName:    "com.example.openfeature",
 		},
+		{
+			name:           "Go generation with custom template",
+			command:        "go",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_go.golden",
+			outputFile:     "testpackage_gen.go",
+			packageName:    "testpackage",
+			templateFile:   "testdata/custom_template/custom_go.tmpl",
+		},
+		{
+			name:           "React generation with custom template",
+			command:        "react",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_react.golden",
+			outputFile:     "openfeature.ts",
+			templateFile:   "testdata/custom_template/custom_react.tmpl",
+		},
+		{
+			name:           "NodeJS generation with custom template",
+			command:        "nodejs",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_nodejs.golden",
+			outputFile:     "openfeature.ts",
+			templateFile:   "testdata/custom_template/custom_nodejs.tmpl",
+		},
+		{
+			name:           "Python generation with custom template",
+			command:        "python",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_python.golden",
+			outputFile:     "openfeature.py",
+			templateFile:   "testdata/custom_template/custom_python.tmpl",
+		},
+		{
+			name:           "CSharp generation with custom template",
+			command:        "csharp",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_csharp.golden",
+			outputFile:     "OpenFeature.g.cs",
+			packageName:    "TestNamespace",
+			templateFile:   "testdata/custom_template/custom_csharp.tmpl",
+		},
+		{
+			name:           "Java generation with custom template",
+			command:        "java",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_java.golden",
+			outputFile:     "OpenFeature.java",
+			packageName:    "com.example.openfeature",
+			templateFile:   "testdata/custom_template/custom_java.tmpl",
+		},
+		{
+			name:           "NestJS generation with custom template",
+			command:        "nestjs",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_nestjs.golden",
+			outputFile:     "openfeature-decorators.ts",
+			templateFile:   "testdata/custom_template/custom_nestjs.tmpl",
+		},
 		// Add more test cases here as needed
 	}
 
@@ -89,6 +149,7 @@ func TestGenerate(t *testing.T) {
 
 			// Constant paths
 			const memoryManifestPath = "manifest/path.json"
+			const memoryTemplatePath = "templates/custom.tmpl"
 
 			// Use default output path if not specified
 			outputPath := tc.outputPath
@@ -100,6 +161,9 @@ func TestGenerate(t *testing.T) {
 			fs := afero.NewMemMapFs()
 			filesystem.SetFileSystem(fs)
 			readOsFileAndWriteToMemMap(t, tc.manifestGolden, memoryManifestPath, fs)
+			if tc.templateFile != "" {
+				readOsFileAndWriteToMemMap(t, tc.templateFile, memoryTemplatePath, fs)
+			}
 
 			// Prepare command arguments
 			args := []string{
@@ -118,6 +182,11 @@ func TestGenerate(t *testing.T) {
 				case "java":
 					args = append(args, "--package-name", tc.packageName)
 				}
+			}
+
+			// Add custom template flag if specified
+			if tc.templateFile != "" {
+				args = append(args, "--template", memoryTemplatePath)
 			}
 
 			cmd.SetArgs(args)

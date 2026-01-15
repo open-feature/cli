@@ -50,8 +50,9 @@ func (g *ReactGenerator) Generate(params *generators.Params[Params]) error {
 	}
 
 	newParams := &generators.Params[any]{
-		OutputPath: params.OutputPath,
-		Custom:     Params{},
+		OutputPath:   params.OutputPath,
+		TemplatePath: params.TemplatePath,
+		Custom:       Params{},
 	}
 
 	return g.GenerateFile(funcs, reactTmpl, newParams, "openfeature.ts")
