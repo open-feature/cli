@@ -1,6 +1,8 @@
 package manifest
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -41,7 +43,129 @@ func Validate(data []byte) ([]ValidationError, error) {
 		}
 	}
 
+	// Check for duplicate flag keys
+	duplicates := findDuplicateFlagKeys(data)
+	for _, key := range duplicates {
+		issues = append(issues, ValidationError{
+			Type:    "duplicate_key",
+			Path:    fmt.Sprintf("flags.%s", key),
+			Message: fmt.Sprintf("flag '%s' is defined multiple times in the manifest", key),
+		})
+	}
+
 	return issues, nil
+}
+
+// findDuplicateFlagKeys parses the raw JSON to detect duplicate keys within the "flags" object.
+// Standard JSON unmarshaling silently accepts duplicates (taking the last value), so we use
+// a token-based approach to detect them.
+func findDuplicateFlagKeys(data []byte) []string {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+
+	// Navigate to the root object
+	token, err := decoder.Token()
+	if err != nil || token != json.Delim('{') {
+		return nil
+	}
+
+	// Look for the "flags" key at the top level
+	for decoder.More() {
+		keyToken, err := decoder.Token()
+		if err != nil {
+			return nil
+		}
+
+		key, ok := keyToken.(string)
+		if !ok {
+			continue
+		}
+
+		if key == "flags" {
+			return findDuplicatesInObject(decoder)
+		}
+
+		// Skip the value for non-"flags" keys
+		skipValue(decoder)
+	}
+
+	return nil
+}
+
+// findDuplicatesInObject reads an object from the decoder and returns any duplicate keys.
+func findDuplicatesInObject(decoder *json.Decoder) []string {
+	token, err := decoder.Token()
+	if err != nil || token != json.Delim('{') {
+		return nil
+	}
+
+	seen := make(map[string]bool)
+	var duplicates []string
+
+	for decoder.More() {
+		keyToken, err := decoder.Token()
+		if err != nil {
+			break
+		}
+
+		key, ok := keyToken.(string)
+		if !ok {
+			continue
+		}
+
+		if seen[key] {
+			duplicates = append(duplicates, key)
+		} else {
+			seen[key] = true
+		}
+
+		// Skip the value
+		skipValue(decoder)
+	}
+
+	// Consume the closing brace
+	_, err = decoder.Token()
+	if err != nil {
+		return duplicates
+	}
+
+	// Sort for consistent output
+	sort.Strings(duplicates)
+
+	return duplicates
+}
+
+// skipValue advances the decoder past one complete JSON value (object, array, or primitive).
+func skipValue(decoder *json.Decoder) {
+	token, err := decoder.Token()
+	if err != nil {
+		return
+	}
+
+	switch t := token.(type) {
+	case json.Delim:
+		switch t {
+		case '{':
+			// Skip object contents
+			for decoder.More() {
+				if _, err := decoder.Token(); err != nil { // key
+					return
+				}
+				skipValue(decoder)
+			}
+			if _, err := decoder.Token(); err != nil { // closing }
+				return
+			}
+		case '[':
+			// Skip array contents
+			for decoder.More() {
+				skipValue(decoder)
+			}
+			if _, err := decoder.Token(); err != nil { // closing ]
+				return
+			}
+		}
+	}
+	// Primitives (string, number, bool, null) are already consumed by the Token() call
 }
 
 func FormatValidationError(issues []ValidationError) string {
