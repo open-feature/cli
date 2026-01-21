@@ -19,12 +19,18 @@ help:
 	@echo "  fmt                      - Format Go code"
 	@echo "  ci                       - Run all CI checks locally (fmt, lint, test, verify-generate)"
 
+# Build variables
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+LDFLAGS := -s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE)
+
 .PHONY: build
 build:
 	@echo "Building CLI binary..."
 	@mkdir -p bin
-	@go build -o bin/openfeature ./cmd/openfeature
-	@echo "CLI binary built successfully at bin/openfeature"
+	@go build -ldflags "$(LDFLAGS)" -o bin/openfeature ./cmd/openfeature
+	@echo "CLI binary built successfully at bin/openfeature (version: $(VERSION))"
 
 .PHONY: install
 install: build
