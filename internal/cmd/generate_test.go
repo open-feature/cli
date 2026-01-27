@@ -27,6 +27,13 @@ type generateTestCase struct {
 func TestGenerate(t *testing.T) {
 	testCases := []generateTestCase{
 		{
+			name:           "Angular generation success",
+			command:        "angular",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/success_angular.golden",
+			outputFile:     "openfeature.generated.ts",
+		},
+		{
 			name:           "Go generation success",
 			command:        "go",
 			manifestGolden: "testdata/success_manifest.golden",
@@ -77,6 +84,14 @@ func TestGenerate(t *testing.T) {
 			outputGolden:   "testdata/success_java.golden",
 			outputFile:     "OpenFeature.java",
 			packageName:    "com.example.openfeature",
+		},
+		{
+			name:           "Angular generation with custom template",
+			command:        "angular",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_angular.golden",
+			outputFile:     "openfeature.generated.ts",
+			templateFile:   "testdata/custom_template/custom_angular.tmpl",
 		},
 		{
 			name:           "Go generation with custom template",
