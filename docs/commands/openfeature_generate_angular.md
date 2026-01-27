@@ -1,9 +1,9 @@
 <!-- markdownlint-disable-file -->
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
-
 ## openfeature generate angular
 
 Generate typesafe Angular services and directives.
+
 
 > **Stability**: alpha
 
@@ -33,4 +33,5 @@ openfeature generate angular [flags]
 
 ### SEE ALSO
 
-- [openfeature generate](openfeature_generate.md) - Generate typesafe OpenFeature accessors.
+* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
+
