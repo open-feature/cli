@@ -12,6 +12,7 @@ import {
   UsernameMaxLengthDirective,
   ThemeCustomizationDirective,
 } from "../generated/openfeature.generated";
+import type { JsonValue } from "@openfeature/angular-sdk";
 
 // Test component for boolean directive with domain input
 @Component({
@@ -133,6 +134,140 @@ class TestObjectComponent {
 })
 class TestAllDirectivesComponent {
   @Input() domain?: string;
+}
+
+// Test component for boolean directive with Else input
+@Component({
+  selector: "test-boolean-else",
+  standalone: true,
+  imports: [EnableFeatureADirective],
+  template: `
+    <div class="container">
+      <ng-container
+        *enableFeatureA="let v; domain: domain; else: enableFeatureAElse"
+      >
+        <div class="flag-content">Feature A is enabled</div>
+      </ng-container>
+      <ng-template #enableFeatureAElse>
+        <div class="else-content">Feature A is disabled</div>
+      </ng-template>
+    </div>
+  `,
+})
+class TestBooleanElseComponent {
+  @Input() domain?: string;
+}
+
+// Test component for string directive with Value and Else inputs
+@Component({
+  selector: "test-string-value",
+  standalone: true,
+  imports: [GreetingMessageDirective],
+  template: `
+    <div class="container">
+      <ng-container
+        *greetingMessage="
+          let v;
+          domain: domain;
+          value: expectedValue;
+          else: greetingMessageElse
+        "
+      >
+        <div class="flag-content">Value matches!</div>
+      </ng-container>
+      <ng-template #greetingMessageElse>
+        <div class="else-content">Value does not match</div>
+      </ng-template>
+    </div>
+  `,
+})
+class TestStringValueComponent {
+  @Input() domain?: string;
+  @Input() expectedValue: string = "";
+}
+
+// Test component for number directive (discountPercentage) with Value and Else inputs
+@Component({
+  selector: "test-number-value",
+  standalone: true,
+  imports: [DiscountPercentageDirective],
+  template: `
+    <div class="container">
+      <ng-container
+        *discountPercentage="
+          let v;
+          domain: domain;
+          value: expectedValue;
+          else: discountPercentageElse
+        "
+      >
+        <div class="flag-content">Value matches!</div>
+      </ng-container>
+      <ng-template #discountPercentageElse>
+        <div class="else-content">Value does not match</div>
+      </ng-template>
+    </div>
+  `,
+})
+class TestNumberValueComponent {
+  @Input() domain?: string;
+  @Input() expectedValue: number = 0;
+}
+
+// Test component for number directive (usernameMaxLength) with Value and Else inputs
+@Component({
+  selector: "test-username-value",
+  standalone: true,
+  imports: [UsernameMaxLengthDirective],
+  template: `
+    <div class="container">
+      <ng-container
+        *usernameMaxLength="
+          let v;
+          domain: domain;
+          value: expectedValue;
+          else: usernameMaxLengthElse
+        "
+      >
+        <div class="flag-content">Value matches!</div>
+      </ng-container>
+      <ng-template #usernameMaxLengthElse>
+        <div class="else-content">Value does not match</div>
+      </ng-template>
+    </div>
+  `,
+})
+class TestUsernameValueComponent {
+  @Input() domain?: string;
+  @Input() expectedValue: number = 0;
+}
+
+// Test component for object directive with Value and Else inputs
+@Component({
+  selector: "test-object-value",
+  standalone: true,
+  imports: [ThemeCustomizationDirective],
+  template: `
+    <div class="container">
+      <ng-container
+        *themeCustomization="
+          let v;
+          domain: domain;
+          value: expectedValue;
+          else: themeCustomizationElse
+        "
+      >
+        <div class="flag-content">Value matches!</div>
+      </ng-container>
+      <ng-template #themeCustomizationElse>
+        <div class="else-content">Value does not match</div>
+      </ng-template>
+    </div>
+  `,
+})
+class TestObjectValueComponent {
+  @Input() domain?: string;
+  @Input() expectedValue: JsonValue = {};
 }
 
 describe("Generated Directives Tests", () => {
@@ -503,6 +638,260 @@ describe("Generated Directives Tests", () => {
       expect(
         fixture.nativeElement.querySelector(".object-flag .flag-content"),
       ).not.toBeNull();
+    });
+  });
+
+  describe("hostDirectives Else/Value input remapping", () => {
+    describe("Boolean directive (enableFeatureA) - Else input", () => {
+      it("should show content when flag is true", async () => {
+        provider = new InMemoryProvider({
+          enableFeatureA: {
+            variants: { on: true },
+            defaultVariant: "on",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestBooleanElseComponent],
+        }).createComponent(TestBooleanElseComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(
+          fixture.nativeElement.querySelector(".flag-content"),
+        ).not.toBeNull();
+        expect(fixture.nativeElement.querySelector(".else-content")).toBeNull();
+      });
+
+      it("should show else template when flag is false", async () => {
+        provider = new InMemoryProvider({
+          enableFeatureA: {
+            variants: { off: false },
+            defaultVariant: "off",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestBooleanElseComponent],
+        }).createComponent(TestBooleanElseComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
+        expect(
+          fixture.nativeElement.querySelector(".else-content"),
+        ).not.toBeNull();
+      });
+    });
+
+    describe("String directive (greetingMessage) - Value/Else inputs", () => {
+      it("should show content when value matches", async () => {
+        const matchingValue = "Hello World";
+        provider = new InMemoryProvider({
+          greetingMessage: {
+            variants: { custom: matchingValue },
+            defaultVariant: "custom",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestStringValueComponent],
+        }).createComponent(TestStringValueComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.componentRef.setInput("expectedValue", matchingValue);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(
+          fixture.nativeElement.querySelector(".flag-content"),
+        ).not.toBeNull();
+        expect(fixture.nativeElement.querySelector(".else-content")).toBeNull();
+      });
+
+      it("should show else template when value does not match", async () => {
+        provider = new InMemoryProvider({
+          greetingMessage: {
+            variants: { custom: "Different value" },
+            defaultVariant: "custom",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestStringValueComponent],
+        }).createComponent(TestStringValueComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.componentRef.setInput("expectedValue", "Expected value");
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
+        expect(
+          fixture.nativeElement.querySelector(".else-content"),
+        ).not.toBeNull();
+      });
+    });
+
+    describe("Number directive (discountPercentage) - Value/Else inputs", () => {
+      it("should show content when value matches", async () => {
+        const matchingValue = 0.25;
+        provider = new InMemoryProvider({
+          discountPercentage: {
+            variants: { custom: matchingValue },
+            defaultVariant: "custom",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestNumberValueComponent],
+        }).createComponent(TestNumberValueComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.componentRef.setInput("expectedValue", matchingValue);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(
+          fixture.nativeElement.querySelector(".flag-content"),
+        ).not.toBeNull();
+        expect(fixture.nativeElement.querySelector(".else-content")).toBeNull();
+      });
+
+      it("should show else template when value does not match", async () => {
+        provider = new InMemoryProvider({
+          discountPercentage: {
+            variants: { custom: 0.5 },
+            defaultVariant: "custom",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestNumberValueComponent],
+        }).createComponent(TestNumberValueComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.componentRef.setInput("expectedValue", 0.25);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
+        expect(
+          fixture.nativeElement.querySelector(".else-content"),
+        ).not.toBeNull();
+      });
+    });
+
+    describe("Number directive (usernameMaxLength) - Value/Else inputs", () => {
+      it("should show content when value matches", async () => {
+        const matchingValue = 100;
+        provider = new InMemoryProvider({
+          usernameMaxLength: {
+            variants: { custom: matchingValue },
+            defaultVariant: "custom",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestUsernameValueComponent],
+        }).createComponent(TestUsernameValueComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.componentRef.setInput("expectedValue", matchingValue);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(
+          fixture.nativeElement.querySelector(".flag-content"),
+        ).not.toBeNull();
+        expect(fixture.nativeElement.querySelector(".else-content")).toBeNull();
+      });
+
+      it("should show else template when value does not match", async () => {
+        provider = new InMemoryProvider({
+          usernameMaxLength: {
+            variants: { custom: 200 },
+            defaultVariant: "custom",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestUsernameValueComponent],
+        }).createComponent(TestUsernameValueComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.componentRef.setInput("expectedValue", 100);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
+        expect(
+          fixture.nativeElement.querySelector(".else-content"),
+        ).not.toBeNull();
+      });
+    });
+
+    describe("Object directive (themeCustomization) - Value/Else inputs", () => {
+      it("should show content when value matches", async () => {
+        const matchingValue = { theme: "dark" };
+        provider = new InMemoryProvider({
+          themeCustomization: {
+            variants: { custom: matchingValue },
+            defaultVariant: "custom",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestObjectValueComponent],
+        }).createComponent(TestObjectValueComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.componentRef.setInput("expectedValue", matchingValue);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(
+          fixture.nativeElement.querySelector(".flag-content"),
+        ).not.toBeNull();
+        expect(fixture.nativeElement.querySelector(".else-content")).toBeNull();
+      });
+
+      it("should show else template when value does not match", async () => {
+        provider = new InMemoryProvider({
+          themeCustomization: {
+            variants: { custom: { theme: "light" } },
+            defaultVariant: "custom",
+            disabled: false,
+          },
+        });
+        await OpenFeature.setProviderAndWait(domain, provider);
+
+        const fixture = TestBed.configureTestingModule({
+          imports: [TestObjectValueComponent],
+        }).createComponent(TestObjectValueComponent);
+        fixture.componentRef.setInput("domain", domain);
+        fixture.componentRef.setInput("expectedValue", { theme: "dark" });
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
+        expect(
+          fixture.nativeElement.querySelector(".else-content"),
+        ).not.toBeNull();
+      });
     });
   });
 });
