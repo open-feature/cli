@@ -250,21 +250,6 @@ export class GeneratedFeatureFlagService {
 // GENERATED STRUCTURAL DIRECTIVES
 // ============================================================================
 
-/**
- * Type alias for the feature flag directive context.
- * Re-exported from the SDK for convenience.
- */
-interface FeatureFlagContext<T> {
-  /**
-   * The current flag value (available as implicit context via `let value`).
-   */
-  $implicit: T;
-  /**
-   * The full evaluation details (available via `let details = evaluationDetails`).
-   */
-  evaluationDetails: EvaluationDetails<T>;
-}
-
 
 /**
  * Structural directive for the `discountPercentage` feature flag.
