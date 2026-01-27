@@ -56,6 +56,11 @@ test-integration-nodejs:
 	@echo "Running NodeJS integration test with Dagger..."
 	@go run ./test/integration/cmd/nodejs/run.go
 
+.PHONY: test-integration-angular
+test-integration-angular:
+	@echo "Running Angular integration test with Dagger..."
+	@go run ./test/integration/cmd/angular/run.go
+
 .PHONY: test-integration
 test-integration:
 	@echo "Running all integration tests with Dagger..."
