@@ -33,7 +33,6 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 			"tsconfig.json",
 			"vitest.config.ts",
 			"setup.ts",
-			"test.component.ts",
 			"specs/**/*.ts",
 		},
 	})
