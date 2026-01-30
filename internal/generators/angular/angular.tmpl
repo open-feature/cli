@@ -180,6 +180,8 @@ export class GeneratedFeatureFlagService {
     {
       directive: {{ $directiveType }},
       inputs: [
+        '{{ $directivePrefix }}: {{ .Key | ToCamel }}',
+        '{{ $directivePrefix }}Default: {{ .Key | ToCamel }}Default',
         '{{ $directivePrefix }}Domain: {{ .Key | ToCamel }}Domain',
         '{{ $directivePrefix }}UpdateOnConfigurationChanged: {{ .Key | ToCamel }}UpdateOnConfigurationChanged',
         '{{ $directivePrefix }}UpdateOnContextChanged: {{ .Key | ToCamel }}UpdateOnContextChanged',

@@ -302,6 +302,8 @@ export class GeneratedFeatureFlagService {
     {
       directive: NumberFeatureFlagDirective,
       inputs: [
+        'numberFeatureFlag: discountPercentage',
+        'numberFeatureFlagDefault: discountPercentageDefault',
         'numberFeatureFlagDomain: discountPercentageDomain',
         'numberFeatureFlagUpdateOnConfigurationChanged: discountPercentageUpdateOnConfigurationChanged',
         'numberFeatureFlagUpdateOnContextChanged: discountPercentageUpdateOnContextChanged',
@@ -374,6 +376,8 @@ export class DiscountPercentageDirective {
     {
       directive: BooleanFeatureFlagDirective,
       inputs: [
+        'booleanFeatureFlag: enableFeatureA',
+        'booleanFeatureFlagDefault: enableFeatureADefault',
         'booleanFeatureFlagDomain: enableFeatureADomain',
         'booleanFeatureFlagUpdateOnConfigurationChanged: enableFeatureAUpdateOnConfigurationChanged',
         'booleanFeatureFlagUpdateOnContextChanged: enableFeatureAUpdateOnContextChanged',
@@ -445,6 +449,8 @@ export class EnableFeatureADirective {
     {
       directive: StringFeatureFlagDirective,
       inputs: [
+        'stringFeatureFlag: greetingMessage',
+        'stringFeatureFlagDefault: greetingMessageDefault',
         'stringFeatureFlagDomain: greetingMessageDomain',
         'stringFeatureFlagUpdateOnConfigurationChanged: greetingMessageUpdateOnConfigurationChanged',
         'stringFeatureFlagUpdateOnContextChanged: greetingMessageUpdateOnContextChanged',
@@ -517,6 +523,8 @@ export class GreetingMessageDirective {
     {
       directive: ObjectFeatureFlagDirective,
       inputs: [
+        'objectFeatureFlag: themeCustomization',
+        'objectFeatureFlagDefault: themeCustomizationDefault',
         'objectFeatureFlagDomain: themeCustomizationDomain',
         'objectFeatureFlagUpdateOnConfigurationChanged: themeCustomizationUpdateOnConfigurationChanged',
         'objectFeatureFlagUpdateOnContextChanged: themeCustomizationUpdateOnContextChanged',
@@ -589,6 +597,8 @@ export class ThemeCustomizationDirective {
     {
       directive: NumberFeatureFlagDirective,
       inputs: [
+        'numberFeatureFlag: usernameMaxLength',
+        'numberFeatureFlagDefault: usernameMaxLengthDefault',
         'numberFeatureFlagDomain: usernameMaxLengthDomain',
         'numberFeatureFlagUpdateOnConfigurationChanged: usernameMaxLengthUpdateOnConfigurationChanged',
         'numberFeatureFlagUpdateOnContextChanged: usernameMaxLengthUpdateOnContextChanged',
