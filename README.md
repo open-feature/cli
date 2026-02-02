@@ -122,7 +122,7 @@ The OpenFeature CLI provides the following commands:
 | Command | Description |
 |---------|-------------|
 | `init` | Initialize a new flag manifest |
-| `manifest` | Manage flag manifest files (add, list) |
+| `manifest` | Manage flag manifest files (add, list, delete) |
 | `compare` | Compare two flag manifests |
 | `generate` | Generate strongly typed flag accessors |
 | `pull` | Fetch flags from remote sources |
@@ -144,7 +144,7 @@ See [here](./docs/commands/openfeature_init.md) for all available options.
 
 ### `manifest`
 
-Manage flag manifest files with subcommands for adding and listing flags.
+Manage flag manifest files with subcommands for adding, listing, and deleting flags.
 
 ```bash
 # Add a new flag interactively
@@ -161,11 +161,15 @@ openfeature manifest add welcome-message \
 
 # List all flags in the manifest
 openfeature manifest list
+
+# Delete a flag from the manifest
+openfeature manifest delete old-feature
 ```
 
 The manifest command provides:
 - **add**: Add new flags to your manifest file
 - **list**: Display all flags with their configuration
+- **delete**: Remove flags from your manifest file
 
 See [here](./docs/commands/openfeature_manifest.md) for all available options.
 

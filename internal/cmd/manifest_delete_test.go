@@ -48,11 +48,11 @@ func TestManifestDeleteCmd(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
 				assert.Len(t, flags, 2, "Should have 2 flags remaining")
 				assert.Contains(t, flags, "flag-to-keep")
 				assert.Contains(t, flags, "another-flag")
@@ -76,11 +76,11 @@ func TestManifestDeleteCmd(t *testing.T) {
 				content, err := afero.ReadFile(fs, "flags.json")
 				require.NoError(t, err)
 
-				var manifest map[string]interface{}
+				var manifest map[string]any
 				err = json.Unmarshal(content, &manifest)
 				require.NoError(t, err)
 
-				flags := manifest["flags"].(map[string]interface{})
+				flags := manifest["flags"].(map[string]any)
 				assert.Len(t, flags, 0, "Should have no flags remaining")
 			},
 		},
@@ -106,7 +106,7 @@ func TestManifestDeleteCmd(t *testing.T) {
 				"$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
 				"flags": {}
 			}`,
-			expectedError: "manifest contains no flags",
+			expectedError: "flag 'any-flag' not found in manifest",
 		},
 		{
 			name:          "error on missing manifest file",
@@ -123,7 +123,7 @@ func TestManifestDeleteCmd(t *testing.T) {
 
 			// Create existing manifest if provided
 			if tt.existingManifest != "" {
-				err := afero.WriteFile(fs, "flags.json", []byte(tt.existingManifest), 0644)
+				err := afero.WriteFile(fs, "flags.json", []byte(tt.existingManifest), 0o644)
 				require.NoError(t, err)
 			}
 
@@ -168,7 +168,7 @@ func TestManifestDeleteCmd_ManifestUnchangedOnError(t *testing.T) {
 			}
 		}
 	}`
-	err := afero.WriteFile(fs, "flags.json", []byte(originalManifest), 0644)
+	err := afero.WriteFile(fs, "flags.json", []byte(originalManifest), 0o644)
 	require.NoError(t, err)
 
 	// Try to delete a non-existent flag
@@ -184,11 +184,11 @@ func TestManifestDeleteCmd_ManifestUnchangedOnError(t *testing.T) {
 	content, err := afero.ReadFile(fs, "flags.json")
 	require.NoError(t, err)
 
-	var manifest map[string]interface{}
+	var manifest map[string]any
 	err = json.Unmarshal(content, &manifest)
 	require.NoError(t, err)
 
-	flags := manifest["flags"].(map[string]interface{})
+	flags := manifest["flags"].(map[string]any)
 	assert.Len(t, flags, 1, "Manifest should still have 1 flag")
 	assert.Contains(t, flags, "existing-flag", "Original flag should still exist")
 }
@@ -214,7 +214,7 @@ func TestManifestDeleteCmd_DisplaysSuccessMessage(t *testing.T) {
 			}
 		}
 	}`
-	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0o644)
 	require.NoError(t, err)
 
 	// Enable pterm output and capture it
@@ -245,11 +245,11 @@ func TestManifestDeleteCmd_DisplaysSuccessMessage(t *testing.T) {
 	content, err := afero.ReadFile(fs, "flags.json")
 	require.NoError(t, err)
 
-	var manifest map[string]interface{}
+	var manifest map[string]any
 	err = json.Unmarshal(content, &manifest)
 	require.NoError(t, err)
 
-	flags := manifest["flags"].(map[string]interface{})
+	flags := manifest["flags"].(map[string]any)
 	assert.Len(t, flags, 1, "Should have 1 flag remaining")
 	assert.Contains(t, flags, "flag-2", "Should still contain flag-2")
 	assert.NotContains(t, flags, "flag-1", "Should not contain deleted flag-1")
@@ -268,7 +268,7 @@ func TestManifestDeleteCmd_WithCustomManifestPath(t *testing.T) {
 
 	// Create manifest in a custom location
 	customPath := "custom/path/manifest.json"
-	err := fs.MkdirAll("custom/path", 0755)
+	err := fs.MkdirAll("custom/path", 0o755)
 	require.NoError(t, err)
 
 	existingManifest := `{
@@ -286,7 +286,7 @@ func TestManifestDeleteCmd_WithCustomManifestPath(t *testing.T) {
 			}
 		}
 	}`
-	err = afero.WriteFile(fs, customPath, []byte(existingManifest), 0644)
+	err = afero.WriteFile(fs, customPath, []byte(existingManifest), 0o644)
 	require.NoError(t, err)
 
 	// Create command and execute
@@ -306,11 +306,11 @@ func TestManifestDeleteCmd_WithCustomManifestPath(t *testing.T) {
 	content, err := afero.ReadFile(fs, customPath)
 	require.NoError(t, err)
 
-	var manifest map[string]interface{}
+	var manifest map[string]any
 	err = json.Unmarshal(content, &manifest)
 	require.NoError(t, err)
 
-	flags := manifest["flags"].(map[string]interface{})
+	flags := manifest["flags"].(map[string]any)
 	assert.Len(t, flags, 1, "Should have 1 flag remaining")
 	assert.Contains(t, flags, "flag-to-keep")
 	assert.NotContains(t, flags, "flag-to-delete")
@@ -381,7 +381,7 @@ func TestManifestDeleteCmd_DeleteFirstFlag(t *testing.T) {
 			}
 		}
 	}`
-	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0o644)
 	require.NoError(t, err)
 
 	// Create command and execute
@@ -397,11 +397,11 @@ func TestManifestDeleteCmd_DeleteFirstFlag(t *testing.T) {
 	content, err := afero.ReadFile(fs, "flags.json")
 	require.NoError(t, err)
 
-	var manifest map[string]interface{}
+	var manifest map[string]any
 	err = json.Unmarshal(content, &manifest)
 	require.NoError(t, err)
 
-	flags := manifest["flags"].(map[string]interface{})
+	flags := manifest["flags"].(map[string]any)
 	assert.Len(t, flags, 2, "Should have 2 flags remaining")
 	assert.NotContains(t, flags, "aaa-first")
 	assert.Contains(t, flags, "bbb-second")
@@ -434,7 +434,7 @@ func TestManifestDeleteCmd_DeleteLastFlag(t *testing.T) {
 			}
 		}
 	}`
-	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0644)
+	err := afero.WriteFile(fs, "flags.json", []byte(existingManifest), 0o644)
 	require.NoError(t, err)
 
 	// Create command and execute
@@ -450,14 +450,13 @@ func TestManifestDeleteCmd_DeleteLastFlag(t *testing.T) {
 	content, err := afero.ReadFile(fs, "flags.json")
 	require.NoError(t, err)
 
-	var manifest map[string]interface{}
+	var manifest map[string]any
 	err = json.Unmarshal(content, &manifest)
 	require.NoError(t, err)
 
-	flags := manifest["flags"].(map[string]interface{})
+	flags := manifest["flags"].(map[string]any)
 	assert.Len(t, flags, 2, "Should have 2 flags remaining")
 	assert.Contains(t, flags, "aaa-first")
 	assert.Contains(t, flags, "bbb-second")
 	assert.NotContains(t, flags, "zzz-last")
 }
-

@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/filesystem"
+	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/logger"
 	"github.com/open-feature/cli/internal/manifest"
 	"github.com/pterm/pterm"
@@ -48,26 +50,16 @@ Examples:
 				return fmt.Errorf("failed to load manifest: %w", err)
 			}
 
-			// Check if manifest has any flags
-			if len(fs.Flags) == 0 {
-				return fmt.Errorf("manifest contains no flags")
-			}
+			// Remove the flag
+			originalLen := len(fs.Flags)
+			fs.Flags = slices.DeleteFunc(fs.Flags, func(flag flagset.Flag) bool {
+				return flag.Key == flagName
+			})
 
-			// Check if flag exists
-			flagIndex := -1
-			for i, flag := range fs.Flags {
-				if flag.Key == flagName {
-					flagIndex = i
-					break
-				}
-			}
-
-			if flagIndex == -1 {
+			// Check if flag was found (length unchanged means nothing was deleted)
+			if len(fs.Flags) == originalLen {
 				return fmt.Errorf("flag '%s' not found in manifest", flagName)
 			}
-
-			// Remove the flag by creating a new slice without it
-			fs.Flags = append(fs.Flags[:flagIndex], fs.Flags[flagIndex+1:]...)
 
 			// Write updated manifest
 			if err := manifest.Write(manifestPath, *fs); err != nil {

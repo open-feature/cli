@@ -30,5 +30,6 @@ openfeature manifest [flags]
 
 * [openfeature](openfeature.md)	 - CLI for OpenFeature.
 * [openfeature manifest add](openfeature_manifest_add.md)	 - Add a new flag to the manifest
+* [openfeature manifest delete](openfeature_manifest_delete.md)	 - Delete a flag from the manifest
 * [openfeature manifest list](openfeature_manifest_list.md)	 - List all flags in the manifest
 
