@@ -214,8 +214,6 @@ openfeature generate typescript --output ./src/flags
 
 | Language | Description |
 |----------|-------------|
-| `typescript` | TypeScript flag accessors |
-| `javascript` | JavaScript flag accessors |
 | `react` | React hooks for feature flags |
 | `go` | Go flag accessors |
 | `csharp` | C# flag accessors |
@@ -223,6 +221,7 @@ openfeature generate typescript --output ./src/flags
 | `python` | Python flag accessors |
 | `nestjs` | NestJS flag accessors |
 | `nodejs` | Node.js flag accessors |
+| `angular` | Angular flag accessors |
 
 See [here](./docs/commands/openfeature_generate.md) for all available options.
 
