@@ -5,6 +5,7 @@ import (
 
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/generators"
+	"github.com/open-feature/cli/internal/generators/angular"
 	"github.com/open-feature/cli/internal/generators/csharp"
 	"github.com/open-feature/cli/internal/generators/golang"
 	"github.com/open-feature/cli/internal/generators/java"
@@ -416,8 +417,55 @@ func getGeneratePythonCmd() *cobra.Command {
 	return pythonCmd
 }
 
+func getGenerateAngularCmd() *cobra.Command {
+	angularCmd := &cobra.Command{
+		Use:   "angular",
+		Short: "Generate typesafe Angular services and directives.",
+		Long:  `Generate typesafe Angular services and directives compatible with the OpenFeature Angular SDK.`,
+		Annotations: map[string]string{
+			"stability": string(generators.Alpha),
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate.angular")
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			manifestPath := config.GetManifestPath(cmd)
+			outputPath := config.GetOutputPath(cmd)
+			templatePath := config.GetTemplatePath(cmd)
+
+			logger.Default.GenerationStarted("Angular")
+
+			params := generators.Params[angular.Params]{
+				OutputPath:   outputPath,
+				TemplatePath: templatePath,
+				Custom:       angular.Params{},
+			}
+			flagset, err := manifest.LoadFlagSet(manifestPath)
+			if err != nil {
+				return err
+			}
+
+			generator := angular.NewGenerator(flagset)
+			logger.Default.Debug("Executing Angular generator")
+			err = generator.Generate(&params)
+			if err != nil {
+				return err
+			}
+
+			logger.Default.GenerationComplete("Angular")
+
+			return nil
+		},
+	}
+
+	addStabilityInfo(angularCmd)
+
+	return angularCmd
+}
+
 func init() {
 	// Register generators with the manager
+	generators.DefaultManager.Register(getGenerateAngularCmd)
 	generators.DefaultManager.Register(getGenerateReactCmd)
 	generators.DefaultManager.Register(getGenerateGoCmd)
 	generators.DefaultManager.Register(getGenerateNodeJSCmd)
