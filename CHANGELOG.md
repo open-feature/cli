@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.14](https://github.com/open-feature/cli/compare/v0.3.13...v0.3.14) (2026-02-03)
+
+
+### 🐛 Bug Fixes
+
+* **204:** add `#nullable enabled` directive on top of generated file ([#205](https://github.com/open-feature/cli/issues/205)) ([0ce3710](https://github.com/open-feature/cli/commit/0ce371058a1502b54cb8d2e6ecf95ebb999a43bc))
+
+
+### ✨ New Features
+
+* **202:** support angular generator ([#203](https://github.com/open-feature/cli/issues/203)) ([c06c4ba](https://github.com/open-feature/cli/commit/c06c4ba4c3c8f712ea5632d3f7f63c3b66d436c9))
+* add manifest delete command  ([#206](https://github.com/open-feature/cli/issues/206)) ([f0c10b9](https://github.com/open-feature/cli/commit/f0c10b9a8257773bf18865364497772480ddacdc))
+* enforce unique flag keys in manifest validation ([#200](https://github.com/open-feature/cli/issues/200)) ([dd79d9e](https://github.com/open-feature/cli/commit/dd79d9ef09338a9051b1529f5fca95ade34e3a26)), closes [#193](https://github.com/open-feature/cli/issues/193)
+
+
+### 🧹 Chore
+
+* wire CLI version via ldflags at build time ([#199](https://github.com/open-feature/cli/issues/199)) ([e8dd221](https://github.com/open-feature/cli/commit/e8dd22184b510102ab6f46753ab3a32b61272a5b))
+
 ## [0.3.13](https://github.com/open-feature/cli/compare/v0.3.12...v0.3.13) (2026-01-15)
 
 
