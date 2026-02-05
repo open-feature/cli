@@ -35,7 +35,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
         {
             return services
                 .AddSingleton(_ => Api.Instance)
-                .AddSingleton(provider => provider.GetRequiredService<Api>().GetClient())
+                .AddSingleton<IFeatureClient, FeatureClient>(provider => provider.GetRequiredService<Api>().GetClient())
                 .AddSingleton<GeneratedClient>();
         }
 
@@ -49,7 +49,7 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
         {
             return services
                 .AddSingleton(_ => Api.Instance)
-                .AddSingleton(provider => provider.GetRequiredService<Api>().GetClient(domain))
+                .AddSingleton<IFeatureClient, FeatureClient>(provider => provider.GetRequiredService<Api>().GetClient(domain))
                 .AddSingleton<GeneratedClient>();
         }
     }

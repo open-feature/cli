@@ -24,7 +24,7 @@ namespace TestNamespace
         {
             return services
                 .AddSingleton(_ => Api.Instance)
-                .AddSingleton(provider => provider.GetRequiredService<Api>().GetClient())
+                .AddSingleton<IFeatureClient, FeatureClient>(provider => provider.GetRequiredService<Api>().GetClient())
                 .AddSingleton<GeneratedClient>();
         }
 
@@ -38,7 +38,7 @@ namespace TestNamespace
         {
             return services
                 .AddSingleton(_ => Api.Instance)
-                .AddSingleton(provider => provider.GetRequiredService<Api>().GetClient(domain))
+                .AddSingleton<IFeatureClient, FeatureClient>(provider => provider.GetRequiredService<Api>().GetClient(domain))
                 .AddSingleton<GeneratedClient>();
         }
     }
