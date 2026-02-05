@@ -17,10 +17,9 @@ namespace CompileTest
             
             // Test DI initialization
             var services = new ServiceCollection();
-            // Register OpenFeature services manually for the test
-            services.AddSingleton(_ => Api.Instance);
-            services.AddSingleton<IFeatureClient>(_ => Api.Instance.GetClient());
-            services.AddSingleton<GeneratedClient>();
+            
+            services.AddOpenFeature();
+
             var serviceProvider = services.BuildServiceProvider();
             
             // Test client retrieval from DI
