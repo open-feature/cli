@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.15](https://github.com/open-feature/cli/compare/v0.3.14...v0.3.15) (2026-02-09)
+
+
+### 🐛 Bug Fixes
+
+* **generator:** dotnet dependency injection issue ([#209](https://github.com/open-feature/cli/issues/209)) ([2cc23ee](https://github.com/open-feature/cli/commit/2cc23ee64c1bb009b0d858b0e79b52ed428bf22c))
+
+
+### 🧹 Chore
+
+* downgrade version from 0.3.15 to 0.3.14 ([#214](https://github.com/open-feature/cli/issues/214)) ([32a1a40](https://github.com/open-feature/cli/commit/32a1a40d71a5cf0e1f6bc60697e10464438f45a8))
+* **main:** release 0.3.15 ([#211](https://github.com/open-feature/cli/issues/211)) ([9c5b634](https://github.com/open-feature/cli/commit/9c5b6345a4380438114a4e2b5c1e12839c55a43f))
+
 ## [0.3.14](https://github.com/open-feature/cli/compare/v0.3.13...v0.3.14) (2026-02-03)
 
 
