@@ -46,3 +46,6 @@ openfeature
 
 # Build output directory
 /bin
+
+# test output
+**/obj/
