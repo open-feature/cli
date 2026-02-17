@@ -38,24 +38,6 @@ func openFeatureType(t flagset.FlagType) string {
 	}
 }
 
-// sdkDirectiveType returns the corresponding Angular SDK directive name for a flag type.
-func sdkDirectiveType(t flagset.FlagType) string {
-	switch t {
-	case flagset.IntType:
-		fallthrough
-	case flagset.FloatType:
-		return "numberFeatureFlag"
-	case flagset.BoolType:
-		return "booleanFeatureFlag"
-	case flagset.StringType:
-		return "stringFeatureFlag"
-	case flagset.ObjectType:
-		return "objectFeatureFlag"
-	default:
-		return ""
-	}
-}
-
 // sdkServiceMethod returns the corresponding FeatureFlagService method name for a flag type.
 func sdkServiceMethod(t flagset.FlagType) string {
 	switch t {
@@ -87,7 +69,6 @@ func toJSONString(value any) string {
 func (g *AngularGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
 		"OpenFeatureType":  openFeatureType,
-		"SdkDirectiveType": sdkDirectiveType,
 		"SdkServiceMethod": sdkServiceMethod,
 		"ToJSONString":     toJSONString,
 	}

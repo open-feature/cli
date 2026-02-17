@@ -4,25 +4,28 @@
  * This file contains generated typesafe Angular services and directives
  * for feature flags defined in your OpenFeature flag manifest.
  *
- * @openfeature/angular-sdk is required as a peer dependency.
+ * @openfeature/angular-sdk 1.1.0 or newer is required as a peer dependency.
  *
  * @see https://openfeature.dev
  */
 
 import {
+  ChangeDetectorRef,
   Directive,
   inject,
   Injectable,
+  Input,
+  OnChanges,
+  TemplateRef,
+  ViewContainerRef,
 } from '@angular/core';
 import {
   AngularFlagEvaluationOptions,
-  BooleanFeatureFlagDirective,
   EvaluationDetails,
+  FeatureFlagDirective,
+  FeatureFlagDirectiveContext,
   FeatureFlagService,
   JsonValue,
-  NumberFeatureFlagDirective,
-  ObjectFeatureFlagDirective,
-  StringFeatureFlagDirective,
 } from '@openfeature/angular-sdk';
 import { Observable } from 'rxjs';
 
@@ -251,374 +254,700 @@ export class GeneratedFeatureFlagService {
 // ============================================================================
 
 
+
 /**
  * Structural directive for the `discountPercentage` feature flag.
  *
- * Discount percentage applied to purchases.
+ *Discount percentage applied to purchases.
  *
- * This directive wraps the `NumberFeatureFlagDirective` from @openfeature/angular-sdk
- * with pre-configured flag key and default value.
+ * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
+ * with a pre-configured flag key and default value.
  *
  * **Details:**
  * - Flag key: `discountPercentage`
  * - Type: `number`
  * - Default value: `0.15`
  *
- * @example
- * Basic usage:
- * ```html
- * <div *discountPercentage>
- *   Content shown when flag is matched.
- * </div>
- * ```
  *
  * @example
- * With else template:
+ * Explicit `ng-template` (no `*`), bind inputs directly
  * ```html
- * <div *discountPercentage="else: disabledTemplate">
- *   Content shown when flag is matched.
- * </div>
- * <ng-template #disabledTemplate>
+ * <ng-template discountPercentage
+ *   [discountPercentageDefault]="defaultValue"
+ *   [discountPercentageValue]="expectedValue"
+ *   [discountPercentageElse]="elseTemplate"
+ *   [discountPercentageInitializing]="initTemplate"
+ *   [discountPercentageReconciling]="reconcilingTemplate">
+ *   <div>Content shown when flag is matched.</div>
+ * </ng-template>
+ * <ng-template #elseTemplate>
  *   Content shown when flag is not matched.
  * </ng-template>
  * ```
  *
  * @example
- * With all options:
+ * Microsyntax `*` form, start with `let`
  * ```html
- * <div *discountPercentage="value: expectedValue; else: elseTemplate;
- * initializing: initTemplate;
- * reconciling: reconcilingTemplate;
- * let value;
- * let details = evaluationDetails">
- *   Flag value: {{ value }}
+ * <div *discountPercentage="let v; value: expectedValue; else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
+ *   Content shown when flag is matched.
  * </div>
  * ```
+ *
+ * @example
+ * Simple `*` usage (no else/initializing/reconciling)
+ * ```html
+ * <div *discountPercentage="let v">
+ *   Content shown when flag is matched.
+ * </div>
+ * ```
+ *
+ * @remarks
+ * Note: Angular's microsyntax parser requires the first segment to be a primary
+ * expression or a `let` declaration. Because the flag key is preconfigured, start with
+ * `let v` or `let details = evaluationDetails` (or `let _` if you do not need the value)
+ * before any `else`/`initializing`/`reconciling`/`default` segments.
+ * This is an Angular microsyntax parsing constraint, not a directive limitation.
+ * `*discountPercentage="else elseTemplate"` will not parse because `else` is a
+ * secondary segment. If you do not need the value, use `let _`, or use the
+ * explicit `ng-template` form above.
  */
 @Directive({
   selector: '[discountPercentage]',
   standalone: true,
-  hostDirectives: [
-    {
-      directive: NumberFeatureFlagDirective,
-      inputs: [
-        'numberFeatureFlag: discountPercentage',
-        'numberFeatureFlagDefault: discountPercentageDefault',
-        'numberFeatureFlagDomain: discountPercentageDomain',
-        'numberFeatureFlagUpdateOnConfigurationChanged: discountPercentageUpdateOnConfigurationChanged',
-        'numberFeatureFlagUpdateOnContextChanged: discountPercentageUpdateOnContextChanged',
-        'numberFeatureFlagElse: discountPercentageElse',
-        'numberFeatureFlagInitializing: discountPercentageInitializing',
-        'numberFeatureFlagReconciling: discountPercentageReconciling',
-        'numberFeatureFlagValue: discountPercentageValue',
-      ],
-    },
-  ],
 })
-export class DiscountPercentageDirective {
-  private readonly hostDirective = inject(NumberFeatureFlagDirective);
+export class DiscountPercentageFeatureFlagDirective extends FeatureFlagDirective<number> implements OnChanges {
+  override _changeDetectorRef = inject(ChangeDetectorRef);
+  override _viewContainerRef = inject(ViewContainerRef);
+  override _thenTemplateRef = inject<TemplateRef<FeatureFlagDirectiveContext<number>>>(TemplateRef);
+
+  /**
+   * The expected value of this number feature flag, for which the `then` template should be rendered.
+   */
+  @Input({ required: false }) discountPercentageValue?: number;
 
   constructor() {
-    // Set the pre-configured flag key and default value
-    this.hostDirective.numberFeatureFlag = "discountPercentage";
-    this.hostDirective.numberFeatureFlagDefault = 0.15;
+    super();
+
+    this._featureFlagKey = "discountPercentage";
+    this._featureFlagDefault = 0.15;
+
+  }
+
+  override ngOnChanges() {
+    super.ngOnChanges();
+
+    this._featureFlagValue = this.discountPercentageValue;
+  }
+
+  /**
+   * The domain of the number feature flag.
+   */
+  @Input({ required: false })
+  set discountPercentageDomain(domain: string | undefined) {
+    super.featureFlagDomain = domain;
+  }
+
+  /**
+   * Update the component if the provider emits a ConfigurationChanged event.
+   * Set to false to prevent components from re-rendering when flag value changes
+   * are received by the associated provider.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set discountPercentageUpdateOnConfigurationChanged(enabled: boolean | undefined) {
+    this._updateOnConfigurationChanged = enabled ?? true;
+  }
+
+  /**
+   * Update the component when the OpenFeature context changes.
+   * Set to false to prevent components from re-rendering when attributes which
+   * may be factors in flag evaluation change.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set discountPercentageUpdateOnContextChanged(enabled: boolean | undefined) {
+    this._updateOnContextChanged = enabled ?? true;
+  }
+
+  /**
+   * Template to be displayed when the feature flag does not match value.
+   */
+  @Input()
+  set discountPercentageElse(tpl: TemplateRef<FeatureFlagDirectiveContext<number>>) {
+    this._elseTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is not ready.
+   */
+  @Input()
+  set discountPercentageInitializing(tpl: TemplateRef<FeatureFlagDirectiveContext<number>>) {
+    this._initializingTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is reconciling.
+   */
+  @Input()
+  set discountPercentageReconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<number>>) {
+    this._reconcilingTemplateRef = tpl;
   }
 }
+
+
 
 /**
  * Structural directive for the `enableFeatureA` feature flag.
  *
- * Controls whether Feature A is enabled.
+ *Controls whether Feature A is enabled.
  *
- * This directive wraps the `BooleanFeatureFlagDirective` from @openfeature/angular-sdk
- * with pre-configured flag key and default value.
+ * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
+ * with a pre-configured flag key and default value.
  *
  * **Details:**
  * - Flag key: `enableFeatureA`
  * - Type: `boolean`
  * - Default value: `false`
  *
- * @example
- * Basic usage:
- * ```html
- * <div *enableFeatureA>
- *   Content shown when flag is enabled.
- * </div>
- * ```
  *
  * @example
- * With else template:
+ * Explicit `ng-template` (no `*`), bind inputs directly
  * ```html
- * <div *enableFeatureA="else: disabledTemplate">
- *   Content shown when flag is enabled.
- * </div>
- * <ng-template #disabledTemplate>
+ * <ng-template enableFeatureA
+ *   [enableFeatureADefault]="defaultValue"
+ *   [enableFeatureAElse]="elseTemplate"
+ *   [enableFeatureAInitializing]="initTemplate"
+ *   [enableFeatureAReconciling]="reconcilingTemplate">
+ *   <div>Content shown when flag is enabled.</div>
+ * </ng-template>
+ * <ng-template #elseTemplate>
  *   Content shown when flag is disabled.
  * </ng-template>
  * ```
  *
  * @example
- * With all options:
+ * Microsyntax `*` form, start with `let`
  * ```html
- * <div *enableFeatureA="else: elseTemplate;
- * initializing: initTemplate;
- * reconciling: reconcilingTemplate;
- * let value;
- * let details = evaluationDetails">
- *   Flag value: {{ value }}
+ * <div *enableFeatureA="let v; else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
+ *   Content shown when flag is enabled.
  * </div>
  * ```
+ *
+ * @example
+ * Simple `*` usage (no else/initializing/reconciling)
+ * ```html
+ * <div *enableFeatureA="let v">
+ *   Content shown when flag is enabled.
+ * </div>
+ * ```
+ *
+ * @remarks
+ * Note: Angular's microsyntax parser requires the first segment to be a primary
+ * expression or a `let` declaration. Because the flag key is preconfigured, start with
+ * `let v` or `let details = evaluationDetails` (or `let _` if you do not need the value)
+ * before any `else`/`initializing`/`reconciling`/`default` segments.
+ * This is an Angular microsyntax parsing constraint, not a directive limitation.
+ * `*enableFeatureA="else elseTemplate"` will not parse because `else` is a
+ * secondary segment. If you do not need the value, use `let _`, or use the
+ * explicit `ng-template` form above.
  */
 @Directive({
   selector: '[enableFeatureA]',
   standalone: true,
-  hostDirectives: [
-    {
-      directive: BooleanFeatureFlagDirective,
-      inputs: [
-        'booleanFeatureFlag: enableFeatureA',
-        'booleanFeatureFlagDefault: enableFeatureADefault',
-        'booleanFeatureFlagDomain: enableFeatureADomain',
-        'booleanFeatureFlagUpdateOnConfigurationChanged: enableFeatureAUpdateOnConfigurationChanged',
-        'booleanFeatureFlagUpdateOnContextChanged: enableFeatureAUpdateOnContextChanged',
-        'booleanFeatureFlagElse: enableFeatureAElse',
-        'booleanFeatureFlagInitializing: enableFeatureAInitializing',
-        'booleanFeatureFlagReconciling: enableFeatureAReconciling',
-      ],
-    },
-  ],
 })
-export class EnableFeatureADirective {
-  private readonly hostDirective = inject(BooleanFeatureFlagDirective);
+export class EnableFeatureAFeatureFlagDirective extends FeatureFlagDirective<boolean> implements OnChanges {
+  override _changeDetectorRef = inject(ChangeDetectorRef);
+  override _viewContainerRef = inject(ViewContainerRef);
+  override _thenTemplateRef = inject<TemplateRef<FeatureFlagDirectiveContext<boolean>>>(TemplateRef);
 
   constructor() {
-    // Set the pre-configured flag key and default value
-    this.hostDirective.booleanFeatureFlag = "enableFeatureA";
-    this.hostDirective.booleanFeatureFlagDefault = false;
+    super();
+
+    this._featureFlagKey = "enableFeatureA";
+    this._featureFlagDefault = false;
+
+    this._featureFlagValue = true;
+
+  }
+
+  /**
+   * The domain of the boolean feature flag.
+   */
+  @Input({ required: false })
+  set enableFeatureADomain(domain: string | undefined) {
+    super.featureFlagDomain = domain;
+  }
+
+  /**
+   * Update the component if the provider emits a ConfigurationChanged event.
+   * Set to false to prevent components from re-rendering when flag value changes
+   * are received by the associated provider.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set enableFeatureAUpdateOnConfigurationChanged(enabled: boolean | undefined) {
+    this._updateOnConfigurationChanged = enabled ?? true;
+  }
+
+  /**
+   * Update the component when the OpenFeature context changes.
+   * Set to false to prevent components from re-rendering when attributes which
+   * may be factors in flag evaluation change.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set enableFeatureAUpdateOnContextChanged(enabled: boolean | undefined) {
+    this._updateOnContextChanged = enabled ?? true;
+  }
+
+  /**
+   * Template to be displayed when the feature flag is false.
+   */
+  @Input()
+  set enableFeatureAElse(tpl: TemplateRef<FeatureFlagDirectiveContext<boolean>>) {
+    this._elseTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is not ready.
+   */
+  @Input()
+  set enableFeatureAInitializing(tpl: TemplateRef<FeatureFlagDirectiveContext<boolean>>) {
+    this._initializingTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is reconciling.
+   */
+  @Input()
+  set enableFeatureAReconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<boolean>>) {
+    this._reconcilingTemplateRef = tpl;
   }
 }
+
+
 
 /**
  * Structural directive for the `greetingMessage` feature flag.
  *
- * The message to use for greeting users.
+ *The message to use for greeting users.
  *
- * This directive wraps the `StringFeatureFlagDirective` from @openfeature/angular-sdk
- * with pre-configured flag key and default value.
+ * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
+ * with a pre-configured flag key and default value.
  *
  * **Details:**
  * - Flag key: `greetingMessage`
  * - Type: `string`
  * - Default value: `Hello there!`
  *
- * @example
- * Basic usage:
- * ```html
- * <div *greetingMessage>
- *   Content shown when flag is matched.
- * </div>
- * ```
  *
  * @example
- * With else template:
+ * Explicit `ng-template` (no `*`), bind inputs directly
  * ```html
- * <div *greetingMessage="else: disabledTemplate">
- *   Content shown when flag is matched.
- * </div>
- * <ng-template #disabledTemplate>
+ * <ng-template greetingMessage
+ *   [greetingMessageDefault]="defaultValue"
+ *   [greetingMessageValue]="expectedValue"
+ *   [greetingMessageElse]="elseTemplate"
+ *   [greetingMessageInitializing]="initTemplate"
+ *   [greetingMessageReconciling]="reconcilingTemplate">
+ *   <div>Content shown when flag is matched.</div>
+ * </ng-template>
+ * <ng-template #elseTemplate>
  *   Content shown when flag is not matched.
  * </ng-template>
  * ```
  *
  * @example
- * With all options:
+ * Microsyntax `*` form, start with `let`
  * ```html
- * <div *greetingMessage="value: expectedValue; else: elseTemplate;
- * initializing: initTemplate;
- * reconciling: reconcilingTemplate;
- * let value;
- * let details = evaluationDetails">
- *   Flag value: {{ value }}
+ * <div *greetingMessage="let v; value: expectedValue; else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
+ *   Content shown when flag is matched.
  * </div>
  * ```
+ *
+ * @example
+ * Simple `*` usage (no else/initializing/reconciling)
+ * ```html
+ * <div *greetingMessage="let v">
+ *   Content shown when flag is matched.
+ * </div>
+ * ```
+ *
+ * @remarks
+ * Note: Angular's microsyntax parser requires the first segment to be a primary
+ * expression or a `let` declaration. Because the flag key is preconfigured, start with
+ * `let v` or `let details = evaluationDetails` (or `let _` if you do not need the value)
+ * before any `else`/`initializing`/`reconciling`/`default` segments.
+ * This is an Angular microsyntax parsing constraint, not a directive limitation.
+ * `*greetingMessage="else elseTemplate"` will not parse because `else` is a
+ * secondary segment. If you do not need the value, use `let _`, or use the
+ * explicit `ng-template` form above.
  */
 @Directive({
   selector: '[greetingMessage]',
   standalone: true,
-  hostDirectives: [
-    {
-      directive: StringFeatureFlagDirective,
-      inputs: [
-        'stringFeatureFlag: greetingMessage',
-        'stringFeatureFlagDefault: greetingMessageDefault',
-        'stringFeatureFlagDomain: greetingMessageDomain',
-        'stringFeatureFlagUpdateOnConfigurationChanged: greetingMessageUpdateOnConfigurationChanged',
-        'stringFeatureFlagUpdateOnContextChanged: greetingMessageUpdateOnContextChanged',
-        'stringFeatureFlagElse: greetingMessageElse',
-        'stringFeatureFlagInitializing: greetingMessageInitializing',
-        'stringFeatureFlagReconciling: greetingMessageReconciling',
-        'stringFeatureFlagValue: greetingMessageValue',
-      ],
-    },
-  ],
 })
-export class GreetingMessageDirective {
-  private readonly hostDirective = inject(StringFeatureFlagDirective);
+export class GreetingMessageFeatureFlagDirective extends FeatureFlagDirective<string> implements OnChanges {
+  override _changeDetectorRef = inject(ChangeDetectorRef);
+  override _viewContainerRef = inject(ViewContainerRef);
+  override _thenTemplateRef = inject<TemplateRef<FeatureFlagDirectiveContext<string>>>(TemplateRef);
+
+  /**
+   * The expected value of this string feature flag, for which the `then` template should be rendered.
+   */
+  @Input({ required: false }) greetingMessageValue?: string;
 
   constructor() {
-    // Set the pre-configured flag key and default value
-    this.hostDirective.stringFeatureFlag = "greetingMessage";
-    this.hostDirective.stringFeatureFlagDefault = "Hello there!";
+    super();
+
+    this._featureFlagKey = "greetingMessage";
+    this._featureFlagDefault = "Hello there!";
+
+  }
+
+  override ngOnChanges() {
+    super.ngOnChanges();
+
+    this._featureFlagValue = this.greetingMessageValue;
+  }
+
+  /**
+   * The domain of the string feature flag.
+   */
+  @Input({ required: false })
+  set greetingMessageDomain(domain: string | undefined) {
+    super.featureFlagDomain = domain;
+  }
+
+  /**
+   * Update the component if the provider emits a ConfigurationChanged event.
+   * Set to false to prevent components from re-rendering when flag value changes
+   * are received by the associated provider.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set greetingMessageUpdateOnConfigurationChanged(enabled: boolean | undefined) {
+    this._updateOnConfigurationChanged = enabled ?? true;
+  }
+
+  /**
+   * Update the component when the OpenFeature context changes.
+   * Set to false to prevent components from re-rendering when attributes which
+   * may be factors in flag evaluation change.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set greetingMessageUpdateOnContextChanged(enabled: boolean | undefined) {
+    this._updateOnContextChanged = enabled ?? true;
+  }
+
+  /**
+   * Template to be displayed when the feature flag does not match value.
+   */
+  @Input()
+  set greetingMessageElse(tpl: TemplateRef<FeatureFlagDirectiveContext<string>>) {
+    this._elseTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is not ready.
+   */
+  @Input()
+  set greetingMessageInitializing(tpl: TemplateRef<FeatureFlagDirectiveContext<string>>) {
+    this._initializingTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is reconciling.
+   */
+  @Input()
+  set greetingMessageReconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<string>>) {
+    this._reconcilingTemplateRef = tpl;
   }
 }
+
+
 
 /**
  * Structural directive for the `themeCustomization` feature flag.
  *
- * Allows customization of theme colors.
+ *Allows customization of theme colors.
  *
- * This directive wraps the `ObjectFeatureFlagDirective` from @openfeature/angular-sdk
- * with pre-configured flag key and default value.
+ * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
+ * with a pre-configured flag key and default value.
  *
  * **Details:**
  * - Flag key: `themeCustomization`
  * - Type: `JsonValue`
  * - Default value: `{"primaryColor":"#007bff","secondaryColor":"#6c757d"}`
  *
- * @example
- * Basic usage:
- * ```html
- * <div *themeCustomization>
- *   Content shown when flag is matched.
- * </div>
- * ```
  *
  * @example
- * With else template:
+ * Explicit `ng-template` (no `*`), bind inputs directly
  * ```html
- * <div *themeCustomization="else: disabledTemplate">
- *   Content shown when flag is matched.
- * </div>
- * <ng-template #disabledTemplate>
+ * <ng-template themeCustomization
+ *   [themeCustomizationDefault]="defaultValue"
+ *   [themeCustomizationValue]="expectedValue"
+ *   [themeCustomizationElse]="elseTemplate"
+ *   [themeCustomizationInitializing]="initTemplate"
+ *   [themeCustomizationReconciling]="reconcilingTemplate">
+ *   <div>Content shown when flag is matched.</div>
+ * </ng-template>
+ * <ng-template #elseTemplate>
  *   Content shown when flag is not matched.
  * </ng-template>
  * ```
  *
  * @example
- * With all options:
+ * Microsyntax `*` form, start with `let`
  * ```html
- * <div *themeCustomization="value: expectedValue; else: elseTemplate;
- * initializing: initTemplate;
- * reconciling: reconcilingTemplate;
- * let value;
- * let details = evaluationDetails">
- *   Flag value: {{ value }}
+ * <div *themeCustomization="let v; value: expectedValue; else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
+ *   Content shown when flag is matched.
  * </div>
  * ```
+ *
+ * @example
+ * Simple `*` usage (no else/initializing/reconciling)
+ * ```html
+ * <div *themeCustomization="let v">
+ *   Content shown when flag is matched.
+ * </div>
+ * ```
+ *
+ * @remarks
+ * Note: Angular's microsyntax parser requires the first segment to be a primary
+ * expression or a `let` declaration. Because the flag key is preconfigured, start with
+ * `let v` or `let details = evaluationDetails` (or `let _` if you do not need the value)
+ * before any `else`/`initializing`/`reconciling`/`default` segments.
+ * This is an Angular microsyntax parsing constraint, not a directive limitation.
+ * `*themeCustomization="else elseTemplate"` will not parse because `else` is a
+ * secondary segment. If you do not need the value, use `let _`, or use the
+ * explicit `ng-template` form above.
  */
 @Directive({
   selector: '[themeCustomization]',
   standalone: true,
-  hostDirectives: [
-    {
-      directive: ObjectFeatureFlagDirective,
-      inputs: [
-        'objectFeatureFlag: themeCustomization',
-        'objectFeatureFlagDefault: themeCustomizationDefault',
-        'objectFeatureFlagDomain: themeCustomizationDomain',
-        'objectFeatureFlagUpdateOnConfigurationChanged: themeCustomizationUpdateOnConfigurationChanged',
-        'objectFeatureFlagUpdateOnContextChanged: themeCustomizationUpdateOnContextChanged',
-        'objectFeatureFlagElse: themeCustomizationElse',
-        'objectFeatureFlagInitializing: themeCustomizationInitializing',
-        'objectFeatureFlagReconciling: themeCustomizationReconciling',
-        'objectFeatureFlagValue: themeCustomizationValue',
-      ],
-    },
-  ],
 })
-export class ThemeCustomizationDirective {
-  private readonly hostDirective = inject(ObjectFeatureFlagDirective);
+export class ThemeCustomizationFeatureFlagDirective extends FeatureFlagDirective<JsonValue> implements OnChanges {
+  override _changeDetectorRef = inject(ChangeDetectorRef);
+  override _viewContainerRef = inject(ViewContainerRef);
+  override _thenTemplateRef = inject<TemplateRef<FeatureFlagDirectiveContext<JsonValue>>>(TemplateRef);
+
+  /**
+   * The expected value of this object feature flag, for which the `then` template should be rendered.
+   */
+  @Input({ required: false }) themeCustomizationValue?: JsonValue;
 
   constructor() {
-    // Set the pre-configured flag key and default value
-    this.hostDirective.objectFeatureFlag = "themeCustomization";
-    this.hostDirective.objectFeatureFlagDefault = {"primaryColor":"#007bff","secondaryColor":"#6c757d"};
+    super();
+
+    this._featureFlagKey = "themeCustomization";
+    this._featureFlagDefault = {"primaryColor":"#007bff","secondaryColor":"#6c757d"};
+
+  }
+
+  override ngOnChanges() {
+    super.ngOnChanges();
+
+    this._featureFlagValue = this.themeCustomizationValue;
+  }
+
+  /**
+   * The domain of the object feature flag.
+   */
+  @Input({ required: false })
+  set themeCustomizationDomain(domain: string | undefined) {
+    super.featureFlagDomain = domain;
+  }
+
+  /**
+   * Update the component if the provider emits a ConfigurationChanged event.
+   * Set to false to prevent components from re-rendering when flag value changes
+   * are received by the associated provider.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set themeCustomizationUpdateOnConfigurationChanged(enabled: boolean | undefined) {
+    this._updateOnConfigurationChanged = enabled ?? true;
+  }
+
+  /**
+   * Update the component when the OpenFeature context changes.
+   * Set to false to prevent components from re-rendering when attributes which
+   * may be factors in flag evaluation change.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set themeCustomizationUpdateOnContextChanged(enabled: boolean | undefined) {
+    this._updateOnContextChanged = enabled ?? true;
+  }
+
+  /**
+   * Template to be displayed when the feature flag does not match value.
+   */
+  @Input()
+  set themeCustomizationElse(tpl: TemplateRef<FeatureFlagDirectiveContext<JsonValue>>) {
+    this._elseTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is not ready.
+   */
+  @Input()
+  set themeCustomizationInitializing(tpl: TemplateRef<FeatureFlagDirectiveContext<JsonValue>>) {
+    this._initializingTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is reconciling.
+   */
+  @Input()
+  set themeCustomizationReconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<JsonValue>>) {
+    this._reconcilingTemplateRef = tpl;
   }
 }
+
+
 
 /**
  * Structural directive for the `usernameMaxLength` feature flag.
  *
- * Maximum allowed length for usernames.
+ *Maximum allowed length for usernames.
  *
- * This directive wraps the `NumberFeatureFlagDirective` from @openfeature/angular-sdk
- * with pre-configured flag key and default value.
+ * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
+ * with a pre-configured flag key and default value.
  *
  * **Details:**
  * - Flag key: `usernameMaxLength`
  * - Type: `number`
  * - Default value: `50`
  *
- * @example
- * Basic usage:
- * ```html
- * <div *usernameMaxLength>
- *   Content shown when flag is matched.
- * </div>
- * ```
  *
  * @example
- * With else template:
+ * Explicit `ng-template` (no `*`), bind inputs directly
  * ```html
- * <div *usernameMaxLength="else: disabledTemplate">
- *   Content shown when flag is matched.
- * </div>
- * <ng-template #disabledTemplate>
+ * <ng-template usernameMaxLength
+ *   [usernameMaxLengthDefault]="defaultValue"
+ *   [usernameMaxLengthValue]="expectedValue"
+ *   [usernameMaxLengthElse]="elseTemplate"
+ *   [usernameMaxLengthInitializing]="initTemplate"
+ *   [usernameMaxLengthReconciling]="reconcilingTemplate">
+ *   <div>Content shown when flag is matched.</div>
+ * </ng-template>
+ * <ng-template #elseTemplate>
  *   Content shown when flag is not matched.
  * </ng-template>
  * ```
  *
  * @example
- * With all options:
+ * Microsyntax `*` form, start with `let`
  * ```html
- * <div *usernameMaxLength="value: expectedValue; else: elseTemplate;
- * initializing: initTemplate;
- * reconciling: reconcilingTemplate;
- * let value;
- * let details = evaluationDetails">
- *   Flag value: {{ value }}
+ * <div *usernameMaxLength="let v; value: expectedValue; else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
+ *   Content shown when flag is matched.
  * </div>
  * ```
+ *
+ * @example
+ * Simple `*` usage (no else/initializing/reconciling)
+ * ```html
+ * <div *usernameMaxLength="let v">
+ *   Content shown when flag is matched.
+ * </div>
+ * ```
+ *
+ * @remarks
+ * Note: Angular's microsyntax parser requires the first segment to be a primary
+ * expression or a `let` declaration. Because the flag key is preconfigured, start with
+ * `let v` or `let details = evaluationDetails` (or `let _` if you do not need the value)
+ * before any `else`/`initializing`/`reconciling`/`default` segments.
+ * This is an Angular microsyntax parsing constraint, not a directive limitation.
+ * `*usernameMaxLength="else elseTemplate"` will not parse because `else` is a
+ * secondary segment. If you do not need the value, use `let _`, or use the
+ * explicit `ng-template` form above.
  */
 @Directive({
   selector: '[usernameMaxLength]',
   standalone: true,
-  hostDirectives: [
-    {
-      directive: NumberFeatureFlagDirective,
-      inputs: [
-        'numberFeatureFlag: usernameMaxLength',
-        'numberFeatureFlagDefault: usernameMaxLengthDefault',
-        'numberFeatureFlagDomain: usernameMaxLengthDomain',
-        'numberFeatureFlagUpdateOnConfigurationChanged: usernameMaxLengthUpdateOnConfigurationChanged',
-        'numberFeatureFlagUpdateOnContextChanged: usernameMaxLengthUpdateOnContextChanged',
-        'numberFeatureFlagElse: usernameMaxLengthElse',
-        'numberFeatureFlagInitializing: usernameMaxLengthInitializing',
-        'numberFeatureFlagReconciling: usernameMaxLengthReconciling',
-        'numberFeatureFlagValue: usernameMaxLengthValue',
-      ],
-    },
-  ],
 })
-export class UsernameMaxLengthDirective {
-  private readonly hostDirective = inject(NumberFeatureFlagDirective);
+export class UsernameMaxLengthFeatureFlagDirective extends FeatureFlagDirective<number> implements OnChanges {
+  override _changeDetectorRef = inject(ChangeDetectorRef);
+  override _viewContainerRef = inject(ViewContainerRef);
+  override _thenTemplateRef = inject<TemplateRef<FeatureFlagDirectiveContext<number>>>(TemplateRef);
+
+  /**
+   * The expected value of this number feature flag, for which the `then` template should be rendered.
+   */
+  @Input({ required: false }) usernameMaxLengthValue?: number;
 
   constructor() {
-    // Set the pre-configured flag key and default value
-    this.hostDirective.numberFeatureFlag = "usernameMaxLength";
-    this.hostDirective.numberFeatureFlagDefault = 50;
+    super();
+
+    this._featureFlagKey = "usernameMaxLength";
+    this._featureFlagDefault = 50;
+
+  }
+
+  override ngOnChanges() {
+    super.ngOnChanges();
+
+    this._featureFlagValue = this.usernameMaxLengthValue;
+  }
+
+  /**
+   * The domain of the number feature flag.
+   */
+  @Input({ required: false })
+  set usernameMaxLengthDomain(domain: string | undefined) {
+    super.featureFlagDomain = domain;
+  }
+
+  /**
+   * Update the component if the provider emits a ConfigurationChanged event.
+   * Set to false to prevent components from re-rendering when flag value changes
+   * are received by the associated provider.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set usernameMaxLengthUpdateOnConfigurationChanged(enabled: boolean | undefined) {
+    this._updateOnConfigurationChanged = enabled ?? true;
+  }
+
+  /**
+   * Update the component when the OpenFeature context changes.
+   * Set to false to prevent components from re-rendering when attributes which
+   * may be factors in flag evaluation change.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set usernameMaxLengthUpdateOnContextChanged(enabled: boolean | undefined) {
+    this._updateOnContextChanged = enabled ?? true;
+  }
+
+  /**
+   * Template to be displayed when the feature flag does not match value.
+   */
+  @Input()
+  set usernameMaxLengthElse(tpl: TemplateRef<FeatureFlagDirectiveContext<number>>) {
+    this._elseTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is not ready.
+   */
+  @Input()
+  set usernameMaxLengthInitializing(tpl: TemplateRef<FeatureFlagDirectiveContext<number>>) {
+    this._initializingTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is reconciling.
+   */
+  @Input()
+  set usernameMaxLengthReconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<number>>) {
+    this._reconcilingTemplateRef = tpl;
   }
 }
+
 
 
 // ============================================================================
@@ -640,9 +969,9 @@ export class UsernameMaxLengthDirective {
  * ```
  */
 export const GeneratedFeatureFlagDirectives = [
-  DiscountPercentageDirective,
-  EnableFeatureADirective,
-  GreetingMessageDirective,
-  ThemeCustomizationDirective,
-  UsernameMaxLengthDirective,
+  DiscountPercentageFeatureFlagDirective,
+  EnableFeatureAFeatureFlagDirective,
+  GreetingMessageFeatureFlagDirective,
+  ThemeCustomizationFeatureFlagDirective,
+  UsernameMaxLengthFeatureFlagDirective,
 ] as const;
