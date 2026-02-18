@@ -225,6 +225,9 @@ openfeature generate typescript --output ./src/flags
 
 See [here](./docs/commands/openfeature_generate.md) for all available options.
 
+> **_NOTE:_**
+> Angular generated code requires `@openfeature/angular-sdk` version `1.1.0` or newer.
+
 ### `pull`
 
 Fetch feature flag configurations from a remote source.
