@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.16](https://github.com/open-feature/cli/compare/v0.3.15...v0.3.16) (2026-02-19)
+
+
+### 🔄 Refactoring
+
+* **generator/angular:** extend FeatureFlagDirective&lt;T&gt; instead of using hostDirectives ([#218](https://github.com/open-feature/cli/issues/218)) ([ea36a20](https://github.com/open-feature/cli/commit/ea36a2058c05b04b73e9c328913023b4ac386e73))
+
 ## [0.3.15](https://github.com/open-feature/cli/compare/v0.3.14...v0.3.15) (2026-02-09)
 
 
