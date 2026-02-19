@@ -32,18 +32,18 @@ describe("Compilation Tests", () => {
 
   it("should import all generated directives", async () => {
     const {
-      DiscountPercentageDirective,
-      EnableFeatureADirective,
-      GreetingMessageDirective,
-      ThemeCustomizationDirective,
-      UsernameMaxLengthDirective,
+      DiscountPercentageFeatureFlagDirective,
+      EnableFeatureAFeatureFlagDirective,
+      GreetingMessageFeatureFlagDirective,
+      ThemeCustomizationFeatureFlagDirective,
+      UsernameMaxLengthFeatureFlagDirective,
     } = await import("../generated/openfeature.generated");
 
-    expect(DiscountPercentageDirective).toBeDefined();
-    expect(EnableFeatureADirective).toBeDefined();
-    expect(GreetingMessageDirective).toBeDefined();
-    expect(ThemeCustomizationDirective).toBeDefined();
-    expect(UsernameMaxLengthDirective).toBeDefined();
+    expect(DiscountPercentageFeatureFlagDirective).toBeDefined();
+    expect(EnableFeatureAFeatureFlagDirective).toBeDefined();
+    expect(GreetingMessageFeatureFlagDirective).toBeDefined();
+    expect(ThemeCustomizationFeatureFlagDirective).toBeDefined();
+    expect(UsernameMaxLengthFeatureFlagDirective).toBeDefined();
   });
 
   it("should import GeneratedFeatureFlagDirectives array", async () => {

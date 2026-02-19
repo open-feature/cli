@@ -4,25 +4,28 @@
  * This file contains generated typesafe Angular services and directives
  * for feature flags defined in your OpenFeature flag manifest.
  *
- * @openfeature/angular-sdk is required as a peer dependency.
+ * Requires @openfeature/angular-sdk >= 1.1.0.
  *
- * @see https://openfeature.dev
+ * @see https://openfeature.dev/docs/reference/other-technologies/cli
  */
 
 import {
+  ChangeDetectorRef,
   Directive,
   inject,
   Injectable,
+  Input,
+  OnChanges,
+  TemplateRef,
+  ViewContainerRef,
 } from '@angular/core';
 import {
   AngularFlagEvaluationOptions,
-  BooleanFeatureFlagDirective,
   EvaluationDetails,
+  FeatureFlagDirective,
+  FeatureFlagDirectiveContext,
   FeatureFlagService,
   JsonValue,
-  NumberFeatureFlagDirective,
-  ObjectFeatureFlagDirective,
-  StringFeatureFlagDirective,
 } from '@openfeature/angular-sdk';
 import { Observable } from 'rxjs';
 
@@ -113,97 +116,154 @@ export class GeneratedFeatureFlagService {
 // ============================================================================
 
 {{ range .Flagset.Flags }}
-{{- $type := .Type | OpenFeatureType -}}
-{{- $directiveType := "" -}}
-{{- $directivePrefix := "" -}}
-{{- if eq $type "boolean" -}}
-  {{- $directiveType = "BooleanFeatureFlagDirective" -}}
-  {{- $directivePrefix = "booleanFeatureFlag" -}}
-{{- else if eq $type "string" -}}
-  {{- $directiveType = "StringFeatureFlagDirective" -}}
-  {{- $directivePrefix = "stringFeatureFlag" -}}
-{{- else if eq $type "number" -}}
-  {{- $directiveType = "NumberFeatureFlagDirective" -}}
-  {{- $directivePrefix = "numberFeatureFlag" -}}
-{{- else -}}
-  {{- $directiveType = "ObjectFeatureFlagDirective" -}}
-  {{- $directivePrefix = "objectFeatureFlag" -}}
-{{- end }}
+{{ $type := .Type | OpenFeatureType }}
 /**
  * Structural directive for the `{{ .Key }}` feature flag.
  *
- * {{ if .Description }}{{ .Description }}{{ else }}Feature flag directive.{{ end }}
+ * {{ if .Description }}{{ .Description }}{{ end }}
  *
- * This directive wraps the `{{ $directiveType }}` from @openfeature/angular-sdk
- * with pre-configured flag key and default value.
+ * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
+ * with a pre-configured flag key and default value.
  *
  * **Details:**
  * - Flag key: `{{ .Key }}`
  * - Type: `{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}`
  * - Default value: `{{ if eq $type "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
  *
- * @example
- * Basic usage:
- * ```html
- * <div *{{ .Key | ToCamel }}>
- *   Content shown when flag is {{ if eq $type "boolean" }}enabled{{ else }}matched{{ end }}.
- * </div>
- * ```
  *
  * @example
- * With else template:
+ * Explicit `ng-template` (no `*`), bind inputs directly
  * ```html
- * <div *{{ .Key | ToCamel }}="else: disabledTemplate">
- *   Content shown when flag is {{ if eq $type "boolean" }}enabled{{ else }}matched{{ end }}.
- * </div>
- * <ng-template #disabledTemplate>
+ * <ng-template {{ .Key | ToCamel }}
+ *   [{{ .Key | ToCamel }}Default]="defaultValue"
+ *   {{ if ne $type "boolean" }}[{{ .Key | ToCamel }}Value]="expectedValue"
+ *   {{ end }}[{{ .Key | ToCamel }}Else]="elseTemplate"
+ *   [{{ .Key | ToCamel }}Initializing]="initTemplate"
+ *   [{{ .Key | ToCamel }}Reconciling]="reconcilingTemplate">
+ *   <div>Content shown when flag is {{ if eq $type "boolean" }}enabled{{ else }}matched{{ end }}.</div>
+ * </ng-template>
+ * <ng-template #elseTemplate>
  *   Content shown when flag is {{ if eq $type "boolean" }}disabled{{ else }}not matched{{ end }}.
  * </ng-template>
  * ```
  *
  * @example
- * With all options:
+ * Microsyntax `*` form, start with `let`
  * ```html
- * <div *{{ .Key | ToCamel }}="{{ if ne $type "boolean" }}value: expectedValue; {{ end }}else: elseTemplate;
- * initializing: initTemplate;
- * reconciling: reconcilingTemplate;
- * let value;
- * let details = evaluationDetails">
- *   Flag value: {{ "{{" }} value {{ "}}" }}
+ * <div *{{ .Key | ToCamel }}="let v; {{ if ne $type "boolean" }}value: expectedValue; {{ end }}else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
+ *   Content shown when flag is {{ if eq $type "boolean" }}enabled{{ else }}matched{{ end }}.
  * </div>
  * ```
+ *
+ * @example
+ * Simple `*` usage (no else/initializing/reconciling)
+ * ```html
+ * <div *{{ .Key | ToCamel }}="let v">
+ *   Content shown when flag is {{ if eq $type "boolean" }}enabled{{ else }}matched{{ end }}.
+ * </div>
+ * ```
+ *
+ * @remarks
+ * Note: Angular's microsyntax parser requires the first segment to be a primary
+ * expression or a `let` declaration. Because the flag key is preconfigured, start with
+ * `let v` or `let details = evaluationDetails` (or `let _` if you do not need the value)
+ * before any `else`/`initializing`/`reconciling`/`default` segments.
+ * This is an Angular microsyntax parsing constraint, not a directive limitation.
+ * `*{{ .Key | ToCamel }}="else elseTemplate"` will not parse because `else` is a
+ * secondary segment. If you do not need the value, use `let _`, or use the
+ * explicit `ng-template` form above.
  */
 @Directive({
   selector: '[{{ .Key | ToCamel }}]',
   standalone: true,
-  hostDirectives: [
-    {
-      directive: {{ $directiveType }},
-      inputs: [
-        '{{ $directivePrefix }}: {{ .Key | ToCamel }}',
-        '{{ $directivePrefix }}Default: {{ .Key | ToCamel }}Default',
-        '{{ $directivePrefix }}Domain: {{ .Key | ToCamel }}Domain',
-        '{{ $directivePrefix }}UpdateOnConfigurationChanged: {{ .Key | ToCamel }}UpdateOnConfigurationChanged',
-        '{{ $directivePrefix }}UpdateOnContextChanged: {{ .Key | ToCamel }}UpdateOnContextChanged',
-        '{{ $directivePrefix }}Else: {{ .Key | ToCamel }}Else',
-        '{{ $directivePrefix }}Initializing: {{ .Key | ToCamel }}Initializing',
-        '{{ $directivePrefix }}Reconciling: {{ .Key | ToCamel }}Reconciling',
-{{- if ne $type "boolean" }}
-        '{{ $directivePrefix }}Value: {{ .Key | ToCamel }}Value',
-{{- end }}
-      ],
-    },
-  ],
 })
-export class {{ .Key | ToPascal }}Directive {
-  private readonly hostDirective = inject({{ $directiveType }});
+export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirective<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}> implements OnChanges {
+  override _changeDetectorRef = inject(ChangeDetectorRef);
+  override _viewContainerRef = inject(ViewContainerRef);
+  override _thenTemplateRef = inject<TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>>(TemplateRef);
+
+{{- if ne $type "boolean" }}
+
+  /**
+   * The expected value of this {{ $type }} feature flag, for which the `then` template should be rendered.
+   */
+  @Input({ required: false }) {{ .Key | ToCamel }}Value?: {{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }};
+{{- end }}
 
   constructor() {
-    // Set the pre-configured flag key and default value
-    this.hostDirective.{{ $directivePrefix }} = {{ .Key | Quote }};
-    this.hostDirective.{{ $directivePrefix }}Default = {{ if eq $type "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }};
+    super();
+
+    this._featureFlagKey = {{ .Key | ToCamel | QuoteString }};
+    this._featureFlagDefault = {{ if eq $type "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }};
+{{ if eq $type "boolean" }}
+    this._featureFlagValue = true;
+{{ end }}
+  }
+
+{{- if ne $type "boolean" }}
+
+  override ngOnChanges() {
+    super.ngOnChanges();
+
+    this._featureFlagValue = this.{{ .Key | ToCamel }}Value;
+  }
+{{- end }}
+
+  /**
+   * The domain of the {{ $type }} feature flag.
+   */
+  @Input({ required: false })
+  set {{ .Key | ToCamel }}Domain(domain: string | undefined) {
+    super.featureFlagDomain = domain;
+  }
+
+  /**
+   * Update the component if the provider emits a ConfigurationChanged event.
+   * Set to false to prevent components from re-rendering when flag value changes
+   * are received by the associated provider.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set {{ .Key | ToCamel }}UpdateOnConfigurationChanged(enabled: boolean | undefined) {
+    this._updateOnConfigurationChanged = enabled ?? true;
+  }
+
+  /**
+   * Update the component when the OpenFeature context changes.
+   * Set to false to prevent components from re-rendering when attributes which
+   * may be factors in flag evaluation change.
+   * Defaults to true.
+   */
+  @Input({ required: false })
+  set {{ .Key | ToCamel }}UpdateOnContextChanged(enabled: boolean | undefined) {
+    this._updateOnContextChanged = enabled ?? true;
+  }
+
+  /**
+   * Template to be displayed when the feature flag {{ if eq $type "boolean" }}is false{{ else }}does not match value{{ end }}.
+   */
+  @Input()
+  set {{ .Key | ToCamel }}Else(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+    this._elseTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is not ready.
+   */
+  @Input()
+  set {{ .Key | ToCamel }}Initializing(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+    this._initializingTemplateRef = tpl;
+  }
+
+  /**
+   * Template to be displayed when the provider is reconciling.
+   */
+  @Input()
+  set {{ .Key | ToCamel }}Reconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+    this._reconcilingTemplateRef = tpl;
   }
 }
+
 {{ end }}
 
 // ============================================================================
@@ -226,6 +286,6 @@ export class {{ .Key | ToPascal }}Directive {
  */
 export const GeneratedFeatureFlagDirectives = [
 {{- range .Flagset.Flags }}
-  {{ .Key | ToPascal }}Directive,
+  {{ .Key | ToPascal }}FeatureFlagDirective,
 {{- end }}
 ] as const;

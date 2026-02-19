@@ -6,11 +6,11 @@ import { OpenFeature, InMemoryProvider } from "@openfeature/web-sdk";
 import { v4 as uuid } from "uuid";
 import {
   GeneratedFeatureFlagDirectives,
-  EnableFeatureADirective,
-  GreetingMessageDirective,
-  DiscountPercentageDirective,
-  UsernameMaxLengthDirective,
-  ThemeCustomizationDirective,
+  EnableFeatureAFeatureFlagDirective,
+  GreetingMessageFeatureFlagDirective,
+  DiscountPercentageFeatureFlagDirective,
+  UsernameMaxLengthFeatureFlagDirective,
+  ThemeCustomizationFeatureFlagDirective,
 } from "../generated/openfeature.generated";
 import type { JsonValue } from "@openfeature/angular-sdk";
 
@@ -18,7 +18,7 @@ import type { JsonValue } from "@openfeature/angular-sdk";
 @Component({
   selector: "test-boolean",
   standalone: true,
-  imports: [EnableFeatureADirective],
+  imports: [EnableFeatureAFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container *enableFeatureA="let value; domain: domain">
@@ -31,11 +31,27 @@ class TestBooleanComponent {
   @Input() domain?: string;
 }
 
+// Test component for boolean directive with simple microsyntax
+@Component({
+  selector: "test-boolean-simple",
+  standalone: true,
+  imports: [EnableFeatureAFeatureFlagDirective],
+  template: `
+    <div class="container">
+      <div class="flag-content" *enableFeatureA>
+        Feature A is enabled
+      </div>
+    </div>
+  `,
+})
+class TestBooleanSimpleComponent {
+}
+
 // Test component for string directive with domain input
 @Component({
   selector: "test-string",
   standalone: true,
-  imports: [GreetingMessageDirective],
+  imports: [GreetingMessageFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container *greetingMessage="let value; domain: domain">
@@ -52,7 +68,7 @@ class TestStringComponent {
 @Component({
   selector: "test-number",
   standalone: true,
-  imports: [DiscountPercentageDirective],
+  imports: [DiscountPercentageFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container *discountPercentage="let value; domain: domain">
@@ -69,7 +85,7 @@ class TestNumberComponent {
 @Component({
   selector: "test-username",
   standalone: true,
-  imports: [UsernameMaxLengthDirective],
+  imports: [UsernameMaxLengthFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container *usernameMaxLength="let value; domain: domain">
@@ -86,7 +102,7 @@ class TestUsernameComponent {
 @Component({
   selector: "test-object",
   standalone: true,
-  imports: [ThemeCustomizationDirective, JsonPipe],
+  imports: [ThemeCustomizationFeatureFlagDirective, JsonPipe],
   template: `
     <div class="container">
       <ng-container *themeCustomization="let value; domain: domain">
@@ -140,7 +156,7 @@ class TestAllDirectivesComponent {
 @Component({
   selector: "test-boolean-else",
   standalone: true,
-  imports: [EnableFeatureADirective],
+  imports: [EnableFeatureAFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container
@@ -162,7 +178,7 @@ class TestBooleanElseComponent {
 @Component({
   selector: "test-string-value",
   standalone: true,
-  imports: [GreetingMessageDirective],
+  imports: [GreetingMessageFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container
@@ -190,7 +206,7 @@ class TestStringValueComponent {
 @Component({
   selector: "test-number-value",
   standalone: true,
-  imports: [DiscountPercentageDirective],
+  imports: [DiscountPercentageFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container
@@ -218,7 +234,7 @@ class TestNumberValueComponent {
 @Component({
   selector: "test-username-value",
   standalone: true,
-  imports: [UsernameMaxLengthDirective],
+  imports: [UsernameMaxLengthFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container
@@ -246,7 +262,7 @@ class TestUsernameValueComponent {
 @Component({
   selector: "test-object-value",
   standalone: true,
-  imports: [ThemeCustomizationDirective],
+  imports: [ThemeCustomizationFeatureFlagDirective],
   template: `
     <div class="container">
       <ng-container
@@ -287,6 +303,27 @@ describe("Generated Directives Tests", () => {
   });
 
   describe("EnableFeatureADirective (boolean)", () => {
+    it("should render content with simple microsyntax", async () => {
+      provider = new InMemoryProvider({
+        enableFeatureA: {
+          variants: { on: true },
+          defaultVariant: "on",
+          disabled: false,
+        },
+      });
+      await OpenFeature.setProviderAndWait(provider);
+
+      const fixture = TestBed.configureTestingModule({
+        imports: [TestBooleanSimpleComponent],
+      }).createComponent(TestBooleanSimpleComponent);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const content = fixture.nativeElement.querySelector(".flag-content");
+      expect(content).not.toBeNull();
+      expect(content.textContent.trim()).toBe("Feature A is enabled");
+    });
+
     it("should render content when flag is true", async () => {
       provider = new InMemoryProvider({
         enableFeatureA: {
