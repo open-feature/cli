@@ -4,9 +4,9 @@
  * This file contains generated typesafe Angular services and directives
  * for feature flags defined in your OpenFeature flag manifest.
  *
- * @openfeature/angular-sdk 1.1.0 or newer is required as a peer dependency.
+ * Requires @openfeature/angular-sdk >= 1.1.0.
  *
- * @see https://openfeature.dev
+ * @see https://openfeature.dev/docs/reference/other-technologies/cli
  */
 
 import {
@@ -258,7 +258,7 @@ export class GeneratedFeatureFlagService {
 /**
  * Structural directive for the `discountPercentage` feature flag.
  *
- *Discount percentage applied to purchases.
+ * Discount percentage applied to purchases.
  *
  * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
  * with a pre-configured flag key and default value.
@@ -399,7 +399,7 @@ export class DiscountPercentageFeatureFlagDirective extends FeatureFlagDirective
 /**
  * Structural directive for the `enableFeatureA` feature flag.
  *
- *Controls whether Feature A is enabled.
+ * Controls whether Feature A is enabled.
  *
  * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
  * with a pre-configured flag key and default value.
@@ -530,7 +530,7 @@ export class EnableFeatureAFeatureFlagDirective extends FeatureFlagDirective<boo
 /**
  * Structural directive for the `greetingMessage` feature flag.
  *
- *The message to use for greeting users.
+ * The message to use for greeting users.
  *
  * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
  * with a pre-configured flag key and default value.
@@ -671,7 +671,7 @@ export class GreetingMessageFeatureFlagDirective extends FeatureFlagDirective<st
 /**
  * Structural directive for the `themeCustomization` feature flag.
  *
- *Allows customization of theme colors.
+ * Allows customization of theme colors.
  *
  * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
  * with a pre-configured flag key and default value.
@@ -812,7 +812,7 @@ export class ThemeCustomizationFeatureFlagDirective extends FeatureFlagDirective
 /**
  * Structural directive for the `usernameMaxLength` feature flag.
  *
- *Maximum allowed length for usernames.
+ * Maximum allowed length for usernames.
  *
  * This directive extends `FeatureFlagDirective` from @openfeature/angular-sdk
  * with a pre-configured flag key and default value.
