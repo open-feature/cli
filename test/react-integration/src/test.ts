@@ -60,8 +60,9 @@ async function main() {
     console.log('All generated React hooks are properly structured!');
     console.log('Generated React code compiles successfully!');
     process.exit(0);
-  } catch (error: any) {
-    console.error('Error:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Error:', message);
     process.exit(1);
   }
 }

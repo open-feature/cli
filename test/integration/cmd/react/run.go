@@ -34,9 +34,9 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 		Include: []string{"package.json", "tsconfig.json", "src/**/*.ts", "src/**/*.tsx"},
 	})
 
-	// Build the CLI
+	// Build the CLI in a Go container
 	cli := client.Container().
-		From("golang:1.24-alpine").
+		From("golang:1.24.3-alpine").
 		WithExec([]string{"apk", "add", "--no-cache", "git"}).
 		WithDirectory("/src", source).
 		WithWorkdir("/src").
@@ -54,9 +54,9 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 	// Get generated files
 	generatedFiles := generated.Directory("/tmp/generated")
 
-	// Test React compilation with the generated files
+	// Create the React test container
 	reactContainer := client.Container().
-		From("node:20-alpine").
+		From("node:20.18.1-alpine").
 		WithWorkdir("/app").
 		WithDirectory("/app", testFiles).
 		WithDirectory("/app/src/generated", generatedFiles).
