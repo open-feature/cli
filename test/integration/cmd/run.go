@@ -45,6 +45,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Run the Java integration test
+	javaCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/java")
+	javaCmd.Stdout = os.Stdout
+	javaCmd.Stderr = os.Stderr
+	if err := javaCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running Java integration test: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Add more tests here as they are available
 
 	fmt.Println("=== All integration tests passed successfully ===")
