@@ -45,7 +45,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Add more tests here as they are available
+	// Run the React integration test
+	reactCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/react")
+	reactCmd.Stdout = os.Stdout
+	reactCmd.Stderr = os.Stderr
+	if err := reactCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running React integration test: %v\n", err)
+		os.Exit(1)
+	}
 
 	fmt.Println("=== All integration tests passed successfully ===")
 }
