@@ -45,7 +45,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Add more tests here as they are available
+	// Run the NestJS integration test
+	nestjsCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/nestjs")
+	nestjsCmd.Stdout = os.Stdout
+	nestjsCmd.Stderr = os.Stderr
+	if err := nestjsCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running NestJS integration test: %v\n", err)
+		os.Exit(1)
+	}
 
 	fmt.Println("=== All integration tests passed successfully ===")
 }
