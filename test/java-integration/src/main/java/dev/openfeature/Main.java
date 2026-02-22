@@ -5,7 +5,6 @@ import dev.openfeature.sdk.*;
 import dev.openfeature.sdk.providers.memory.Flag;
 import dev.openfeature.sdk.providers.memory.InMemoryProvider;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -22,36 +21,33 @@ public class Main {
 
     private static void run() throws Exception {
         // Set up the in-memory provider with test flags
-        Map<String, Flag<?>> flags = new HashMap<>();
+        Map<String, Object> themeConfig = Map.of(
+            "primaryColor", "#007bff",
+            "secondaryColor", "#6c757d"
+        );
 
-        flags.put("discountPercentage", Flag.builder()
-            .variant("default", 0.15)
-            .defaultVariant("default")
-            .build());
-
-        flags.put("enableFeatureA", Flag.builder()
-            .variant("default", false)
-            .defaultVariant("default")
-            .build());
-
-        flags.put("greetingMessage", Flag.builder()
-            .variant("default", "Hello there!")
-            .defaultVariant("default")
-            .build());
-
-        flags.put("usernameMaxLength", Flag.builder()
-            .variant("default", 50)
-            .defaultVariant("default")
-            .build());
-
-        Map<String, Object> themeConfig = new HashMap<>();
-        themeConfig.put("primaryColor", "#007bff");
-        themeConfig.put("secondaryColor", "#6c757d");
-
-        flags.put("themeCustomization", Flag.builder()
-            .variant("default", new Value(themeConfig))
-            .defaultVariant("default")
-            .build());
+        Map<String, Flag<?>> flags = Map.of(
+            "discountPercentage", Flag.builder()
+                .variant("default", 0.15)
+                .defaultVariant("default")
+                .build(),
+            "enableFeatureA", Flag.builder()
+                .variant("default", false)
+                .defaultVariant("default")
+                .build(),
+            "greetingMessage", Flag.builder()
+                .variant("default", "Hello there!")
+                .defaultVariant("default")
+                .build(),
+            "usernameMaxLength", Flag.builder()
+                .variant("default", 50)
+                .defaultVariant("default")
+                .build(),
+            "themeCustomization", Flag.builder()
+                .variant("default", new Value(themeConfig))
+                .defaultVariant("default")
+                .build()
+        );
 
         InMemoryProvider provider = new InMemoryProvider(flags);
 
