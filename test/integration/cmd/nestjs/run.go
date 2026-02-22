@@ -40,7 +40,6 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 		WithExec([]string{"apk", "add", "--no-cache", "git"}).
 		WithDirectory("/src", source).
 		WithWorkdir("/src").
-		WithExec([]string{"go", "mod", "tidy"}).
 		WithExec([]string{"go", "mod", "download"}).
 		WithExec([]string{"go", "build", "-o", "cli", "./cmd/openfeature"})
 
@@ -76,7 +75,7 @@ func main() {
 	ctx := context.Background()
 
 	// Get project root
-	projectDir, err := filepath.Abs(os.Getenv("PWD"))
+	projectDir, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get project dir: %v\n", err)
 		os.Exit(1)
