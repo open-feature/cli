@@ -5,7 +5,6 @@ import dev.openfeature.sdk.*;
 import dev.openfeature.sdk.providers.memory.Flag;
 import dev.openfeature.sdk.providers.memory.InMemoryProvider;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -22,36 +21,33 @@ public class Main {
 
     private static void run() throws Exception {
         // Set up the in-memory provider with test flags
-        Map<String, Flag<?>> flags = new HashMap<>();
+        Map<String, Object> themeConfig = Map.of(
+            "primaryColor", "#007bff",
+            "secondaryColor", "#6c757d"
+        );
 
-        flags.put("discountPercentage", Flag.builder()
-            .variant("default", 0.15)
-            .defaultVariant("default")
-            .build());
-
-        flags.put("enableFeatureA", Flag.builder()
-            .variant("default", false)
-            .defaultVariant("default")
-            .build());
-
-        flags.put("greetingMessage", Flag.builder()
-            .variant("default", "Hello there!")
-            .defaultVariant("default")
-            .build());
-
-        flags.put("usernameMaxLength", Flag.builder()
-            .variant("default", 50)
-            .defaultVariant("default")
-            .build());
-
-        Map<String, Object> themeConfig = new HashMap<>();
-        themeConfig.put("primaryColor", "#007bff");
-        themeConfig.put("secondaryColor", "#6c757d");
-
-        flags.put("themeCustomization", Flag.builder()
-            .variant("default", new Value(themeConfig))
-            .defaultVariant("default")
-            .build());
+        Map<String, Flag<?>> flags = Map.of(
+            "discountPercentage", Flag.builder()
+                .variant("default", 0.15)
+                .defaultVariant("default")
+                .build(),
+            "enableFeatureA", Flag.builder()
+                .variant("default", false)
+                .defaultVariant("default")
+                .build(),
+            "greetingMessage", Flag.builder()
+                .variant("default", "Hello there!")
+                .defaultVariant("default")
+                .build(),
+            "usernameMaxLength", Flag.builder()
+                .variant("default", 50)
+                .defaultVariant("default")
+                .build(),
+            "themeCustomization", Flag.builder()
+                .variant("default", new Value(themeConfig))
+                .defaultVariant("default")
+                .build()
+        );
 
         InMemoryProvider provider = new InMemoryProvider(flags);
 
@@ -66,34 +62,34 @@ public class Main {
         System.out.println("enableFeatureA: " + enableFeatureA);
         FlagEvaluationDetails<Boolean> enableFeatureADetails = EnableFeatureA.valueWithDetails(client, evalContext);
         if (enableFeatureADetails.getErrorCode() != null) {
-            throw new Exception("Error evaluating boolean flag");
+            throw new Exception("Error evaluating boolean flag: " + enableFeatureADetails.getFlagKey());
         }
 
         Double discount = DiscountPercentage.value(client, evalContext);
         System.out.printf("Discount Percentage: %.2f%n", discount);
         FlagEvaluationDetails<Double> discountDetails = DiscountPercentage.valueWithDetails(client, evalContext);
         if (discountDetails.getErrorCode() != null) {
-            throw new Exception("Failed to get discount");
+            throw new Exception("Failed to get discount for flag: " + discountDetails.getFlagKey());
         }
 
         String greetingMessage = GreetingMessage.value(client, evalContext);
         System.out.println("greetingMessage: " + greetingMessage);
         FlagEvaluationDetails<String> greetingDetails = GreetingMessage.valueWithDetails(client, evalContext);
         if (greetingDetails.getErrorCode() != null) {
-            throw new Exception("Error evaluating string flag");
+            throw new Exception("Error evaluating string flag: " + greetingDetails.getFlagKey());
         }
 
         Integer usernameMaxLength = UsernameMaxLength.value(client, evalContext);
         System.out.println("usernameMaxLength: " + usernameMaxLength);
         FlagEvaluationDetails<Integer> usernameDetails = UsernameMaxLength.valueWithDetails(client, evalContext);
         if (usernameDetails.getErrorCode() != null) {
-            throw new Exception("Error evaluating int flag");
+            throw new Exception("Error evaluating int flag: " + usernameDetails.getFlagKey());
         }
 
         Value themeCustomization = ThemeCustomization.value(client, evalContext);
         FlagEvaluationDetails<Value> themeDetails = ThemeCustomization.valueWithDetails(client, evalContext);
         if (themeDetails.getErrorCode() != null) {
-            throw new Exception("Error evaluating object flag");
+            throw new Exception("Error evaluating object flag: " + themeDetails.getFlagKey());
         }
         System.out.println("themeCustomization: " + themeCustomization);
 

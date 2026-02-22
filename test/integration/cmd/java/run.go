@@ -76,18 +76,14 @@ func main() {
 	ctx := context.Background()
 
 	// Get project root
-	projectDir, err := filepath.Abs(os.Getenv("PWD"))
+	projectDir, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get project dir: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Get test directory
-	testDir, err := filepath.Abs(filepath.Join(projectDir, "test/java-integration"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to get test dir: %v\n", err)
-		os.Exit(1)
-	}
+	testDir := filepath.Join(projectDir, "test/java-integration")
 
 	// Create and run the Java integration test
 	test := New(projectDir, testDir)
