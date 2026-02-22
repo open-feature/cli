@@ -76,7 +76,7 @@ func main() {
 	ctx := context.Background()
 
 	// Get project root
-	projectDir, err := filepath.Abs(os.Getenv("PWD"))
+	projectDir, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get project dir: %v\n", err)
 		os.Exit(1)

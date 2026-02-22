@@ -4,14 +4,14 @@ async function main() {
   try {
     // Validate that all generated exports exist and have the expected structure
     const flags = [
-      { name: 'EnableFeatureA', flag: generated.EnableFeatureA },
-      { name: 'DiscountPercentage', flag: generated.DiscountPercentage },
-      { name: 'GreetingMessage', flag: generated.GreetingMessage },
-      { name: 'UsernameMaxLength', flag: generated.UsernameMaxLength },
-      { name: 'ThemeCustomization', flag: generated.ThemeCustomization },
+      { name: 'EnableFeatureA', flag: generated.EnableFeatureA, expectedKey: 'enableFeatureA' },
+      { name: 'DiscountPercentage', flag: generated.DiscountPercentage, expectedKey: 'discountPercentage' },
+      { name: 'GreetingMessage', flag: generated.GreetingMessage, expectedKey: 'greetingMessage' },
+      { name: 'UsernameMaxLength', flag: generated.UsernameMaxLength, expectedKey: 'usernameMaxLength' },
+      { name: 'ThemeCustomization', flag: generated.ThemeCustomization, expectedKey: 'themeCustomization' },
     ];
 
-    for (const { name, flag } of flags) {
+    for (const { name, flag, expectedKey } of flags) {
       // Validate the flag object has the expected properties
       if (typeof flag !== 'object' || flag === null) {
         throw new Error(`${name} is not an object`);
@@ -25,8 +25,8 @@ async function main() {
       const key = flag.getKey();
       console.log(`${name} flag key:`, key);
 
-      if (typeof key !== 'string' || key.length === 0) {
-        throw new Error(`${name}.getKey() did not return a valid string`);
+      if (key !== expectedKey) {
+        throw new Error(`${name} has incorrect key. Expected '${expectedKey}', but got '${key}'.`);
       }
 
       // Check for useFlag hook
@@ -38,23 +38,6 @@ async function main() {
       if (typeof flag.useFlagWithDetails !== 'function') {
         throw new Error(`${name}.useFlagWithDetails is not a function`);
       }
-    }
-
-    // Verify expected flag keys
-    if (generated.EnableFeatureA.getKey() !== 'enableFeatureA') {
-      throw new Error('EnableFeatureA has incorrect key');
-    }
-    if (generated.DiscountPercentage.getKey() !== 'discountPercentage') {
-      throw new Error('DiscountPercentage has incorrect key');
-    }
-    if (generated.GreetingMessage.getKey() !== 'greetingMessage') {
-      throw new Error('GreetingMessage has incorrect key');
-    }
-    if (generated.UsernameMaxLength.getKey() !== 'usernameMaxLength') {
-      throw new Error('UsernameMaxLength has incorrect key');
-    }
-    if (generated.ThemeCustomization.getKey() !== 'themeCustomization') {
-      throw new Error('ThemeCustomization has incorrect key');
     }
 
     console.log('All generated React hooks are properly structured!');
