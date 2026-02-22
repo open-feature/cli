@@ -11,6 +11,7 @@ help:
 	@echo "  test-integration-csharp  - Run C# integration tests"
 	@echo "  test-integration-go      - Run Go integration tests"
 	@echo "  test-integration-nodejs  - Run NodeJS integration tests"
+	@echo "  test-integration-react   - Run React integration tests"
 	@echo "  generate                 - Generate all code (API clients, docs, schema)"
 	@echo "  generate-api             - Generate API clients from OpenAPI specs"
 	@echo "  generate-docs            - Generate documentation"
@@ -66,6 +67,11 @@ test-integration-nodejs:
 test-integration-angular:
 	@echo "Running Angular integration test with Dagger..."
 	@go run ./test/integration/cmd/angular/run.go
+
+.PHONY: test-integration-react
+test-integration-react:
+	@echo "Running React integration test with Dagger..."
+	@go run ./test/integration/cmd/react/run.go
 
 .PHONY: test-integration
 test-integration:
