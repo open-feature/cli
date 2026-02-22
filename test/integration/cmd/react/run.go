@@ -56,8 +56,7 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 
 	// Create the React test container
 	reactContainer := client.Container().
-		From("node:20.18.1-alpine").
-		WithWorkdir("/app").
+From("node:20.18.1-alpine3.19").
 		WithDirectory("/app", testFiles).
 		WithDirectory("/app/src/generated", generatedFiles).
 		WithExec([]string{"npm", "install"}).
