@@ -97,7 +97,7 @@ import { EnableFeatureAFeatureFlagDirective } from "@generated/openfeature.gener
   selector: "test-host",
   imports: [EnableFeatureAFeatureFlagDirective],
   template: \`
-    <ng-template enableFeatureA>
+    <ng-template enableFeatureAFeatureFlag>
       <div>Feature A enabled</div>
     </ng-template>
   \`,
@@ -120,8 +120,8 @@ import { EnableFeatureAFeatureFlagDirective } from "@generated/openfeature.gener
     <ng-template #elseTemplate>Else</ng-template>
 
     <ng-template
-      enableFeatureA
-      [enableFeatureAElse]="elseTemplate">
+      enableFeatureAFeatureFlag
+      [enableFeatureAFeatureFlagElse]="elseTemplate">
       <div>Feature A enabled</div>
     </ng-template>
   \`,
@@ -141,7 +141,7 @@ import { EnableFeatureAFeatureFlagDirective } from "@generated/openfeature.gener
   selector: "test-host",
   imports: [EnableFeatureAFeatureFlagDirective],
   template: \`
-    <div *enableFeatureA>Feature A enabled</div>
+    <div *enableFeatureAFeatureFlag>Feature A enabled</div>
   \`,
 })
 export class SimpleMicrosyntaxHostComponent {}
@@ -164,7 +164,7 @@ import { GreetingMessageFeatureFlagDirective } from "@generated/openfeature.gene
     <ng-template #reconcilingTemplate>Reconciling</ng-template>
 
     <div
-      *greetingMessage="let value; let details = evaluationDetails; default: expectedValue; else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
+      *greetingMessageFeatureFlag="let value; let details = evaluationDetails; default: expectedValue; else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
       Flag value: {{ value }}
     </div>
   \`,
@@ -196,7 +196,7 @@ export class CustomWidgetComponent {
   imports: [CustomWidgetComponent, GreetingMessageFeatureFlagDirective],
   template: 
     \`<custom-widget
-      *greetingMessage=\"let value; default: expectedValue\"
+      *greetingMessageFeatureFlag=\"let value; default: expectedValue\"
       [label]=\"value\">
     </custom-widget>\`,
 })
