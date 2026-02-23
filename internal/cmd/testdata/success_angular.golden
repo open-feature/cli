@@ -27,6 +27,7 @@ import {
   FeatureFlagService,
   JsonValue,
 } from '@openfeature/angular-sdk';
+import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 // ============================================================================
@@ -132,6 +133,24 @@ export class GeneratedFeatureFlagService {
   }
 
   /**
+   * Get the value of the `discountPercentage` flag.
+   *
+   * Discount percentage applied to purchases.
+   *
+   * @param domain - Optional domain for flag evaluation (scopes the flag to a specific provider).
+   * @param options - Optional configuration for the flag evaluation.
+   * @returns An Observable that emits the flag value whenever it changes.
+   */
+  getDiscountPercentage(
+    domain?: string,
+    options?: AngularFlagEvaluationOptions
+  ): Observable<number> {
+    return this.getDiscountPercentageDetails(domain, options).pipe(
+      map((details) => details.value)
+    );
+  }
+
+  /**
    * Get evaluation details for the `enableFeatureA` flag.
    *
    * Controls whether Feature A is enabled.
@@ -157,6 +176,24 @@ export class GeneratedFeatureFlagService {
         updateOnConfigurationChanged: options?.updateOnConfigurationChanged ?? true,
         updateOnContextChanged: options?.updateOnContextChanged ?? true,
       }
+    );
+  }
+
+  /**
+   * Get the value of the `enableFeatureA` flag.
+   *
+   * Controls whether Feature A is enabled.
+   *
+   * @param domain - Optional domain for flag evaluation (scopes the flag to a specific provider).
+   * @param options - Optional configuration for the flag evaluation.
+   * @returns An Observable that emits the flag value whenever it changes.
+   */
+  getEnableFeatureA(
+    domain?: string,
+    options?: AngularFlagEvaluationOptions
+  ): Observable<boolean> {
+    return this.getEnableFeatureADetails(domain, options).pipe(
+      map((details) => details.value)
     );
   }
 
@@ -190,6 +227,24 @@ export class GeneratedFeatureFlagService {
   }
 
   /**
+   * Get the value of the `greetingMessage` flag.
+   *
+   * The message to use for greeting users.
+   *
+   * @param domain - Optional domain for flag evaluation (scopes the flag to a specific provider).
+   * @param options - Optional configuration for the flag evaluation.
+   * @returns An Observable that emits the flag value whenever it changes.
+   */
+  getGreetingMessage(
+    domain?: string,
+    options?: AngularFlagEvaluationOptions
+  ): Observable<string> {
+    return this.getGreetingMessageDetails(domain, options).pipe(
+      map((details) => details.value)
+    );
+  }
+
+  /**
    * Get evaluation details for the `themeCustomization` flag.
    *
    * Allows customization of theme colors.
@@ -219,6 +274,24 @@ export class GeneratedFeatureFlagService {
   }
 
   /**
+   * Get the value of the `themeCustomization` flag.
+   *
+   * Allows customization of theme colors.
+   *
+   * @param domain - Optional domain for flag evaluation (scopes the flag to a specific provider).
+   * @param options - Optional configuration for the flag evaluation.
+   * @returns An Observable that emits the flag value whenever it changes.
+   */
+  getThemeCustomization(
+    domain?: string,
+    options?: AngularFlagEvaluationOptions
+  ): Observable<JsonValue> {
+    return this.getThemeCustomizationDetails(domain, options).pipe(
+      map((details) => details.value)
+    );
+  }
+
+  /**
    * Get evaluation details for the `usernameMaxLength` flag.
    *
    * Maximum allowed length for usernames.
@@ -244,6 +317,24 @@ export class GeneratedFeatureFlagService {
         updateOnConfigurationChanged: options?.updateOnConfigurationChanged ?? true,
         updateOnContextChanged: options?.updateOnContextChanged ?? true,
       }
+    );
+  }
+
+  /**
+   * Get the value of the `usernameMaxLength` flag.
+   *
+   * Maximum allowed length for usernames.
+   *
+   * @param domain - Optional domain for flag evaluation (scopes the flag to a specific provider).
+   * @param options - Optional configuration for the flag evaluation.
+   * @returns An Observable that emits the flag value whenever it changes.
+   */
+  getUsernameMaxLength(
+    domain?: string,
+    options?: AngularFlagEvaluationOptions
+  ): Observable<number> {
+    return this.getUsernameMaxLengthDetails(domain, options).pipe(
+      map((details) => details.value)
     );
   }
 
