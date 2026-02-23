@@ -6,52 +6,29 @@ import (
 	"os/exec"
 )
 
+// runIntegrationTest runs a single integration test for the specified language
+func runIntegrationTest(language string) error {
+	cmd := exec.Command("go", "run", fmt.Sprintf("github.com/open-feature/cli/test/integration/cmd/%s", language))
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("error running %s integration test: %w", language, err)
+	}
+	return nil
+}
+
 func main() {
-	// Run the language-specific tests
+	// List of all integration tests to run
+	tests := []string{"csharp", "go", "nodejs", "angular", "nestjs"}
+
 	fmt.Println("=== Running all integration tests ===")
 
-	// Run the C# integration test
-	csharpCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/csharp")
-	csharpCmd.Stdout = os.Stdout
-	csharpCmd.Stderr = os.Stderr
-	if err := csharpCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running C# integration test: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Run the Go integration test
-	goCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/go")
-	goCmd.Stdout = os.Stdout
-	goCmd.Stderr = os.Stderr
-	if err := goCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running Go integration test: %v\n", err)
-		os.Exit(1)
-	}
-	// Run the nodejs test
-	nodeCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/nodejs")
-	nodeCmd.Stdout = os.Stdout
-	nodeCmd.Stderr = os.Stderr
-	if err := nodeCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running nodejs integration test: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Run the Angular integration test
-	angularCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/angular")
-	angularCmd.Stdout = os.Stdout
-	angularCmd.Stderr = os.Stderr
-	if err := angularCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running Angular integration test: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Run the NestJS integration test
-	nestjsCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/nestjs")
-	nestjsCmd.Stdout = os.Stdout
-	nestjsCmd.Stderr = os.Stderr
-	if err := nestjsCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running NestJS integration test: %v\n", err)
-		os.Exit(1)
+	// Run each integration test
+	for _, test := range tests {
+		if err := runIntegrationTest(test); err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	fmt.Println("=== All integration tests passed successfully ===")
