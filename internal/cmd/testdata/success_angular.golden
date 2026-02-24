@@ -27,8 +27,7 @@ import {
   FeatureFlagService,
   JsonValue,
 } from '@openfeature/angular-sdk';
-import { map } from 'rxjs';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 // ============================================================================
 // FLAG KEYS
