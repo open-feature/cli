@@ -152,12 +152,12 @@ export class GeneratedFeatureFlagService {
  * @example
  * Explicit `ng-template` (no `*`), bind inputs directly
  * ```html
- * <ng-template {{ .Key | ToCamel }}
- *   [{{ .Key | ToCamel }}Default]="defaultValue"
- *   {{ if ne $type "boolean" }}[{{ .Key | ToCamel }}Value]="expectedValue"
- *   {{ end }}[{{ .Key | ToCamel }}Else]="elseTemplate"
- *   [{{ .Key | ToCamel }}Initializing]="initTemplate"
- *   [{{ .Key | ToCamel }}Reconciling]="reconcilingTemplate">
+ * <ng-template {{ .Key | ToCamel }}FeatureFlag
+ *   [{{ .Key | ToCamel }}FeatureFlagDefault]="defaultValue"
+ *   {{ if ne $type "boolean" }}[{{ .Key | ToCamel }}FeatureFlagValue]="expectedValue"
+ *   {{ end }}[{{ .Key | ToCamel }}FeatureFlagElse]="elseTemplate"
+ *   [{{ .Key | ToCamel }}FeatureFlagInitializing]="initTemplate"
+ *   [{{ .Key | ToCamel }}FeatureFlagReconciling]="reconcilingTemplate">
  *   <div>Content shown when flag is {{ if eq $type "boolean" }}enabled{{ else }}matched{{ end }}.</div>
  * </ng-template>
  * <ng-template #elseTemplate>
@@ -168,7 +168,7 @@ export class GeneratedFeatureFlagService {
  * @example
  * Microsyntax `*` form, start with `let`
  * ```html
- * <div *{{ .Key | ToCamel }}="let v; {{ if ne $type "boolean" }}value: expectedValue; {{ end }}else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
+ * <div *{{ .Key | ToCamel }}FeatureFlag="let v; {{ if ne $type "boolean" }}value: expectedValue; {{ end }}else: elseTemplate; initializing: initTemplate; reconciling: reconcilingTemplate">
  *   Content shown when flag is {{ if eq $type "boolean" }}enabled{{ else }}matched{{ end }}.
  * </div>
  * ```
@@ -176,7 +176,7 @@ export class GeneratedFeatureFlagService {
  * @example
  * Simple `*` usage (no else/initializing/reconciling)
  * ```html
- * <div *{{ .Key | ToCamel }}="let v">
+ * <div *{{ .Key | ToCamel }}FeatureFlag="let v">
  *   Content shown when flag is {{ if eq $type "boolean" }}enabled{{ else }}matched{{ end }}.
  * </div>
  * ```
@@ -187,12 +187,12 @@ export class GeneratedFeatureFlagService {
  * `let v` or `let details = evaluationDetails` (or `let _` if you do not need the value)
  * before any `else`/`initializing`/`reconciling`/`default` segments.
  * This is an Angular microsyntax parsing constraint, not a directive limitation.
- * `*{{ .Key | ToCamel }}="else elseTemplate"` will not parse because `else` is a
+ * `*{{ .Key | ToCamel }}FeatureFlag="else elseTemplate"` will not parse because `else` is a
  * secondary segment. If you do not need the value, use `let _`, or use the
  * explicit `ng-template` form above.
  */
 @Directive({
-  selector: '[{{ .Key | ToCamel }}]',
+  selector: '[{{ .Key | ToCamel }}FeatureFlag]',
   standalone: true,
 })
 export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirective<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}> implements OnChanges {
@@ -205,7 +205,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
   /**
    * The expected value of this {{ $type }} feature flag, for which the `then` template should be rendered.
    */
-  @Input({ required: false }) {{ .Key | ToCamel }}Value?: {{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }};
+  @Input({ required: false }) {{ .Key | ToCamel }}FeatureFlagValue?: {{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }};
 {{- end }}
 
   constructor() {
@@ -223,7 +223,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
   override ngOnChanges() {
     super.ngOnChanges();
 
-    this._featureFlagValue = this.{{ .Key | ToCamel }}Value;
+    this._featureFlagValue = this.{{ .Key | ToCamel }}FeatureFlagValue;
   }
 {{- end }}
 
@@ -231,7 +231,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * The domain of the {{ $type }} feature flag.
    */
   @Input({ required: false })
-  set {{ .Key | ToCamel }}Domain(domain: string | undefined) {
+  set {{ .Key | ToCamel }}FeatureFlagDomain(domain: string | undefined) {
     super.featureFlagDomain = domain;
   }
 
@@ -242,7 +242,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * Defaults to true.
    */
   @Input({ required: false })
-  set {{ .Key | ToCamel }}UpdateOnConfigurationChanged(enabled: boolean | undefined) {
+  set {{ .Key | ToCamel }}FeatureFlagUpdateOnConfigurationChanged(enabled: boolean | undefined) {
     this._updateOnConfigurationChanged = enabled ?? true;
   }
 
@@ -253,7 +253,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * Defaults to true.
    */
   @Input({ required: false })
-  set {{ .Key | ToCamel }}UpdateOnContextChanged(enabled: boolean | undefined) {
+  set {{ .Key | ToCamel }}FeatureFlagUpdateOnContextChanged(enabled: boolean | undefined) {
     this._updateOnContextChanged = enabled ?? true;
   }
 
@@ -261,7 +261,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * Template to be displayed when the feature flag {{ if eq $type "boolean" }}is false{{ else }}does not match value{{ end }}.
    */
   @Input()
-  set {{ .Key | ToCamel }}Else(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+  set {{ .Key | ToCamel }}FeatureFlagElse(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
     this._elseTemplateRef = tpl;
   }
 
@@ -269,7 +269,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * Template to be displayed when the provider is not ready.
    */
   @Input()
-  set {{ .Key | ToCamel }}Initializing(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+  set {{ .Key | ToCamel }}FeatureFlagInitializing(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
     this._initializingTemplateRef = tpl;
   }
 
@@ -277,7 +277,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * Template to be displayed when the provider is reconciling.
    */
   @Input()
-  set {{ .Key | ToCamel }}Reconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+  set {{ .Key | ToCamel }}FeatureFlagReconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
     this._reconcilingTemplateRef = tpl;
   }
 }

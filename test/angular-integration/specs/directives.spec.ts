@@ -21,7 +21,7 @@ import type { JsonValue } from "@openfeature/angular-sdk";
   imports: [EnableFeatureAFeatureFlagDirective],
   template: `
     <div class="container">
-      <ng-container *enableFeatureA="let value; domain: domain">
+      <ng-container *enableFeatureAFeatureFlag="let value; domain: domain">
         <div class="flag-content">Feature A is enabled</div>
       </ng-container>
     </div>
@@ -38,7 +38,7 @@ class TestBooleanComponent {
   imports: [EnableFeatureAFeatureFlagDirective],
   template: `
     <div class="container">
-      <div class="flag-content" *enableFeatureA>
+      <div class="flag-content" *enableFeatureAFeatureFlag>
         Feature A is enabled
       </div>
     </div>
@@ -54,7 +54,7 @@ class TestBooleanSimpleComponent {
   imports: [GreetingMessageFeatureFlagDirective],
   template: `
     <div class="container">
-      <ng-container *greetingMessage="let value; domain: domain">
+      <ng-container *greetingMessageFeatureFlag="let value; domain: domain">
         <div class="flag-content">Greeting: {{ value }}</div>
       </ng-container>
     </div>
@@ -71,7 +71,7 @@ class TestStringComponent {
   imports: [DiscountPercentageFeatureFlagDirective],
   template: `
     <div class="container">
-      <ng-container *discountPercentage="let value; domain: domain">
+      <ng-container *discountPercentageFeatureFlag="let value; domain: domain">
         <div class="flag-content">Discount: {{ value }}</div>
       </ng-container>
     </div>
@@ -88,7 +88,7 @@ class TestNumberComponent {
   imports: [UsernameMaxLengthFeatureFlagDirective],
   template: `
     <div class="container">
-      <ng-container *usernameMaxLength="let value; domain: domain">
+      <ng-container *usernameMaxLengthFeatureFlag="let value; domain: domain">
         <div class="flag-content">Max Length: {{ value }}</div>
       </ng-container>
     </div>
@@ -105,7 +105,7 @@ class TestUsernameComponent {
   imports: [ThemeCustomizationFeatureFlagDirective, JsonPipe],
   template: `
     <div class="container">
-      <ng-container *themeCustomization="let value; domain: domain">
+      <ng-container *themeCustomizationFeatureFlag="let value; domain: domain">
         <div class="flag-content">Theme: {{ value | json }}</div>
       </ng-container>
     </div>
@@ -122,27 +122,27 @@ class TestObjectComponent {
   imports: [GeneratedFeatureFlagDirectives],
   template: `
     <div class="boolean-flag">
-      <ng-container *enableFeatureA="let v; domain: domain">
+      <ng-container *enableFeatureAFeatureFlag="let v; domain: domain">
         <div class="flag-content">Boolean flag: {{ v }}</div>
       </ng-container>
     </div>
     <div class="string-flag">
-      <ng-container *greetingMessage="let v; domain: domain">
+      <ng-container *greetingMessageFeatureFlag="let v; domain: domain">
         <div class="flag-content">String flag: {{ v }}</div>
       </ng-container>
     </div>
     <div class="number-flag">
-      <ng-container *discountPercentage="let v; domain: domain">
+      <ng-container *discountPercentageFeatureFlag="let v; domain: domain">
         <div class="flag-content">Number flag: {{ v }}</div>
       </ng-container>
     </div>
     <div class="username-flag">
-      <ng-container *usernameMaxLength="let v; domain: domain">
+      <ng-container *usernameMaxLengthFeatureFlag="let v; domain: domain">
         <div class="flag-content">Username flag: {{ v }}</div>
       </ng-container>
     </div>
     <div class="object-flag">
-      <ng-container *themeCustomization="let v; domain: domain">
+      <ng-container *themeCustomizationFeatureFlag="let v; domain: domain">
         <div class="flag-content">Object flag</div>
       </ng-container>
     </div>
@@ -160,7 +160,7 @@ class TestAllDirectivesComponent {
   template: `
     <div class="container">
       <ng-container
-        *enableFeatureA="let v; domain: domain; else: enableFeatureAElse"
+        *enableFeatureAFeatureFlag="let v; domain: domain; else: enableFeatureAElse"
       >
         <div class="flag-content">Feature A is enabled</div>
       </ng-container>
@@ -182,7 +182,7 @@ class TestBooleanElseComponent {
   template: `
     <div class="container">
       <ng-container
-        *greetingMessage="
+        *greetingMessageFeatureFlag="
           let v;
           domain: domain;
           value: expectedValue;
@@ -210,7 +210,7 @@ class TestStringValueComponent {
   template: `
     <div class="container">
       <ng-container
-        *discountPercentage="
+        *discountPercentageFeatureFlag="
           let v;
           domain: domain;
           value: expectedValue;
@@ -238,7 +238,7 @@ class TestNumberValueComponent {
   template: `
     <div class="container">
       <ng-container
-        *usernameMaxLength="
+        *usernameMaxLengthFeatureFlag="
           let v;
           domain: domain;
           value: expectedValue;
@@ -266,7 +266,7 @@ class TestUsernameValueComponent {
   template: `
     <div class="container">
       <ng-container
-        *themeCustomization="
+        *themeCustomizationFeatureFlag="
           let v;
           domain: domain;
           value: expectedValue;
