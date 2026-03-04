@@ -1,0 +1,21 @@
+{
+  "name": "cli-nestjs-integration-test",
+  "version": "1.0.0",
+  "description": "Integration test for OpenFeature CLI NestJS generator",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@openfeature/nestjs-sdk": "^0.7.0",
+    "@openfeature/server-sdk": "^1.34.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}
