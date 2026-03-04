@@ -211,4 +211,103 @@ describe("GeneratedFeatureFlagService", () => {
       });
     });
   });
+
+  describe("getEnableFeatureA (convenience)", () => {
+    it("should return boolean value directly", async () => {
+      const value = await firstValueFrom(service.getEnableFeatureA(domain));
+
+      expect(typeof value).toBe("boolean");
+      expect(value).toBe(true);
+    });
+
+    it("should return default value when flag is not configured", async () => {
+      const emptyDomain = uuid();
+      const emptyProvider = new InMemoryProvider({});
+      await OpenFeature.setProviderAndWait(emptyDomain, emptyProvider);
+
+      const value = await firstValueFrom(
+        service.getEnableFeatureA(emptyDomain),
+      );
+
+      expect(value).toBe(false);
+    });
+  });
+
+  describe("getGreetingMessage (convenience)", () => {
+    it("should return string value directly", async () => {
+      const value = await firstValueFrom(service.getGreetingMessage(domain));
+
+      expect(typeof value).toBe("string");
+      expect(value).toBe("Hello from provider!");
+    });
+
+    it("should return default value when flag is not configured", async () => {
+      const emptyDomain = uuid();
+      const emptyProvider = new InMemoryProvider({});
+      await OpenFeature.setProviderAndWait(emptyDomain, emptyProvider);
+
+      const value = await firstValueFrom(
+        service.getGreetingMessage(emptyDomain),
+      );
+
+      expect(value).toBe("Hello there!");
+    });
+  });
+
+  describe("getDiscountPercentage (convenience)", () => {
+    it("should return number value directly", async () => {
+      const value = await firstValueFrom(service.getDiscountPercentage(domain));
+
+      expect(typeof value).toBe("number");
+      expect(value).toBe(0.25);
+    });
+
+    it("should return default value when flag is not configured", async () => {
+      const emptyDomain = uuid();
+      const emptyProvider = new InMemoryProvider({});
+      await OpenFeature.setProviderAndWait(emptyDomain, emptyProvider);
+
+      const value = await firstValueFrom(
+        service.getDiscountPercentage(emptyDomain),
+      );
+
+      expect(value).toBe(0.15);
+    });
+  });
+
+  describe("getUsernameMaxLength (convenience)", () => {
+    it("should return number value directly", async () => {
+      const value = await firstValueFrom(service.getUsernameMaxLength(domain));
+
+      expect(typeof value).toBe("number");
+      expect(value).toBe(100);
+    });
+  });
+
+  describe("getThemeCustomization (convenience)", () => {
+    it("should return object value directly", async () => {
+      const value = await firstValueFrom(service.getThemeCustomization(domain));
+
+      expect(typeof value).toBe("object");
+      expect(value).toEqual({
+        primaryColor: "#ff0000",
+        secondaryColor: "#00ff00",
+      });
+    });
+
+    it("should return default value when flag is not configured", async () => {
+      const emptyDomain = uuid();
+      const emptyProvider = new InMemoryProvider({});
+      await OpenFeature.setProviderAndWait(emptyDomain, emptyProvider);
+
+      const value = await firstValueFrom(
+        service.getThemeCustomization(emptyDomain),
+      );
+
+      expect(value).toEqual({
+        primaryColor: "#007bff",
+        secondaryColor: "#6c757d",
+      });
+    });
+  });
 });

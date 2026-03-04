@@ -27,7 +27,7 @@ import {
   FeatureFlagService,
   JsonValue,
 } from '@openfeature/angular-sdk';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 // ============================================================================
 // FLAG KEYS
@@ -106,6 +106,24 @@ export class GeneratedFeatureFlagService {
         updateOnConfigurationChanged: options?.updateOnConfigurationChanged ?? true,
         updateOnContextChanged: options?.updateOnContextChanged ?? true,
       }
+    );
+  }
+
+  /**
+   * Get the value of the `{{ .Key }}` flag.
+   *
+   * {{ if .Description }}{{ .Description }}{{ else }}Feature flag.{{ end }}
+   *
+   * @param domain - Optional domain for flag evaluation (scopes the flag to a specific provider).
+   * @param options - Optional configuration for the flag evaluation.
+   * @returns An Observable that emits the flag value whenever it changes.
+   */
+  get{{ .Key | ToPascal }}(
+    domain?: string,
+    options?: AngularFlagEvaluationOptions
+  ): Observable<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> {
+    return this.get{{ .Key | ToPascal }}Details(domain, options).pipe(
+      map((details) => details.value)
     );
   }
 {{ end }}
