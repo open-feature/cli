@@ -7,45 +7,29 @@ import (
 )
 
 func main() {
-	// Run the language-specific tests
 	fmt.Println("=== Running all integration tests ===")
 
-	// Run the C# integration test
-	csharpCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/csharp")
-	csharpCmd.Stdout = os.Stdout
-	csharpCmd.Stderr = os.Stderr
-	if err := csharpCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running C# integration test: %v\n", err)
-		os.Exit(1)
+	tests := []struct {
+		name string
+		path string
+	}{
+		{"C#", "github.com/open-feature/cli/test/integration/cmd/csharp"},
+		{"Go", "github.com/open-feature/cli/test/integration/cmd/go"},
+		{"NodeJS", "github.com/open-feature/cli/test/integration/cmd/nodejs"},
+		{"Angular", "github.com/open-feature/cli/test/integration/cmd/angular"},
+		{"Java", "github.com/open-feature/cli/test/integration/cmd/java"},
 	}
 
-	// Run the Go integration test
-	goCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/go")
-	goCmd.Stdout = os.Stdout
-	goCmd.Stderr = os.Stderr
-	if err := goCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running Go integration test: %v\n", err)
-		os.Exit(1)
+	for _, test := range tests {
+		fmt.Printf("--- Running %s integration test ---\n", test.name)
+		cmd := exec.Command("go", "run", test.path)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error running %s integration test: %v\n", test.name, err)
+			os.Exit(1)
+		}
 	}
-	// Run the nodejs test
-	nodeCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/nodejs")
-	nodeCmd.Stdout = os.Stdout
-	nodeCmd.Stderr = os.Stderr
-	if err := nodeCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running nodejs integration test: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Run the Angular integration test
-	angularCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/angular")
-	angularCmd.Stdout = os.Stdout
-	angularCmd.Stderr = os.Stderr
-	if err := angularCmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error running Angular integration test: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Add more tests here as they are available
 
 	fmt.Println("=== All integration tests passed successfully ===")
 }
