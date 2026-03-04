@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.4.0](https://github.com/open-feature/cli/compare/v0.3.16...v0.4.0) (2026-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* **angular:** use [flagNameFeatureFlag] selector for generated directives ([#227](https://github.com/open-feature/cli/issues/227))
+
+### 🐛 Bug Fixes
+
+* **security:** update module go.opentelemetry.io/otel/sdk to v1.40.0 [security] ([#231](https://github.com/open-feature/cli/issues/231)) ([84e1677](https://github.com/open-feature/cli/commit/84e16772882eb08235766640417db00674cd3367))
+
+
+### ✨ New Features
+
+* **angular:** add convenience value method alongside details method in generated service ([#228](https://github.com/open-feature/cli/issues/228)) ([96cc00e](https://github.com/open-feature/cli/commit/96cc00e4123834108893133cada8f905e4f716e5))
+
+
+### 🔄 Refactoring
+
+* **angular:** use [flagNameFeatureFlag] selector for generated directives ([36028e0](https://github.com/open-feature/cli/commit/36028e029f4fa12c65ed26237a266c93ef9ce5ce))
+* **angular:** use [flagNameFeatureFlag] selector for generated directives ([#227](https://github.com/open-feature/cli/issues/227)) ([36028e0](https://github.com/open-feature/cli/commit/36028e029f4fa12c65ed26237a266c93ef9ce5ce))
+
 ## [0.3.16](https://github.com/open-feature/cli/compare/v0.3.15...v0.3.16) (2026-02-19)
 
 
