@@ -29,7 +29,7 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 	})
 
 	cli := client.Container().
-		From("golang:1.24-alpine").
+		From("golang:1.25-alpine").
 		WithDirectory("/src", source).
 		WithWorkdir("/src").
 		WithExec([]string{"go", "build", "-o", "cli", "./cmd/openfeature"})
