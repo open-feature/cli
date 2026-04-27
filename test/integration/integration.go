@@ -8,6 +8,11 @@ import (
 	"dagger.io/dagger"
 )
 
+// GoBaseImage is the Go container image used to build the CLI inside
+// integration test pipelines. Centralized here so the version is bumped
+// in a single place when go.mod's required Go version changes.
+const GoBaseImage = "golang:1.25-alpine"
+
 // Test defines the interface for all integration tests
 type Test interface {
 	// Run executes the integration test with the given Dagger client

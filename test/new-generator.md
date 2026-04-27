@@ -59,9 +59,10 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
   Include: []string{"test_openfeature.py", "requirements.txt"},
  })
 
- // Build the CLI
+ // Build the CLI. Use integration.GoBaseImage so the Go version is
+ // bumped in a single place when go.mod changes.
  cli := client.Container().
-  From("golang:1.25-alpine").
+  From(integration.GoBaseImage).
   WithDirectory("/src", source).
   WithWorkdir("/src").
   WithExec([]string{"go", "build", "-o", "cli"})

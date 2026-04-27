@@ -34,10 +34,16 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 		Include: []string{"test.go", "go.mod"},
 	})
 
+	// goBase returns a Go container with git installed, used both to build
+	// the CLI and to compile the generated client against the test fixture.
+	goBase := func() *dagger.Container {
+		return client.Container().
+			From(integration.GoBaseImage).
+			WithExec([]string{"apk", "add", "--no-cache", "git"})
+	}
+
 	// Build the CLI
-	cli := client.Container().
-		From("golang:1.25-alpine").
-		WithExec([]string{"apk", "add", "--no-cache", "git"}).
+	cli := goBase().
 		WithDirectory("/src", source).
 		WithWorkdir("/src").
 		WithExec([]string{"go", "mod", "tidy"}).
@@ -56,9 +62,7 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 	generatedFiles := generated.Directory("/tmp/generated")
 
 	// Test Go compilation with the generated files
-	goContainer := client.Container().
-		From("golang:1.25-alpine").
-		WithExec([]string{"apk", "add", "--no-cache", "git"}).
+	goContainer := goBase().
 		WithWorkdir("/app").
 		WithDirectory("/app", testFiles).
 		WithDirectory("/app/openfeature", generatedFiles).
