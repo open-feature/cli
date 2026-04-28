@@ -5,7 +5,7 @@ Thank you for your interest in contributing to the OpenFeature CLI! This documen
 ## Development Setup
 
 1. **Prerequisites**:
-   - Go 1.23 or later
+   - Go 1.25 or later
    - Make
    - golangci-lint (will be auto-installed by make commands)
 
