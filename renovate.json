@@ -6,10 +6,10 @@
       "customType": "regex",
       "description": "Update the GoBaseImage constant when a newer golang Docker image is available",
       "managerFilePatterns": [
-        "/^test/integration/integration\\.go$/"
+        "test/integration/integration.go"
       ],
       "matchStrings": [
-        "GoBaseImage = \"golang:(?<currentValue>\\d+\\.\\d+)-alpine\""
+        "GoBaseImage = \"golang:(?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?)-alpine\""
       ],
       "depNameTemplate": "golang",
       "datasourceTemplate": "docker",
@@ -19,16 +19,16 @@
       "customType": "regex",
       "description": "Update minimum Go version mentioned in README and CONTRIBUTING",
       "managerFilePatterns": [
-        "/^README\\.md$/",
-        "/^CONTRIBUTING\\.md$/"
+        "README.md",
+        "CONTRIBUTING.md"
       ],
       "matchStrings": [
-        "Go >= (?<currentValue>\\d+\\.\\d+)",
-        "Go (?<currentValue>\\d+\\.\\d+) or later"
+        "Go >= (?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?)",
+        "Go (?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?) or later"
       ],
-      "depNameTemplate": "golang",
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "docker"
+      "depNameTemplate": "go",
+      "datasourceTemplate": "golang-version",
+      "extractVersionTemplate": "^(?<version>\\d+\\.\\d+)"
     }
   ],
   "packageRules": [
