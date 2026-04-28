@@ -92,3 +92,5 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace gopkg.in/yaml.v3 => go.yaml.in/yaml/v3 v3.0.4
