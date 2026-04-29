@@ -3,7 +3,10 @@ package manifest
 import (
 	"testing"
 
+	"github.com/open-feature/cli/internal/filesystem"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestURLLooksLikeAFile(t *testing.T) {
@@ -80,4 +83,23 @@ func TestURLLooksLikeAFile(t *testing.T) {
 			assert.Equal(t, tt.expected, result, "URLLooksLikeAFile(%q) should return %v", tt.url, tt.expected)
 		})
 	}
+}
+
+func TestWriteManifestEndsWithNewline(t *testing.T) {
+	// Use an in-memory filesystem so we don't touch disk
+	memFs := afero.NewMemMapFs()
+	filesystem.SetFileSystem(memFs)
+	t.Cleanup(func() { filesystem.SetFileSystem(afero.NewOsFs()) })
+
+	manifest := createInitManifest(map[string]any{})
+	path := "/flags.json"
+
+	err := writeManifest(path, manifest)
+	require.NoError(t, err)
+
+	data, err := afero.ReadFile(memFs, path)
+	require.NoError(t, err)
+
+	assert.True(t, len(data) > 0, "manifest file should not be empty")
+	assert.Equal(t, byte('\n'), data[len(data)-1], "manifest file should end with a newline")
 }

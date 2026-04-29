@@ -158,6 +158,7 @@ func writeManifest(path string, manifest *initManifest) error {
 	if err != nil {
 		return err
 	}
+	formattedManifest = append(formattedManifest, '\n')
 
 	fs := filesystem.FileSystem()
 	dir := filepath.Dir(path)
