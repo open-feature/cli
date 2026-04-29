@@ -1,4 +1,42 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>open-feature/community-tooling"]
+  "extends": ["github>open-feature/community-tooling"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update the GoBaseImage constant when a newer golang Docker image is available",
+      "managerFilePatterns": [
+        "test/integration/integration.go"
+      ],
+      "matchStrings": [
+        "GoBaseImage = \"golang:(?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?)-alpine\""
+      ],
+      "depNameTemplate": "golang",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Update minimum Go version mentioned in README and CONTRIBUTING",
+      "managerFilePatterns": [
+        "README.md",
+        "CONTRIBUTING.md"
+      ],
+      "matchStrings": [
+        "Go >= (?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?)",
+        "Go (?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?) or later"
+      ],
+      "depNameTemplate": "go",
+      "datasourceTemplate": "golang-version",
+      "extractVersionTemplate": "^(?<version>\\d+\\.\\d+)"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Group all Go toolchain bumps (go.mod, GoBaseImage const, docs) into a single PR",
+      "matchDatasources": ["docker", "golang-version"],
+      "matchPackageNames": ["golang", "go"],
+      "groupName": "go toolchain"
+    }
+  ]
 }
