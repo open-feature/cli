@@ -1,0 +1,21 @@
+{
+  "$schema": "../../flag-manifest.json",
+  "flags": {
+    "nestedBad": {
+      "flagType": "object",
+      "defaultValue": {
+        "inner": { "x": 1 }
+      },
+      "schema": {
+        "type": "object",
+        "properties": {
+          "inner": {
+            "properties": {
+              "x": { "type": "integer" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

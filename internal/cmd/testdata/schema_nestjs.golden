@@ -14,15 +14,9 @@ import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeature
 
 import type { GeneratedClient } from "./openfeature";
 import { getGeneratedClient, FlagKeys } from "./openfeature";
-{{- if HasObjectFlagsWithSchema .Flagset.Flags }}
 import type {
-{{- range .Flagset.Flags }}
-{{- if HasSchema . }}
-  {{ TSFlagReturnType . }},
-{{- end }}
-{{- end }}
+  ThemeCustomization,
 } from "./openfeature";
-{{- end }}
 
 // Re-export flag keys for convenience
 export { FlagKeys };
@@ -105,29 +99,78 @@ interface TypedFeatureProps {
   context?: EvaluationContext;
 }
 
-{{ range .Flagset.Flags }}
+
 /**
- * Gets the {@link EvaluationDetails} for `{{ .Key }}` from a domain scoped or the default OpenFeature
+ * Gets the {@link EvaluationDetails} for `enableFeatureA` from a domain scoped or the default OpenFeature
  * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
  *
  * **Details:**
- * - flag key: `{{ .Key }}`
- * - description: `{{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}`
- * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
- * - type: `{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
+ * - flag key: `enableFeatureA`
+ * - description: `Controls whether Feature A is enabled.`
+ * - default value: `false`
+ * - type: `boolean`
  *
  * Usage:
  * ```typescript
  * @Get("/")
  * public async handleRequest(
- *     @{{ .Key | ToPascal }}()
- *     {{ .Key | ToCamel }}: Observable<EvaluationDetails<{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>>,
+ *     @EnableFeatureA()
+ *     enableFeatureA: Observable<EvaluationDetails<boolean>>,
  * )
  * ```
  * @param {TypedFeatureProps} props The options for injecting the feature flag.
  * @returns {ParameterDecorator} The decorator function.
  */
-export function {{ .Key | ToPascal }}(props?: TypedFeatureProps): ParameterDecorator {
-  return {{ .Type | OpenFeatureType | ToPascal }}FeatureFlag({ flagKey: {{ .Key | Quote }}, defaultValue: {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, ...props });
+export function EnableFeatureA(props?: TypedFeatureProps): ParameterDecorator {
+  return BooleanFeatureFlag({ flagKey: "enableFeatureA", defaultValue: false, ...props });
 }
-{{ end -}}
+
+/**
+ * Gets the {@link EvaluationDetails} for `greetingMessage` from a domain scoped or the default OpenFeature
+ * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
+ *
+ * **Details:**
+ * - flag key: `greetingMessage`
+ * - description: `The message to use for greeting users.`
+ * - default value: `Hello there!`
+ * - type: `string`
+ *
+ * Usage:
+ * ```typescript
+ * @Get("/")
+ * public async handleRequest(
+ *     @GreetingMessage()
+ *     greetingMessage: Observable<EvaluationDetails<string>>,
+ * )
+ * ```
+ * @param {TypedFeatureProps} props The options for injecting the feature flag.
+ * @returns {ParameterDecorator} The decorator function.
+ */
+export function GreetingMessage(props?: TypedFeatureProps): ParameterDecorator {
+  return StringFeatureFlag({ flagKey: "greetingMessage", defaultValue: "Hello there!", ...props });
+}
+
+/**
+ * Gets the {@link EvaluationDetails} for `themeCustomization` from a domain scoped or the default OpenFeature
+ * client and populates the annotated parameter with the {@link EvaluationDetails} wrapped in an {@link Observable}.
+ *
+ * **Details:**
+ * - flag key: `themeCustomization`
+ * - description: `Allows customization of theme colors.`
+ * - default value: `{"header":{"fontSize":16,"visible":true},"primaryColor":"#007bff","secondaryColor":"#6c757d","tags":["light"]}`
+ * - type: `ThemeCustomization`
+ *
+ * Usage:
+ * ```typescript
+ * @Get("/")
+ * public async handleRequest(
+ *     @ThemeCustomization()
+ *     themeCustomization: Observable<EvaluationDetails<ThemeCustomization>>,
+ * )
+ * ```
+ * @param {TypedFeatureProps} props The options for injecting the feature flag.
+ * @returns {ParameterDecorator} The decorator function.
+ */
+export function ThemeCustomization(props?: TypedFeatureProps): ParameterDecorator {
+  return ObjectFeatureFlag({ flagKey: "themeCustomization", defaultValue: {"header":{"fontSize":16,"visible":true},"primaryColor":"#007bff","secondaryColor":"#6c757d","tags":["light"]}, ...props });
+}

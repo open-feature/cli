@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/open-feature/cli/internal/flagset"
 	schema "github.com/open-feature/cli/schema/v0"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -166,6 +167,66 @@ func skipValue(decoder *json.Decoder) {
 		}
 	}
 	// Primitives (string, number, bool, null) are already consumed by the Token() call
+}
+
+// ValidateDefaultValues checks that each object flag's defaultValue conforms to its schema.
+// This is called after the flagset is loaded and provides early error detection for
+// manifest authoring mistakes where the defaultValue shape doesn't match the declared schema.
+func ValidateDefaultValues(flags []flagset.Flag) []ValidationError {
+	var issues []ValidationError
+	for _, flag := range flags {
+		if flag.Schema == nil {
+			continue
+		}
+
+		schemaBytes, err := json.Marshal(flag.Schema)
+		if err != nil {
+			issues = append(issues, ValidationError{
+				Type:    "schema_marshal_error",
+				Path:    fmt.Sprintf("flags.%s.schema", flag.Key),
+				Message: fmt.Sprintf("failed to marshal schema: %v", err),
+			})
+			continue
+		}
+
+		valueBytes, err := json.Marshal(flag.DefaultValue)
+		if err != nil {
+			issues = append(issues, ValidationError{
+				Type:    "value_marshal_error",
+				Path:    fmt.Sprintf("flags.%s.defaultValue", flag.Key),
+				Message: fmt.Sprintf("failed to marshal defaultValue: %v", err),
+			})
+			continue
+		}
+
+		schemaLoader := gojsonschema.NewBytesLoader(schemaBytes)
+		valueLoader := gojsonschema.NewBytesLoader(valueBytes)
+
+		result, err := gojsonschema.Validate(schemaLoader, valueLoader)
+		if err != nil {
+			issues = append(issues, ValidationError{
+				Type:    "schema_validation_error",
+				Path:    fmt.Sprintf("flags.%s.defaultValue", flag.Key),
+				Message: fmt.Sprintf("schema validation failed: %v", err),
+			})
+			continue
+		}
+
+		basePath := fmt.Sprintf("flags.%s.defaultValue", flag.Key)
+		for _, verr := range result.Errors() {
+			field := verr.Field()
+			path := basePath
+			if field != "(root)" {
+				path = fmt.Sprintf("%s.%s", basePath, field)
+			}
+			issues = append(issues, ValidationError{
+				Type:    verr.Type(),
+				Path:    path,
+				Message: verr.Description(),
+			})
+		}
+	}
+	return issues
 }
 
 func FormatValidationError(issues []ValidationError) string {
