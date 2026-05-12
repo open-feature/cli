@@ -3,10 +3,13 @@ package nodejs
 import (
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"text/template"
 
+	"github.com/iancoleman/strcase"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
+	"github.com/open-feature/cli/internal/logger"
 )
 
 type NodejsGenerator struct {
@@ -43,7 +46,28 @@ func toJSONString(value any) string {
 	return string(bytes)
 }
 
+// reservedNames are symbols exported by the Node.js generator itself. Flag
+// keys that transform (via ToCamel) to one of these names will be excluded
+// from the generated output and a warning will be emitted.
+var reservedNames = map[string]bool{
+	"client": true,
+}
+
 func (g *NodejsGenerator) Generate(params *generators.Params[Params]) error {
+	filtered := &flagset.Flagset{}
+	for _, flag := range g.Flagset.Flags {
+		transformed := strcase.ToLowerCamel(flag.Key)
+		if reservedNames[transformed] {
+			logger.Default.Warning(fmt.Sprintf(
+				"Flag %q transforms to %q which is a reserved symbol in the Node.js generator. This flag will be excluded from the generated output.",
+				flag.Key, transformed,
+			))
+			continue
+		}
+		filtered.Flags = append(filtered.Flags, flag)
+	}
+	g.Flagset = filtered
+
 	funcs := template.FuncMap{
 		"OpenFeatureType": openFeatureType,
 		"ToJSONString":    toJSONString,
