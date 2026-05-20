@@ -79,6 +79,14 @@ export type FlagKey = (typeof FlagKeys)[keyof typeof FlagKeys];
 export class GeneratedFeatureFlagService {
   private readonly flagService = inject(FeatureFlagService);
 
+  /**
+   * The underlying FeatureFlagService for ad-hoc flag evaluations
+   * beyond what's defined in the manifest.
+   */
+  get client(): FeatureFlagService {
+    return this.flagService;
+  }
+
 {{ range .Flagset.Flags }}
   /**
    * Get evaluation details for the `{{ .Key }}` flag.

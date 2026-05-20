@@ -10,8 +10,10 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/iancoleman/strcase"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
+	"github.com/open-feature/cli/internal/logger"
 	"golang.org/x/tools/imports"
 )
 
@@ -128,7 +130,28 @@ func formatNestedValue(value any) string {
 	}
 }
 
+// reservedNames are symbols exported by the Go generator itself. Flag keys
+// that transform (via ToPascal) to one of these names will be excluded from
+// the generated output and a warning will be emitted.
+var reservedNames = map[string]bool{
+	"Client": true,
+}
+
 func (g *GolangGenerator) Generate(params *generators.Params[Params]) error {
+	filtered := &flagset.Flagset{}
+	for _, flag := range g.Flagset.Flags {
+		transformed := strcase.ToCamel(flag.Key)
+		if reservedNames[transformed] {
+			logger.Default.Warning(fmt.Sprintf(
+				"Flag %q transforms to %q which is a reserved symbol in the Go generator. This flag will be excluded from the generated output.",
+				flag.Key, transformed,
+			))
+			continue
+		}
+		filtered.Flags = append(filtered.Flags, flag)
+	}
+	g.Flagset = filtered
+
 	funcs := template.FuncMap{
 		"SupportImports":  supportImports,
 		"OpenFeatureType": openFeatureType,

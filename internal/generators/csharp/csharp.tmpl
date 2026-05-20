@@ -70,6 +70,11 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
             _client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
+        /// <summary>
+        /// The underlying OpenFeature client for ad-hoc flag evaluations.
+        /// </summary>
+        public IFeatureClient Client => _client;
+
         {{- range .Flagset.Flags }}
         /// <summary>
         /// {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}

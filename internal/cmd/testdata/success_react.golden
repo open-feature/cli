@@ -6,6 +6,7 @@ import {
   type FlagQuery,
   useFlag,
   useSuspenseFlag,
+  useOpenFeatureClient,
   JsonValue
 } from "@openfeature/react-sdk";
 
@@ -158,3 +159,9 @@ export const useUsernameMaxLength = (options?: ReactFlagEvaluationOptions): Flag
 export const useSuspenseUsernameMaxLength = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<number> => {
   return useSuspenseFlag("usernameMaxLength", 50, options);
 };
+
+/**
+ * Re-exported hook for accessing the underlying OpenFeature client
+ * for ad-hoc flag evaluations beyond what's defined in the manifest.
+ */
+export { useOpenFeatureClient };
