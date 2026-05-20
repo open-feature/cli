@@ -1,0 +1,48 @@
+{
+    "flags": {
+      "enableFeatureA": {
+        "flagType": "boolean",
+        "defaultValue": false,
+        "description": "Controls whether Feature A is enabled."
+      },
+      "greetingMessage": {
+        "flagType": "string",
+        "defaultValue": "Hello there!",
+        "description": "The message to use for greeting users."
+      },
+      "themeCustomization": {
+        "flagType": "object",
+        "defaultValue": {
+          "primaryColor": "#007bff",
+          "secondaryColor": "#6c757d",
+          "tags": ["light"],
+          "header": {
+            "fontSize": 16,
+            "visible": true
+          }
+        },
+        "description": "Allows customization of theme colors.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "primaryColor": { "type": "string" },
+            "secondaryColor": { "type": "string" },
+            "tags": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "header": {
+              "type": "object",
+              "properties": {
+                "fontSize": { "type": "integer" },
+                "visible": { "type": "boolean" }
+              },
+              "required": ["fontSize"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["primaryColor"]
+        }
+      }
+    }
+  }

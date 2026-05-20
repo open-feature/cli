@@ -27,7 +27,15 @@
         "primaryColor": "#007bff",
         "secondaryColor": "#6c757d"
       },
-      "description": "Allows customization of theme colors."
+      "description": "Allows customization of theme colors.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "primaryColor": { "type": "string" },
+          "secondaryColor": { "type": "string" }
+        },
+        "required": ["primaryColor"]
+      }
     }
   }
 }
