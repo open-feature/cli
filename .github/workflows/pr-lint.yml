@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
       - name: Check Go formatting
         run: |
           unformatted=$(go fmt ./...)
@@ -48,4 +48,4 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.7.1
+          version: v2.12.2

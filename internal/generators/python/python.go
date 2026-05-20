@@ -98,7 +98,7 @@ func toPythonDict(value any) string {
 		}
 		val := assertedMap[key]
 
-		builder.WriteString(fmt.Sprintf(`%q: %s`, key, formatNestedValue(val)))
+		fmt.Fprintf(&builder, `%q: %s`, key, formatNestedValue(val))
 	}
 
 	builder.WriteString("}")

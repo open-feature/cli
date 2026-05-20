@@ -11,28 +11,21 @@ import (
 )
 
 type Test struct {
-	ProjectDir string
+	projectDir string
 	TestDir    string
 }
 
 func New(projectDir, testDir string) *Test {
 	return &Test{
-		ProjectDir: projectDir,
+		projectDir: projectDir,
 		TestDir:    testDir,
 	}
 }
 
-func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Container, error) {
-	source := client.Host().Directory(t.ProjectDir)
+func (t *Test) Run(ctx context.Context, client *dagger.Client, cli *dagger.Container) (*dagger.Container, error) {
 	testFiles := client.Host().Directory(t.TestDir, dagger.HostDirectoryOpts{
 		Include: []string{"package.json", "test.ts"},
 	})
-
-	cli := client.Container().
-		From(integration.GoBaseImage).
-		WithDirectory("/src", source).
-		WithWorkdir("/src").
-		WithExec([]string{"go", "build", "-o", "cli", "./cmd/openfeature"})
 
 	generated := cli.WithExec([]string{
 		"./cli", "generate", "nodejs",
@@ -58,6 +51,10 @@ func (t *Test) Name() string {
 	return "nodejs"
 }
 
+func (t *Test) ProjectDir() string {
+	return t.projectDir
+}
+
 func main() {
 	ctx := context.Background()
 
@@ -72,6 +69,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to get test dir: %v\n", err)
 		os.Exit(1)
 	}
+
 	test := New(projectDir, testDir)
 
 	if err := integration.RunTest(ctx, test); err != nil {
