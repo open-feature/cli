@@ -12,8 +12,8 @@ import (
 
 // Test implements the integration test for the Go generator
 type Test struct {
-	// ProjectDir is the absolute path to the root of the project
-	ProjectDir string
+	// projectDir is the absolute path to the root of the project
+	projectDir string
 	// TestDir is the absolute path to the test directory
 	TestDir string
 }
@@ -21,36 +21,19 @@ type Test struct {
 // New creates a new Test
 func New(projectDir, testDir string) *Test {
 	return &Test{
-		ProjectDir: projectDir,
+		projectDir: projectDir,
 		TestDir:    testDir,
 	}
 }
 
 // Run executes the Go integration test using Dagger
-func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Container, error) {
-	// Source code container
-	source := client.Host().Directory(t.ProjectDir)
+func (t *Test) Run(ctx context.Context, client *dagger.Client, cli *dagger.Container) (*dagger.Container, error) {
+	// Test source files
 	testFiles := client.Host().Directory(t.TestDir, dagger.HostDirectoryOpts{
 		Include: []string{"test.go", "go.mod"},
 	})
 
-	// goBase returns a Go container with git installed, used both to build
-	// the CLI and to compile the generated client against the test fixture.
-	goBase := func() *dagger.Container {
-		return client.Container().
-			From(integration.GoBaseImage).
-			WithExec([]string{"apk", "add", "--no-cache", "git"})
-	}
-
-	// Build the CLI
-	cli := goBase().
-		WithDirectory("/src", source).
-		WithWorkdir("/src").
-		WithExec([]string{"go", "mod", "tidy"}).
-		WithExec([]string{"go", "mod", "download"}).
-		WithExec([]string{"go", "build", "-o", "cli", "./cmd/openfeature"})
-
-	// Generate Go client
+	// Generate Go client using the pre-built CLI
 	generated := cli.WithExec([]string{
 		"./cli", "generate", "go",
 		"--manifest=/src/sample/sample_manifest.json",
@@ -62,7 +45,8 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 	generatedFiles := generated.Directory("/tmp/generated")
 
 	// Test Go compilation with the generated files
-	goContainer := goBase().
+	goContainer := client.Container().
+		From(integration.GoGenerateMinCompatImage).
 		WithWorkdir("/app").
 		WithDirectory("/app", testFiles).
 		WithDirectory("/app/openfeature", generatedFiles).
@@ -76,6 +60,11 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 // Name returns the name of the integration test
 func (t *Test) Name() string {
 	return "go"
+}
+
+// ProjectDir returns the absolute path to the project root
+func (t *Test) ProjectDir() string {
+	return t.projectDir
 }
 
 func main() {

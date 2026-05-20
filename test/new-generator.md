@@ -32,42 +32,33 @@ import (
  "fmt"
  "os"
  "path/filepath"
- 
+
  "dagger.io/dagger"
  "github.com/open-feature/cli/test/integration"
 )
 
 // Test implements the integration test for the Python generator
 type Test struct {
- ProjectDir string
+ projectDir string
  TestDir    string
 }
 
 // New creates a new Test
 func New(projectDir, testDir string) *Test {
  return &Test{
-  ProjectDir: projectDir,
+  projectDir: projectDir,
   TestDir:    testDir,
  }
 }
 
 // Run executes the Python integration test
-func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Container, error) {
- // Source code container
- source := client.Host().Directory(t.ProjectDir)
+// The CLI is pre-built and provided by the framework.
+func (t *Test) Run(ctx context.Context, client *dagger.Client, cli *dagger.Container) (*dagger.Container, error) {
  testFiles := client.Host().Directory(t.TestDir, dagger.HostDirectoryOpts{
   Include: []string{"test_openfeature.py", "requirements.txt"},
  })
 
- // Build the CLI. Use integration.GoBaseImage so the Go version is
- // bumped in a single place when go.mod changes.
- cli := client.Container().
-  From(integration.GoBaseImage).
-  WithDirectory("/src", source).
-  WithWorkdir("/src").
-  WithExec([]string{"go", "build", "-o", "cli"})
-
- // Generate Python client
+ // Generate Python client using the pre-built CLI
  generated := cli.WithExec([]string{
   "./cli", "generate", "python",
   "--manifest=/src/sample/sample_manifest.json",
@@ -93,6 +84,11 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 // Name returns the name of the integration test
 func (t *Test) Name() string {
  return "python"
+}
+
+// ProjectDir returns the absolute path to the project root
+func (t *Test) ProjectDir() string {
+ return t.projectDir
 }
 
 func main() {
@@ -138,7 +134,7 @@ import (
 func main() {
  // Run the generator-specific tests
  fmt.Println("=== Running all integration tests ===")
- 
+
  // Run the C# integration test
  csharpCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/csharp")
  csharpCmd.Stdout = os.Stdout
@@ -147,7 +143,7 @@ func main() {
   fmt.Fprintf(os.Stderr, "Error running C# integration test: %v\n", err)
   os.Exit(1)
  }
- 
+
  // Run the Python integration test
  pythonCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/python")
  pythonCmd.Stdout = os.Stdout
@@ -156,9 +152,9 @@ func main() {
   fmt.Fprintf(os.Stderr, "Error running Python integration test: %v\n", err)
   os.Exit(1)
  }
- 
+
  // Add more tests here as they are available
- 
+
  fmt.Println("=== All integration tests passed successfully ===")
 }
 ```
@@ -189,3 +185,4 @@ test-python-dagger:
 ## Step 5: Update the documentation
 
 Update `test/README.md` to include your new test.
+

@@ -68,8 +68,7 @@ func getKnownFlagProperties() map[string]bool {
 
 	// Extract fields from BaseFlag struct
 	t := reflect.TypeFor[BaseFlag]()
-	for i := range t.NumField() {
-		field := t.Field(i)
+	for field := range t.Fields() {
 		jsonTag := field.Tag.Get("json")
 		if jsonTag != "" {
 			// Extract field name from json tag (e.g., "flagType,omitempty" -> "flagType")

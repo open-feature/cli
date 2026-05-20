@@ -19,6 +19,9 @@ help:
 	@echo "  fmt                      - Format Go code"
 	@echo "  ci                       - Run all CI checks locally (fmt, lint, test, verify-generate)"
 
+# Tool versions
+GOLANGCI_LINT_VERSION := v2.12.2
+
 # Build variables
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
@@ -105,7 +108,7 @@ lint:
 	@echo "Running golangci-lint..."
 	@if ! command -v golangci-lint &> /dev/null; then \
 		echo "Installing golangci-lint..."; \
-		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.7.1; \
+		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
 	fi
 	@golangci-lint run
 	@echo "Linting completed successfully!"
@@ -115,7 +118,7 @@ lint-fix:
 	@echo "Running golangci-lint with auto-fix..."
 	@if ! command -v golangci-lint &> /dev/null; then \
 		echo "Installing golangci-lint..."; \
-		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.7.1; \
+		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
 	fi
 	@golangci-lint run --fix
 	@echo "Linting with auto-fix completed successfully!"
