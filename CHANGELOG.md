@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.2](https://github.com/open-feature/cli/compare/v0.4.1...v0.4.2) (2026-05-20)
+
+
+### 🐛 Bug Fixes
+
+* ensure generated flag manifest ends with a final newline ([#246](https://github.com/open-feature/cli/issues/246)) ([c2688a7](https://github.com/open-feature/cli/commit/c2688a76c2daee82cc00be9fa46b41259f688391))
+
+
+### 🧹 Chore
+
+* **deps:** replace google-github-actions/release-please-action action with googleapis/release-please-action v3 ([#245](https://github.com/open-feature/cli/issues/245)) ([d29afd8](https://github.com/open-feature/cli/commit/d29afd886a096b422333c5c69cd164fa07eada87))
+* resolve open dependabot security alerts ([#249](https://github.com/open-feature/cli/issues/249)) ([ed72dad](https://github.com/open-feature/cli/commit/ed72dadaad978bce8f5fcf415e42753c94e137ff))
+
 ## [0.4.1](https://github.com/open-feature/cli/compare/v0.4.0...v0.4.1) (2026-04-28)
 
 
