@@ -34,6 +34,13 @@ func TestGenerate(t *testing.T) {
 			outputFile:     "openfeature.generated.ts",
 		},
 		{
+			name:           "Angular generation with no JsonValue type success",
+			command:        "angular",
+			manifestGolden: "testdata/source_manifest.json",
+			outputGolden:   "testdata/success_angular_no_jsonvalue.golden",
+			outputFile:     "openfeature.generated.ts",
+		},
+		{
 			name:           "Go generation success",
 			command:        "go",
 			manifestGolden: "testdata/success_manifest.golden",
@@ -46,6 +53,13 @@ func TestGenerate(t *testing.T) {
 			command:        "react",
 			manifestGolden: "testdata/success_manifest.golden",
 			outputGolden:   "testdata/success_react.golden",
+			outputFile:     "openfeature.ts",
+		},
+		{
+			name:           "React generation with no JsonValue type success",
+			command:        "react",
+			manifestGolden: "testdata/source_manifest.json",
+			outputGolden:   "testdata/success_react_no_jsonvalue.golden",
 			outputFile:     "openfeature.ts",
 		},
 		{
