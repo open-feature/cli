@@ -719,6 +719,7 @@ describe("Generated Directives Tests", () => {
         fixture.componentRef.setInput("domain", domain);
         fixture.detectChanges();
         await fixture.whenStable();
+        fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
         expect(
@@ -770,6 +771,7 @@ describe("Generated Directives Tests", () => {
         fixture.componentRef.setInput("expectedValue", "Expected value");
         fixture.detectChanges();
         await fixture.whenStable();
+        fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
         expect(
@@ -821,6 +823,7 @@ describe("Generated Directives Tests", () => {
         fixture.componentRef.setInput("expectedValue", 0.25);
         fixture.detectChanges();
         await fixture.whenStable();
+        fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
         expect(
@@ -872,6 +875,7 @@ describe("Generated Directives Tests", () => {
         fixture.componentRef.setInput("expectedValue", 100);
         fixture.detectChanges();
         await fixture.whenStable();
+        fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
         expect(
@@ -923,6 +927,7 @@ describe("Generated Directives Tests", () => {
         fixture.componentRef.setInput("expectedValue", { theme: "dark" });
         fixture.detectChanges();
         await fixture.whenStable();
+        fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector(".flag-content")).toBeNull();
         expect(
