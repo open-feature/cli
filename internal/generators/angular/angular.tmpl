@@ -221,9 +221,9 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
 {{- if ne $type "boolean" }}
 
   override ngOnChanges() {
-    super.ngOnChanges();
-
     this._featureFlagValue = this.{{ .Key | ToCamel }}FeatureFlagValue;
+
+    super.ngOnChanges();
   }
 {{- end }}
 

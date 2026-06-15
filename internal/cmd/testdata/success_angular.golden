@@ -424,9 +424,9 @@ export class DiscountPercentageFeatureFlagDirective extends FeatureFlagDirective
   }
 
   override ngOnChanges() {
-    super.ngOnChanges();
-
     this._featureFlagValue = this.discountPercentageFeatureFlagValue;
+
+    super.ngOnChanges();
   }
 
   /**
@@ -696,9 +696,9 @@ export class GreetingMessageFeatureFlagDirective extends FeatureFlagDirective<st
   }
 
   override ngOnChanges() {
-    super.ngOnChanges();
-
     this._featureFlagValue = this.greetingMessageFeatureFlagValue;
+
+    super.ngOnChanges();
   }
 
   /**
@@ -837,9 +837,9 @@ export class ThemeCustomizationFeatureFlagDirective extends FeatureFlagDirective
   }
 
   override ngOnChanges() {
-    super.ngOnChanges();
-
     this._featureFlagValue = this.themeCustomizationFeatureFlagValue;
+
+    super.ngOnChanges();
   }
 
   /**
@@ -978,9 +978,9 @@ export class UsernameMaxLengthFeatureFlagDirective extends FeatureFlagDirective<
   }
 
   override ngOnChanges() {
-    super.ngOnChanges();
-
     this._featureFlagValue = this.usernameMaxLengthFeatureFlagValue;
+
+    super.ngOnChanges();
   }
 
   /**
