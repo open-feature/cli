@@ -33,7 +33,7 @@
   "overrides": {
     "@babel/core": "^7.29.6",
     "esbuild": "^0.28.1",
-    "fast-uri": "3.1.4",
+    "fast-uri": "3.1.5",
     "minimatch": "^9.0.7",
     "picomatch": "^4.0.4",
     "postcss": "^8.5.18",
