@@ -5,6 +5,7 @@ import (
 
 	"github.com/invopop/jsonschema"
 	"github.com/pterm/pterm"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
 
 type BooleanFlag struct {
@@ -45,6 +46,10 @@ type ObjectFlag struct {
 	Type string `json:"flagType,omitempty" jsonschema:"enum=object"`
 	// The value returned from an unsuccessful flag evaluation
 	DefaultValue any `json:"defaultValue,omitempty"`
+	// An optional JSON Schema subset describing the structure of the object value.
+	// The reflected type here doesn't matter because buildObjectFlagProperties replaces
+	// this property with a $ref to the manually-constructed propertySchema definition.
+	Schema any `json:"schema,omitempty"`
 }
 
 type BaseFlag struct {
@@ -116,9 +121,62 @@ func ToJSONSchema() *jsonschema.Schema {
 		},
 		"objectFlag": &jsonschema.Schema{
 			Type:       "object",
-			Properties: reflector.Reflect(ObjectFlag{}).Properties,
+			Properties: buildObjectFlagProperties(reflector),
 		},
+		"propertySchema": buildPropertySchemaDefinition(),
 	}
 
 	return schema
+}
+
+// buildObjectFlagProperties builds the properties for objectFlag, replacing the
+// auto-reflected schema property with a $ref to the recursive propertySchema definition.
+func buildObjectFlagProperties(reflector *jsonschema.Reflector) *orderedmap.OrderedMap[string, *jsonschema.Schema] {
+	props := reflector.Reflect(ObjectFlag{}).Properties
+	// Replace the auto-generated schema property with a $ref to the recursive definition
+	props.Set("schema", &jsonschema.Schema{
+		Ref:         "#/$defs/propertySchema",
+		Description: "An optional JSON Schema subset describing the structure of the object value",
+	})
+	return props
+}
+
+// buildPropertySchemaDefinition constructs the recursive JSON Schema definition
+// for the propertySchema type used in object flag schemas.
+func buildPropertySchemaDefinition() *jsonschema.Schema {
+	props := orderedmap.New[string, *jsonschema.Schema]()
+	props.Set("type", &jsonschema.Schema{
+		Type:        "string",
+		Enum:        []any{"object", "array", "string", "number", "integer", "boolean"},
+		Description: "The JSON Schema type",
+	})
+	props.Set("properties", &jsonschema.Schema{
+		Type:        "object",
+		Description: "Property schemas for object types",
+		AdditionalProperties: &jsonschema.Schema{
+			Ref: "#/$defs/propertySchema",
+		},
+	})
+	props.Set("required", &jsonschema.Schema{
+		Type:        "array",
+		Description: "Required property names for object types",
+		Items: &jsonschema.Schema{
+			Type: "string",
+		},
+	})
+	props.Set("items", &jsonschema.Schema{
+		Ref:         "#/$defs/propertySchema",
+		Description: "Schema for array element types",
+	})
+	props.Set("additionalProperties", &jsonschema.Schema{
+		Type:        "boolean",
+		Description: "Whether additional properties are allowed for object types",
+	})
+
+	return &jsonschema.Schema{
+		Type:        "object",
+		Description: "A JSON Schema subset for describing object flag value structure",
+		Properties:  props,
+		Required:    []string{"type"},
+	}
 }

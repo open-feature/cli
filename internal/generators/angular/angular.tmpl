@@ -28,6 +28,18 @@ import {
   JsonValue,
 } from '@openfeature/angular-sdk';
 import { Observable, map } from 'rxjs';
+{{- if HasObjectFlagsWithSchema .Flagset.Flags }}
+
+// ============================================================================
+// TYPED OBJECT FLAG INTERFACES
+// ============================================================================
+
+{{ range .Flagset.Flags }}
+{{- if HasSchema . }}
+{{ TSInterfaceDef . }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 // ============================================================================
 // FLAG KEYS
@@ -87,7 +99,7 @@ export class GeneratedFeatureFlagService {
    *
    * **Details:**
    * - Flag key: `{{ .Key }}`
-   * - Type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
+   * - Type: `{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
    * - Default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
    *
    * @param domain - Optional domain for flag evaluation (scopes the flag to a specific provider).
@@ -97,7 +109,7 @@ export class GeneratedFeatureFlagService {
   get{{ .Key | ToPascal }}Details(
     domain?: string,
     options?: AngularFlagEvaluationOptions
-  ): Observable<EvaluationDetails<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>> {
+  ): Observable<EvaluationDetails<{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>> {
     return this.flagService.{{ .Type | SdkServiceMethod }}(
       {{ .Key | Quote }},
       {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }},
@@ -106,7 +118,7 @@ export class GeneratedFeatureFlagService {
         updateOnConfigurationChanged: options?.updateOnConfigurationChanged ?? true,
         updateOnContextChanged: options?.updateOnContextChanged ?? true,
       }
-    );
+    ){{ if HasSchema . }} as unknown as Observable<EvaluationDetails<{{ TSFlagReturnType . }}>>{{ end }};
   }
 
   /**
@@ -121,7 +133,7 @@ export class GeneratedFeatureFlagService {
   get{{ .Key | ToPascal }}(
     domain?: string,
     options?: AngularFlagEvaluationOptions
-  ): Observable<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> {
+  ): Observable<{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> {
     return this.get{{ .Key | ToPascal }}Details(domain, options).pipe(
       map((details) => details.value)
     );
@@ -145,7 +157,7 @@ export class GeneratedFeatureFlagService {
  *
  * **Details:**
  * - Flag key: `{{ .Key }}`
- * - Type: `{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}`
+ * - Type: `{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}`
  * - Default value: `{{ if eq $type "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
  *
  *
@@ -195,17 +207,18 @@ export class GeneratedFeatureFlagService {
   selector: '[{{ .Key | ToCamel }}FeatureFlag]',
   standalone: true,
 })
-export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirective<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}> implements OnChanges {
+{{ $tsType := "" }}{{ if HasSchema . }}{{ $tsType = (TSFlagReturnType .) }}{{ else if eq $type "object" }}{{ $tsType = "JsonValue" }}{{ else }}{{ $tsType = $type }}{{ end -}}
+export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirective<{{ $tsType }}> implements OnChanges {
   override _changeDetectorRef = inject(ChangeDetectorRef);
   override _viewContainerRef = inject(ViewContainerRef);
-  override _thenTemplateRef = inject<TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>>(TemplateRef);
+  override _thenTemplateRef = inject<TemplateRef<FeatureFlagDirectiveContext<{{ $tsType }}>>>(TemplateRef);
 
 {{- if ne $type "boolean" }}
 
   /**
    * The expected value of this {{ $type }} feature flag, for which the `then` template should be rendered.
    */
-  @Input({ required: false }) {{ .Key | ToCamel }}FeatureFlagValue?: {{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }};
+  @Input({ required: false }) {{ .Key | ToCamel }}FeatureFlagValue?: {{ $tsType }};
 {{- end }}
 
   constructor() {
@@ -261,7 +274,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * Template to be displayed when the feature flag {{ if eq $type "boolean" }}is false{{ else }}does not match value{{ end }}.
    */
   @Input()
-  set {{ .Key | ToCamel }}FeatureFlagElse(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+  set {{ .Key | ToCamel }}FeatureFlagElse(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ $tsType }}>>) {
     this._elseTemplateRef = tpl;
   }
 
@@ -269,7 +282,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * Template to be displayed when the provider is not ready.
    */
   @Input()
-  set {{ .Key | ToCamel }}FeatureFlagInitializing(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+  set {{ .Key | ToCamel }}FeatureFlagInitializing(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ $tsType }}>>) {
     this._initializingTemplateRef = tpl;
   }
 
@@ -277,7 +290,7 @@ export class {{ .Key | ToPascal }}FeatureFlagDirective extends FeatureFlagDirect
    * Template to be displayed when the provider is reconciling.
    */
   @Input()
-  set {{ .Key | ToCamel }}FeatureFlagReconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ if eq $type "object" }}JsonValue{{ else }}{{ $type }}{{ end }}>>) {
+  set {{ .Key | ToCamel }}FeatureFlagReconciling(tpl: TemplateRef<FeatureFlagDirectiveContext<{{ $tsType }}>>) {
     this._reconcilingTemplateRef = tpl;
   }
 }
