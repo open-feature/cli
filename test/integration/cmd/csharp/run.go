@@ -12,8 +12,8 @@ import (
 
 // Test implements the integration test for the C# generator
 type Test struct {
-	// ProjectDir is the absolute path to the root of the project
-	ProjectDir string
+	// projectDir is the absolute path to the root of the project
+	projectDir string
 	// TestDir is the absolute path to the test directory
 	TestDir string
 }
@@ -21,27 +21,19 @@ type Test struct {
 // New creates a new Test
 func New(projectDir, testDir string) *Test {
 	return &Test{
-		ProjectDir: projectDir,
+		projectDir: projectDir,
 		TestDir:    testDir,
 	}
 }
 
 // Run executes the C# integration test using Dagger
-func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Container, error) {
-	// Source code container
-	source := client.Host().Directory(t.ProjectDir)
+func (t *Test) Run(ctx context.Context, client *dagger.Client, cli *dagger.Container) (*dagger.Container, error) {
+	// Test source files
 	testFiles := client.Host().Directory(t.TestDir, dagger.HostDirectoryOpts{
 		Include: []string{"CompileTest.csproj", "Program.cs"},
 	})
 
-	// Build the CLI
-	cli := client.Container().
-		From(integration.GoBaseImage).
-		WithDirectory("/src", source).
-		WithWorkdir("/src").
-		WithExec([]string{"go", "build", "-o", "cli", "./cmd/openfeature"})
-
-	// Generate C# client
+	// Generate C# client using the pre-built CLI
 	generated := cli.WithExec([]string{
 		"./cli", "generate", "csharp",
 		"--manifest=/src/sample/sample_manifest.json",
@@ -68,6 +60,11 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 // Name returns the name of the integration test
 func (t *Test) Name() string {
 	return "csharp"
+}
+
+// ProjectDir returns the absolute path to the project root
+func (t *Test) ProjectDir() string {
+	return t.projectDir
 }
 
 func main() {

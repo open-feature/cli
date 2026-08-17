@@ -199,12 +199,10 @@ func FormatValidationError(issues []ValidationError) string {
 		if flagType == "" {
 			flagType = "missing"
 		}
-		sb.WriteString(fmt.Sprintf(
-			"- flagType: %s\n  flagPath: %s\n  errors:\n    ~ %s\n  \tSuggestions:\n      \t- flagType: boolean\n      \t- defaultValue: true\n\n",
+		fmt.Fprintf(&sb, "- flagType: %s\n  flagPath: %s\n  errors:\n    ~ %s\n  \tSuggestions:\n      \t- flagType: boolean\n      \t- defaultValue: true\n\n",
 			flagType,
 			path,
-			strings.Join(entry.messages, "\n    ~ "),
-		))
+			strings.Join(entry.messages, "\n    ~ "))
 	}
 	return sb.String()
 }

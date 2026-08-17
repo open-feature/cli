@@ -11,21 +11,18 @@ import (
 )
 
 type Test struct {
-	ProjectDir string
+	projectDir string
 	TestDir    string
 }
 
 func New(projectDir, testDir string) *Test {
 	return &Test{
-		ProjectDir: projectDir,
+		projectDir: projectDir,
 		TestDir:    testDir,
 	}
 }
 
-func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Container, error) {
-	// Mount the project source
-	source := client.Host().Directory(t.ProjectDir)
-
+func (t *Test) Run(ctx context.Context, client *dagger.Client, cli *dagger.Container) (*dagger.Container, error) {
 	// Mount the test files
 	testFiles := client.Host().Directory(t.TestDir, dagger.HostDirectoryOpts{
 		Include: []string{
@@ -37,14 +34,7 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 		},
 	})
 
-	// Build the CLI in a Go container
-	cli := client.Container().
-		From(integration.GoBaseImage).
-		WithDirectory("/src", source).
-		WithWorkdir("/src").
-		WithExec([]string{"go", "build", "-o", "cli", "./cmd/openfeature"})
-
-	// Generate the Angular code
+	// Generate the Angular code using the pre-built CLI
 	generated := cli.WithExec([]string{
 		"./cli", "generate", "angular",
 		"--manifest=/src/sample/sample_manifest.json",
@@ -74,6 +64,10 @@ func (t *Test) Run(ctx context.Context, client *dagger.Client) (*dagger.Containe
 
 func (t *Test) Name() string {
 	return "angular"
+}
+
+func (t *Test) ProjectDir() string {
+	return t.projectDir
 }
 
 func main() {

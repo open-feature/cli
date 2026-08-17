@@ -25,7 +25,7 @@ make test-integration
 
 ```bash
 # For C# tests
-make test-csharp-dagger
+make test-integration-csharp
 ```
 
 ## Adding a New Integration Test
