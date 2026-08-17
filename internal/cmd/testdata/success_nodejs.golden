@@ -6,6 +6,7 @@ import {
   JsonValue,
 } from "@openfeature/server-sdk";
 import type {
+  Client,
   EvaluationContext,
   EvaluationDetails,
   FlagEvaluationOptions,
@@ -26,6 +27,8 @@ export const FlagKeys = {
 } as const;
 
 export interface GeneratedClient {
+  /** The underlying OpenFeature client for ad-hoc flag evaluations. */
+  readonly client: Client;
   /**
   * Discount percentage applied to purchases.
   * 
@@ -206,6 +209,7 @@ export function getGeneratedClient(domainOrContext?: string | EvaluationContext,
   const client = domain ? OpenFeature.getClient(domain, context) : OpenFeature.getClient(context)
 
   return {
+    client,
     discountPercentage: (context?: EvaluationContext, options?: FlagEvaluationOptions): Promise<number> => {
       return client.getNumberValue("discountPercentage", 0.15, context, options);
     },
