@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.4.1](https://github.com/open-feature/cli/compare/v0.4.0...v0.4.1) (2026-04-28)
+
+
+### 🐛 Bug Fixes
+
+* **security:** update vulnerability-updates [security] ([#233](https://github.com/open-feature/cli/issues/233)) ([91ac14a](https://github.com/open-feature/cli/commit/91ac14ad40e0cbffbff87c1ac7cc3486fedf7c8c))
+* **security:** update vulnerability-updates to v1.43.0 [security] ([#237](https://github.com/open-feature/cli/issues/237)) ([b96b303](https://github.com/open-feature/cli/commit/b96b303b7cbce1df8e8d738ca9463a39f23033fd))
+
+
+### 🧹 Chore
+
+* align remaining Go 1.25 references in docs and test go.mod ([#242](https://github.com/open-feature/cli/issues/242)) ([e7e367d](https://github.com/open-feature/cli/commit/e7e367d3f802edd3f79f9320ea85091f3ea2111a))
+* **deps:** replace archived gopkg.in/yaml.v3 with go.yaml.in/yaml/v3 ([#240](https://github.com/open-feature/cli/issues/240)) ([1cf2beb](https://github.com/open-feature/cli/commit/1cf2bebb1058536fe1c0e8630383f05c498b6833))
+* resolve open dependabot security alerts ([#244](https://github.com/open-feature/cli/issues/244)) ([1046097](https://github.com/open-feature/cli/commit/1046097037747074337406c3fb30eb165909a6c1))
+
 ## [0.4.0](https://github.com/open-feature/cli/compare/v0.3.16...v0.4.0) (2026-03-09)
 
 

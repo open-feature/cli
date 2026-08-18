@@ -1,4 +1,59 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>open-feature/community-tooling"]
+  "extends": ["github>open-feature/community-tooling"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update the GoBaseImage constant when a newer golang Docker image is available",
+      "managerFilePatterns": ["test/integration/integration.go"],
+      "matchStrings": [
+        "GoBaseImage = \"golang:(?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?)-alpine\""
+      ],
+      "depNameTemplate": "golang",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Update minimum Go version mentioned in README and CONTRIBUTING",
+      "managerFilePatterns": ["README.md", "CONTRIBUTING.md"],
+      "matchStrings": [
+        "Go >= (?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?)",
+        "Go (?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?) or later"
+      ],
+      "depNameTemplate": "go",
+      "datasourceTemplate": "golang-version",
+      "extractVersionTemplate": "^(?<version>\\d+\\.\\d+)"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["Makefile"],
+      "matchStrings": [
+        "GOLANGCI_LINT_VERSION\\s*:?=\\s*(?<currentValue>v?\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "golangci/golangci-lint",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [".github/workflows/pr-lint.yml"],
+      "matchStrings": [
+        "uses:\\s*golangci/golangci-lint-action@v\\d+[\\s\\S]*?version:\\s*(?<currentValue>v?\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "golangci/golangci-lint",
+      "datasourceTemplate": "github-releases"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Group all Go toolchain bumps (go.mod, GoBaseImage const, docs) into a single PR",
+      "matchDatasources": ["docker", "golang-version"],
+      "matchPackageNames": ["golang", "go"],
+      "groupName": "go toolchain"
+    },
+    {
+      "matchDepNames": ["golangci/golangci-lint"],
+      "groupName": "golangci-lint"
+    }
+  ]
 }
