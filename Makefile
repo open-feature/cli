@@ -20,7 +20,7 @@ help:
 	@echo "  ci                       - Run all CI checks locally (fmt, lint, test, verify-generate)"
 
 # Tool versions
-GOLANGCI_LINT_VERSION := v2.12.2
+GOLANGCI_LINT_VERSION := v2.13.2
 
 # Build variables
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
