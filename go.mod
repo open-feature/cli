@@ -3,7 +3,7 @@ module github.com/open-feature/cli
 go 1.26.4
 
 require (
-	dagger.io/dagger v0.20.6
+	dagger.io/dagger v0.21.9
 	github.com/google/go-cmp v0.7.0
 	github.com/h2non/gock v1.2.0
 	github.com/iancoleman/strcase v0.3.0
@@ -37,6 +37,7 @@ require (
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/containerd/console v1.0.5 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
+	github.com/dagger/querybuilder v0.0.0-20260402040506-574a5e81cb59 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
