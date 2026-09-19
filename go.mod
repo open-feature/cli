@@ -9,7 +9,7 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/kriscoleman/GoRetry v0.0.1
-	github.com/oapi-codegen/runtime v1.2.0
+	github.com/oapi-codegen/runtime v1.7.0
 	github.com/pterm/pterm v0.12.83
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.2
