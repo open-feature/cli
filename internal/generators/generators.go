@@ -27,9 +27,10 @@ type CommonGenerator struct {
 }
 
 type Params[T any] struct {
-	OutputPath   string
-	TemplatePath string
-	Custom       T
+	OutputPath        string
+	TemplatePath      string
+	RuntimeValidation bool
+	Custom            T
 }
 
 type TemplateData struct {

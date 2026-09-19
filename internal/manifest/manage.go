@@ -51,6 +51,12 @@ func LoadFlagSet(manifestPath string) (*flagset.Flagset, error) {
 		return nil, fmt.Errorf("error unmarshaling JSON: %v", err)
 	}
 
+	// Validate that defaultValues conform to their declared schemas
+	schemaErrors := ValidateDefaultValues(flagset.Flags)
+	if len(schemaErrors) > 0 {
+		return nil, errors.New(FormatValidationError(schemaErrors))
+	}
+
 	return &flagset, nil
 }
 
