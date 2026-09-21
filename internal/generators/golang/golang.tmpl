@@ -23,7 +23,9 @@ type (
 	evaluationDetails[T any] func(context.Context, openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[T], error)
 )
 
-var client = openfeature.NewDefaultClient()
+// Client is the underlying OpenFeature client used for flag evaluations.
+// It can be used directly for ad-hoc flag evaluations beyond what is defined in the manifest.
+var Client = openfeature.NewDefaultClient()
 
 {{- range .Flagset.Flags }}
 // {{ .Key | ToPascal }} returns the value of the "{{ .Key }}" feature flag.
@@ -41,10 +43,10 @@ var {{ .Key | ToPascal }} = struct {
 }{
 		Stringer: stringer({{ .Key | Quote }}),
 	 Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) {{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}} {
-	     return client.{{ .Type | OpenFeatureType }}(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
+	     return Client.{{ .Type | OpenFeatureType }}(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
 	 },
 	 ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[{{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}], error){
-	     return client.{{ .Type | OpenFeatureType }}ValueDetails(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
+	     return Client.{{ .Type | OpenFeatureType }}ValueDetails(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
 	 },
 }
 {{- end}}
