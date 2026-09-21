@@ -4,9 +4,9 @@ import {
   type ReactFlagEvaluationOptions,
   type ReactFlagEvaluationNoSuspenseOptions,
   type FlagQuery,
+  type JsonValue,
   useFlag,
-  useSuspenseFlag,
-  JsonValue
+  useSuspenseFlag
 } from "@openfeature/react-sdk";
 
 // Flag key constants for programmatic access
