@@ -1,0 +1,40 @@
+{
+  "$schema": "../../flag-manifest.json",
+  "flags": {
+    "dashboardConfig": {
+      "flagType": "object",
+      "defaultValue": {
+        "title": "My Dashboard",
+        "refreshInterval": 30,
+        "showHeader": true,
+        "layout": {
+          "columns": 3
+        },
+        "widgets": ["chart", "table"]
+      },
+      "description": "Dashboard configuration with all schema features.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "refreshInterval": { "type": "integer" },
+          "showHeader": { "type": "boolean" },
+          "layout": {
+            "type": "object",
+            "properties": {
+              "columns": { "type": "integer" }
+            },
+            "required": ["columns"],
+            "additionalProperties": false
+          },
+          "widgets": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["title", "refreshInterval"],
+        "additionalProperties": true
+      }
+    }
+  }
+}

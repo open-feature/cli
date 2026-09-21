@@ -100,9 +100,56 @@
         },
         "defaultValue": {
           "description": "The value returned from an unsuccessful flag evaluation"
+        },
+        "schema": {
+          "$ref": "#/$defs/propertySchema",
+          "description": "An optional JSON Schema subset describing the structure of the object value"
         }
       },
       "type": "object"
+    },
+    "propertySchema": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ],
+          "description": "The JSON Schema type"
+        },
+        "properties": {
+          "additionalProperties": {
+            "$ref": "#/$defs/propertySchema"
+          },
+          "type": "object",
+          "description": "Property schemas for object types"
+        },
+        "required": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "description": "Required property names for object types"
+        },
+        "items": {
+          "$ref": "#/$defs/propertySchema",
+          "description": "Schema for array element types"
+        },
+        "additionalProperties": {
+          "type": "boolean",
+          "description": "Whether additional properties are allowed for object types"
+        }
+      },
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "description": "A JSON Schema subset for describing object flag value structure"
     },
     "stringFlag": {
       "properties": {

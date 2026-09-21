@@ -8,6 +8,27 @@ import {
   useSuspenseFlag,
   JsonValue
 } from "@openfeature/react-sdk";
+{{- if and (HasObjectFlagsWithSchema .Flagset.Flags) $.Params.RuntimeValidation }}
+import type {
+  EvaluationDetails,
+  Hook,
+  HookContext,
+} from "@openfeature/react-sdk";
+{{- end }}
+
+{{- range .Flagset.Flags }}
+{{- if HasSchema . }}
+
+{{ TSInterfaceDef . }}
+{{- end }}
+{{- end }}
+{{- if and (HasObjectFlagsWithSchema .Flagset.Flags) $.Params.RuntimeValidation }}
+{{ range .Flagset.Flags }}
+{{- if HasSchema . }}
+{{ TSValidationHookDef . }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 // Flag key constants for programmatic access
 export const FlagKeys = {
@@ -24,10 +45,18 @@ export const FlagKeys = {
 * **Details:**
 * - flag key: `{{ .Key }}`
 * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
-* - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
+* - type: `{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
 */
-export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions): FlagQuery<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> => {
+export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions): FlagQuery<{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> => {
+{{- if HasSchema . }}
+{{- if $.Params.RuntimeValidation }}
+  return useFlag({{ .Key | Quote }}, {{ .DefaultValue | ToJSONString }}, { ...options, hooks: [...(options?.hooks ?? []), {{ TSValidationHookName . }}()] }) as FlagQuery<{{ TSFlagReturnType . }}>;
+{{- else }}
+  return useFlag({{ .Key | Quote }}, {{ .DefaultValue | ToJSONString }}, options) as FlagQuery<{{ TSFlagReturnType . }}>;
+{{- end }}
+{{- else }}
   return useFlag({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, options);
+{{- end }}
 };
 
 /**
@@ -36,12 +65,20 @@ export const use{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationOptions): 
 * **Details:**
 * - flag key: `{{ .Key }}`
 * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
-* - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
+* - type: `{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
 *
 * Equivalent to useFlag with options: `{ suspend: true }`
 * @experimental — Suspense is an experimental feature subject to change in future versions.
 */
-export const useSuspense{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> => {
+export const useSuspense{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}> => {
+{{- if HasSchema . }}
+{{- if $.Params.RuntimeValidation }}
+  return useSuspenseFlag({{ .Key | Quote }}, {{ .DefaultValue | ToJSONString }}, { ...options, hooks: [...(options?.hooks ?? []), {{ TSValidationHookName . }}()] }) as FlagQuery<{{ TSFlagReturnType . }}>;
+{{- else }}
+  return useSuspenseFlag({{ .Key | Quote }}, {{ .DefaultValue | ToJSONString }}, options) as FlagQuery<{{ TSFlagReturnType . }}>;
+{{- end }}
+{{- else }}
   return useSuspenseFlag({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, options);
+{{- end }}
 };
 {{ end}}

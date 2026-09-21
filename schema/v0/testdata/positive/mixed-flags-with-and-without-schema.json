@@ -1,0 +1,32 @@
+{
+  "$schema": "../../flag-manifest.json",
+  "flags": {
+    "enableBeta": {
+      "flagType": "boolean",
+      "defaultValue": false,
+      "description": "A boolean flag coexisting with schema-typed object flags."
+    },
+    "greeting": {
+      "flagType": "string",
+      "defaultValue": "Hello!",
+      "description": "A string flag."
+    },
+    "untypedObject": {
+      "flagType": "object",
+      "defaultValue": { "key": "value" },
+      "description": "An object flag without a schema."
+    },
+    "typedObject": {
+      "flagType": "object",
+      "defaultValue": { "color": "#000" },
+      "description": "An object flag with a schema.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "color": { "type": "string" }
+        },
+        "required": ["color"]
+      }
+    }
+  }
+}
