@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.4.2](https://github.com/open-feature/cli/compare/v0.4.1...v0.4.2) (2026-09-21)
+
+
+### 🐛 Bug Fixes
+
+* ensure generated flag manifest ends with a final newline ([#246](https://github.com/open-feature/cli/issues/246)) ([c2688a7](https://github.com/open-feature/cli/commit/c2688a76c2daee82cc00be9fa46b41259f688391))
+
+
+### 🧹 Chore
+
+* bump Go to 1.26.4 and centralize CLI build in integration tests ([#251](https://github.com/open-feature/cli/issues/251)) ([5af5baa](https://github.com/open-feature/cli/commit/5af5baa5c0a1f1b35f8a186b84195c3178ae3f61))
+* **deps:** replace google-github-actions/release-please-action action with googleapis/release-please-action v3 ([#245](https://github.com/open-feature/cli/issues/245)) ([d29afd8](https://github.com/open-feature/cli/commit/d29afd886a096b422333c5c69cd164fa07eada87))
+* **deps:** update actions/checkout action to v4.4.0 ([#261](https://github.com/open-feature/cli/issues/261)) ([56098cb](https://github.com/open-feature/cli/commit/56098cb72e750414cabdfa19d5f194f93423737a))
+* **deps:** update actions/setup-go action to v5.6.0 ([#262](https://github.com/open-feature/cli/issues/262)) ([15aaf8f](https://github.com/open-feature/cli/commit/15aaf8f9ca69c8b6ba08e844209811cff20feac3))
+* **deps:** update alpine docker tag to v3.24 ([#280](https://github.com/open-feature/cli/issues/280)) ([286e176](https://github.com/open-feature/cli/commit/286e176874c32fe962a4dfa3decd3766cd023458))
+* **deps:** update amannn/action-semantic-pull-request action to v5.5.3 ([#263](https://github.com/open-feature/cli/issues/263)) ([e23247d](https://github.com/open-feature/cli/commit/e23247d3d59afec35f2ab915b66c72b035dc9ec4))
+* **deps:** update dagger/dagger-for-github action to v7.0.6 ([#257](https://github.com/open-feature/cli/issues/257)) ([406b628](https://github.com/open-feature/cli/commit/406b628d87d821cbab0bcf43a944700b1faa9dc7))
+* **deps:** update dependency golangci/golangci-lint to v2.13.2 ([#264](https://github.com/open-feature/cli/issues/264)) ([fd6a28f](https://github.com/open-feature/cli/commit/fd6a28fb660c0d7d4855ae572e12c52bdc781486))
+* **deps:** update dependency microsoft.extensions.dependencyinjection to 9.0.20 ([#258](https://github.com/open-feature/cli/issues/258)) ([0359064](https://github.com/open-feature/cli/commit/03590647ea396127abe3f4a29be3338eb5690446))
+* **deps:** update dependency openfeature to 2.14.1 ([#265](https://github.com/open-feature/cli/issues/265)) ([1219982](https://github.com/open-feature/cli/commit/1219982971faf0fdbd53a0c65f1e01988c4f74a8))
+* **deps:** update docker/login-action action to v3.7.0 ([#266](https://github.com/open-feature/cli/issues/266)) ([b92f382](https://github.com/open-feature/cli/commit/b92f38293752fd8f1a7953b03c3b505481c28976))
+* **deps:** update docker/setup-buildx-action action to v3.12.0 ([#267](https://github.com/open-feature/cli/issues/267)) ([7a21555](https://github.com/open-feature/cli/commit/7a2155534b911b7bc18d882b313c6fd8ee22f6f9))
+* **deps:** update docker/setup-qemu-action action to v3.7.0 ([#268](https://github.com/open-feature/cli/issues/268)) ([295dac5](https://github.com/open-feature/cli/commit/295dac5bfd43b53890066caf2ad563310561593f))
+* **deps:** update golangci/golangci-lint-action action to v9.3.0 ([#269](https://github.com/open-feature/cli/issues/269)) ([e9b8122](https://github.com/open-feature/cli/commit/e9b8122c73c9bcef177717d68c8f663f2652ce26))
+* **deps:** update marocchino/sticky-pull-request-comment action to v2.9.4 ([#272](https://github.com/open-feature/cli/issues/272)) ([6fe32f2](https://github.com/open-feature/cli/commit/6fe32f2c23ae2c8c653e9b09902f707d41ed2935))
+* **deps:** update module dagger.io/dagger to v0.21.9 ([#273](https://github.com/open-feature/cli/issues/273)) ([9aaca4d](https://github.com/open-feature/cli/commit/9aaca4dc747b78846b6f90f00df87134c181da1c))
+* **deps:** update module github.com/invopop/jsonschema to v0.14.0 ([#274](https://github.com/open-feature/cli/issues/274)) ([cc53654](https://github.com/open-feature/cli/commit/cc53654905bb3f075477a8d3e5f2c773443af806))
+* **deps:** update module github.com/oapi-codegen/runtime to v1.7.0 ([#275](https://github.com/open-feature/cli/issues/275)) ([0dcc4aa](https://github.com/open-feature/cli/commit/0dcc4aa18a24cef1c3a5bfb2df8f10d84087077d))
+* **deps:** update module github.com/pterm/pterm to v0.12.83 ([#259](https://github.com/open-feature/cli/issues/259)) ([3de34c9](https://github.com/open-feature/cli/commit/3de34c9969c702565d9603c2f6f306b19a3bbdbf))
+* **deps:** update module github.com/stretchr/testify to v1.12.1 ([#276](https://github.com/open-feature/cli/issues/276)) ([901797c](https://github.com/open-feature/cli/commit/901797cac331d1acdb26ff3e6f2a33f9ca163210))
+* **deps:** update module go.yaml.in/yaml/v3 to v3.0.5 ([#260](https://github.com/open-feature/cli/issues/260)) ([2d01e2e](https://github.com/open-feature/cli/commit/2d01e2e9fdc65aa474080bf76ffd003a100b144e))
+* **deps:** update module golang.org/x/term to v0.46.0 ([#277](https://github.com/open-feature/cli/issues/277)) ([be1cb3b](https://github.com/open-feature/cli/commit/be1cb3b8de48a63495165dfe2c7b93efde54b6e6))
+* **deps:** update module golang.org/x/text to v0.42.0 ([#278](https://github.com/open-feature/cli/issues/278)) ([3c31485](https://github.com/open-feature/cli/commit/3c31485d20c865933e8705a282c5cc19b13f0e8c))
+* **deps:** update module golang.org/x/tools to v0.50.0 ([#279](https://github.com/open-feature/cli/issues/279)) ([e6f58b2](https://github.com/open-feature/cli/commit/e6f58b2fa8eda1af8564fb129b9a3c4bb86448ea))
+* resolve open dependabot security alerts ([#249](https://github.com/open-feature/cli/issues/249)) ([ed72dad](https://github.com/open-feature/cli/commit/ed72dadaad978bce8f5fcf415e42753c94e137ff))
+* resolve open dependabot security alerts ([#252](https://github.com/open-feature/cli/issues/252)) ([784196c](https://github.com/open-feature/cli/commit/784196cc0b864f18bb0e593a64f84152266e763b))
+* resolve open dependabot security alerts ([#253](https://github.com/open-feature/cli/issues/253)) ([a64d25c](https://github.com/open-feature/cli/commit/a64d25c5a8e4b9cb7e5b457f965365ec9a2a149c))
+* resolve open dependabot security alerts ([#254](https://github.com/open-feature/cli/issues/254)) ([a821f16](https://github.com/open-feature/cli/commit/a821f163d7a983b746d18e2b9f83a5ed91c39ab0))
+
 ## [0.4.1](https://github.com/open-feature/cli/compare/v0.4.0...v0.4.1) (2026-04-28)
 
 
