@@ -10,23 +10,24 @@ import (
 
 // Flag name constants to avoid duplication
 const (
-	DebugFlagName         = "debug"
-	ManifestFlagName      = "manifest"
-	OutputFlagName        = "output"
-	NoInputFlagName       = "no-input"
-	GoPackageFlagName     = "package-name"
-	CSharpNamespaceName   = "namespace"
-	OverrideFlagName      = "override"
-	JavaPackageFlagName   = "package-name"
-	ProviderURLFlagName   = "provider-url"
-	FlagSourceURLFlagName = "flag-source-url" // Deprecated: use ProviderFlagName instead
-	AuthTokenFlagName     = "auth-token"
-	NoPromptFlagName      = "no-prompt"
-	DryRunFlagName        = "dry-run"
-	TypeFlagName          = "type"
-	DefaultValueFlagName  = "default-value"
-	DescriptionFlagName   = "description"
-	TemplateFlagName      = "template"
+	DebugFlagName             = "debug"
+	ManifestFlagName          = "manifest"
+	OutputFlagName            = "output"
+	NoInputFlagName           = "no-input"
+	GoPackageFlagName         = "package-name"
+	CSharpNamespaceName       = "namespace"
+	OverrideFlagName          = "override"
+	JavaPackageFlagName       = "package-name"
+	ProviderURLFlagName       = "provider-url"
+	FlagSourceURLFlagName     = "flag-source-url" // Deprecated: use ProviderFlagName instead
+	AuthTokenFlagName         = "auth-token"
+	NoPromptFlagName          = "no-prompt"
+	DryRunFlagName            = "dry-run"
+	TypeFlagName              = "type"
+	DefaultValueFlagName      = "default-value"
+	DescriptionFlagName       = "description"
+	TemplateFlagName          = "template"
+	RuntimeValidationFlagName = "runtime-validation"
 )
 
 // Default values for flags
@@ -49,6 +50,7 @@ func AddRootFlags(cmd *cobra.Command) {
 func AddGenerateFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringP(OutputFlagName, "o", DefaultOutputPath, "Path to where the generated files should be saved")
 	cmd.PersistentFlags().StringP(TemplateFlagName, "t", "", "Path to a custom template file. If not specified, the default template is used")
+	cmd.PersistentFlags().Bool(RuntimeValidationFlagName, true, "Generate runtime validation hooks for typed object flags")
 }
 
 // AddGoGenerateFlags adds the go generator specific flags to the given command
@@ -126,6 +128,12 @@ func GetJavaPackageName(cmd *cobra.Command) string {
 func GetTemplatePath(cmd *cobra.Command) string {
 	templatePath, _ := cmd.Flags().GetString(TemplateFlagName)
 	return templatePath
+}
+
+// GetRuntimeValidation gets the runtime-validation flag from the given command
+func GetRuntimeValidation(cmd *cobra.Command) bool {
+	runtimeValidation, _ := cmd.Flags().GetBool(RuntimeValidationFlagName)
+	return runtimeValidation
 }
 
 // GetNoInput gets the no-input flag from the given command

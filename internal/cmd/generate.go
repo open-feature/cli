@@ -82,13 +82,15 @@ func getGenerateNodeJSCmd() *cobra.Command {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
 			templatePath := config.GetTemplatePath(cmd)
+			runtimeValidation := config.GetRuntimeValidation(cmd)
 
 			logger.Default.GenerationStarted("Node.js")
 
 			params := generators.Params[nodejs.Params]{
-				OutputPath:   outputPath,
-				TemplatePath: templatePath,
-				Custom:       nodejs.Params{},
+				OutputPath:        outputPath,
+				TemplatePath:      templatePath,
+				RuntimeValidation: runtimeValidation,
+				Custom:            nodejs.Params{},
 			}
 			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
@@ -128,13 +130,15 @@ func getGenerateReactCmd() *cobra.Command {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
 			templatePath := config.GetTemplatePath(cmd)
+			runtimeValidation := config.GetRuntimeValidation(cmd)
 
 			logger.Default.GenerationStarted("React")
 
 			params := generators.Params[react.Params]{
-				OutputPath:   outputPath,
-				TemplatePath: templatePath,
-				Custom:       react.Params{},
+				OutputPath:        outputPath,
+				TemplatePath:      templatePath,
+				RuntimeValidation: runtimeValidation,
+				Custom:            react.Params{},
 			}
 			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
@@ -174,6 +178,7 @@ func GetGenerateNestJsCmd() *cobra.Command {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
 			templatePath := config.GetTemplatePath(cmd)
+			runtimeValidation := config.GetRuntimeValidation(cmd)
 
 			logger.Default.GenerationStarted("NestJS")
 
@@ -183,9 +188,10 @@ func GetGenerateNestJsCmd() *cobra.Command {
 			}
 
 			nestjsParams := generators.Params[nestjs.Params]{
-				OutputPath:   outputPath,
-				TemplatePath: templatePath,
-				Custom:       nestjs.Params{},
+				OutputPath:        outputPath,
+				TemplatePath:      templatePath,
+				RuntimeValidation: runtimeValidation,
+				Custom:            nestjs.Params{},
 			}
 			nestjsGenerator := nestjs.NewGenerator(flagset)
 			logger.Default.Debug("Executing NestJS generator")
@@ -195,8 +201,9 @@ func GetGenerateNestJsCmd() *cobra.Command {
 			}
 
 			nodejsParams := generators.Params[nodejs.Params]{
-				OutputPath: outputPath,
-				Custom:     nodejs.Params{},
+				OutputPath:        outputPath,
+				RuntimeValidation: runtimeValidation,
+				Custom:            nodejs.Params{},
 			}
 			nodeGenerator := nodejs.NewGenerator(flagset)
 			err = nodeGenerator.Generate(&nodejsParams)
@@ -231,12 +238,14 @@ func getGenerateCSharpCmd() *cobra.Command {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
 			templatePath := config.GetTemplatePath(cmd)
+			runtimeValidation := config.GetRuntimeValidation(cmd)
 
 			logger.Default.GenerationStarted("C#")
 
 			params := generators.Params[csharp.Params]{
-				OutputPath:   outputPath,
-				TemplatePath: templatePath,
+				OutputPath:        outputPath,
+				TemplatePath:      templatePath,
+				RuntimeValidation: runtimeValidation,
 				Custom: csharp.Params{
 					Namespace: namespace,
 				},
@@ -283,12 +292,14 @@ func getGenerateJavaCmd() *cobra.Command {
 			javaPackageName := config.GetJavaPackageName(cmd)
 			outputPath := config.GetOutputPath(cmd)
 			templatePath := config.GetTemplatePath(cmd)
+			runtimeValidation := config.GetRuntimeValidation(cmd)
 
 			logger.Default.GenerationStarted("Java")
 
 			params := generators.Params[java.Params]{
-				OutputPath:   outputPath,
-				TemplatePath: templatePath,
+				OutputPath:        outputPath,
+				TemplatePath:      templatePath,
+				RuntimeValidation: runtimeValidation,
 				Custom: java.Params{
 					JavaPackage: javaPackageName,
 				},
@@ -336,12 +347,14 @@ func getGenerateGoCmd() *cobra.Command {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
 			templatePath := config.GetTemplatePath(cmd)
+			runtimeValidation := config.GetRuntimeValidation(cmd)
 
 			logger.Default.GenerationStarted("Go")
 
 			params := generators.Params[golang.Params]{
-				OutputPath:   outputPath,
-				TemplatePath: templatePath,
+				OutputPath:        outputPath,
+				TemplatePath:      templatePath,
+				RuntimeValidation: runtimeValidation,
 				Custom: golang.Params{
 					GoPackage:  goPackageName,
 					CLIVersion: Version,
@@ -386,13 +399,15 @@ func getGeneratePythonCmd() *cobra.Command {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
 			templatePath := config.GetTemplatePath(cmd)
+			runtimeValidation := config.GetRuntimeValidation(cmd)
 
 			logger.Default.GenerationStarted("Python")
 
 			params := generators.Params[python.Params]{
-				OutputPath:   outputPath,
-				TemplatePath: templatePath,
-				Custom:       python.Params{},
+				OutputPath:        outputPath,
+				TemplatePath:      templatePath,
+				RuntimeValidation: runtimeValidation,
+				Custom:            python.Params{},
 			}
 			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {
@@ -432,13 +447,15 @@ func getGenerateAngularCmd() *cobra.Command {
 			manifestPath := config.GetManifestPath(cmd)
 			outputPath := config.GetOutputPath(cmd)
 			templatePath := config.GetTemplatePath(cmd)
+			runtimeValidation := config.GetRuntimeValidation(cmd)
 
 			logger.Default.GenerationStarted("Angular")
 
 			params := generators.Params[angular.Params]{
-				OutputPath:   outputPath,
-				TemplatePath: templatePath,
-				Custom:       angular.Params{},
+				OutputPath:        outputPath,
+				TemplatePath:      templatePath,
+				RuntimeValidation: runtimeValidation,
+				Custom:            angular.Params{},
 			}
 			flagset, err := manifest.LoadFlagSet(manifestPath)
 			if err != nil {

@@ -5,10 +5,23 @@ import dev.openfeature.sdk.Client;
 import dev.openfeature.sdk.EvaluationContext;
 import dev.openfeature.sdk.FlagEvaluationDetails;
 import dev.openfeature.sdk.OpenFeatureAPI;
+{{- if and .Params.RuntimeValidation (HasObjectFlagsWithSchema .Flagset.Flags) }}
+import dev.openfeature.sdk.FlagEvaluationOptions;
+import dev.openfeature.sdk.Hook;
+import dev.openfeature.sdk.HookContext;
+{{- end }}
+{{- if HasObjectFlagsWithSchema .Flagset.Flags }}
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nullable;
+{{- end }}
 
 public final class OpenFeature {
 
     private OpenFeature() {} // prevent instantiation
+{{- if HasObjectFlagsWithSchema .Flagset.Flags }}
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+{{- end }}
 
     /**
      * Flag key constants for programmatic access
@@ -20,6 +33,20 @@ public final class OpenFeature {
         public static final String {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }};
 {{- end }}
     }
+{{- range .Flagset.Flags }}
+{{- if HasSchema . }}
+
+{{ JavaRecordDef . }}
+{{- end }}
+{{- end }}
+{{- if .Params.RuntimeValidation }}
+{{- range .Flagset.Flags }}
+{{- if HasSchema . }}
+
+{{ JavaHookDef . }}
+{{- end }}
+{{- end }}
+{{- end }}
 
     public interface GeneratedClient {
         {{ range .Flagset.Flags }}
@@ -31,7 +58,11 @@ public final class OpenFeature {
          * - Default value: {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ .DefaultValue }}{{ end }}
          * Returns the flag value
          */
+{{- if HasSchema . }}
+        {{ JavaFlagReturnType . }} {{ .Key | ToCamel }}(EvaluationContext ctx);
+{{- else }}
         {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx);
+{{- end }}
 
         /**
          * {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
@@ -41,7 +72,11 @@ public final class OpenFeature {
          * - Default value: {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ .DefaultValue }}{{ end }}
          * Returns the evaluation details containing the flag value and metadata
          */
+{{- if HasSchema . }}
+        FlagEvaluationDetails<{{ JavaFlagReturnType . }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx);
+{{- else }}
         FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx);
+{{- end }}
 
 {{- end }}
     }
@@ -54,6 +89,36 @@ public final class OpenFeature {
         }
 
         {{ range .Flagset.Flags }}
+{{- if HasSchema . }}
+        @Override
+        public {{ JavaFlagReturnType . }} {{ .Key | ToCamel }}(EvaluationContext ctx) {
+{{- if $.Params.RuntimeValidation }}
+            Object raw = client.getObjectValue("{{ .Key }}", {{ .DefaultValue | ToMapLiteral }}, ctx, FlagEvaluationOptions.builder().hook(new {{ JavaHookName . }}()).build());
+{{- else }}
+            Object raw = client.getObjectValue("{{ .Key }}", {{ .DefaultValue | ToMapLiteral }}, ctx);
+{{- end }}
+            return MAPPER.convertValue(raw, {{ JavaFlagReturnType . }}.class);
+        }
+
+        @Override
+        public FlagEvaluationDetails<{{ JavaFlagReturnType . }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
+{{- if $.Params.RuntimeValidation }}
+            FlagEvaluationDetails<Object> details = client.getObjectDetails("{{ .Key }}", {{ .DefaultValue | ToMapLiteral }}, ctx, FlagEvaluationOptions.builder().hook(new {{ JavaHookName . }}()).build());
+{{- else }}
+            FlagEvaluationDetails<Object> details = client.getObjectDetails("{{ .Key }}", {{ .DefaultValue | ToMapLiteral }}, ctx);
+{{- end }}
+            {{ JavaFlagReturnType . }} typed = MAPPER.convertValue(details.getValue(), {{ JavaFlagReturnType . }}.class);
+            FlagEvaluationDetails<{{ JavaFlagReturnType . }}> typedDetails = new FlagEvaluationDetails<>();
+            typedDetails.setValue(typed);
+            typedDetails.setFlagKey(details.getFlagKey());
+            typedDetails.setVariant(details.getVariant());
+            typedDetails.setReason(details.getReason());
+            typedDetails.setErrorCode(details.getErrorCode());
+            typedDetails.setErrorMessage(details.getErrorMessage());
+            typedDetails.setFlagMetadata(details.getFlagMetadata());
+            return typedDetails;
+        }
+{{- else }}
         @Override
         public {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx) {
             return client.get{{ .Type | OpenFeatureType | ToPascal }}Value("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
@@ -63,6 +128,7 @@ public final class OpenFeature {
         public FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
             return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
         }
+{{- end }}
 
 {{- end }}
     }

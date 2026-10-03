@@ -36,11 +36,29 @@ func (f FlagType) String() string {
 	}
 }
 
+// ObjectSchema represents a JSON Schema subset for describing the shape of object flag values.
+// It supports objects with properties, arrays with item schemas, and primitive types.
+type ObjectSchema struct {
+	// Type is the JSON Schema type: "object", "array", "string", "number", "integer", "boolean"
+	Type string `json:"type"`
+	// Properties defines the properties of an object type (only valid when Type is "object")
+	Properties map[string]*ObjectSchema `json:"properties,omitempty"`
+	// Required lists property names that must be present (only valid when Type is "object")
+	Required []string `json:"required,omitempty"`
+	// Items defines the schema for array elements (only valid when Type is "array")
+	Items *ObjectSchema `json:"items,omitempty"`
+	// AdditionalProperties controls whether extra properties are allowed (only valid when Type is "object")
+	AdditionalProperties *bool `json:"additionalProperties,omitempty"`
+}
+
 type Flag struct {
 	Key          string
 	Type         FlagType
 	Description  string
 	DefaultValue any
+	// Schema is an optional JSON Schema subset describing the shape of an object flag's value.
+	// It is nil when no schema is provided (backward compatible).
+	Schema *ObjectSchema
 }
 
 type Flagset struct {
@@ -80,9 +98,10 @@ func ParseFlagType(typeStr string) (FlagType, error) {
 func (fs *Flagset) UnmarshalJSON(data []byte) error {
 	var manifest struct {
 		Flags map[string]struct {
-			FlagType     string `json:"flagType"`
-			Description  string `json:"description"`
-			DefaultValue any    `json:"defaultValue"`
+			FlagType     string        `json:"flagType"`
+			Description  string        `json:"description"`
+			DefaultValue any           `json:"defaultValue"`
+			Schema       *ObjectSchema `json:"schema,omitempty"`
 		} `json:"flags"`
 	}
 
@@ -96,12 +115,19 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 			return err
 		}
 
-		fs.Flags = append(fs.Flags, Flag{
+		f := Flag{
 			Key:          key,
 			Type:         flagType,
 			Description:  flag.Description,
 			DefaultValue: flag.DefaultValue,
-		})
+		}
+
+		// Only attach schema to object flags
+		if flagType == ObjectType && flag.Schema != nil {
+			f.Schema = flag.Schema
+		}
+
+		fs.Flags = append(fs.Flags, f)
 	}
 
 	// Ensure consistency of order of flag generation.
@@ -116,27 +142,31 @@ func (fs *Flagset) UnmarshalJSON(data []byte) error {
 func (fs *Flagset) MarshalJSON() ([]byte, error) {
 	manifest := struct {
 		Flags map[string]struct {
-			FlagType     string `json:"flagType"`
-			Description  string `json:"description"`
-			DefaultValue any    `json:"defaultValue"`
+			FlagType     string        `json:"flagType"`
+			Description  string        `json:"description"`
+			DefaultValue any           `json:"defaultValue"`
+			Schema       *ObjectSchema `json:"schema,omitempty"`
 		} `json:"flags"`
 	}{
 		Flags: make(map[string]struct {
-			FlagType     string `json:"flagType"`
-			Description  string `json:"description"`
-			DefaultValue any    `json:"defaultValue"`
+			FlagType     string        `json:"flagType"`
+			Description  string        `json:"description"`
+			DefaultValue any           `json:"defaultValue"`
+			Schema       *ObjectSchema `json:"schema,omitempty"`
 		}),
 	}
 
 	for _, flag := range fs.Flags {
 		manifest.Flags[flag.Key] = struct {
-			FlagType     string `json:"flagType"`
-			Description  string `json:"description"`
-			DefaultValue any    `json:"defaultValue"`
+			FlagType     string        `json:"flagType"`
+			Description  string        `json:"description"`
+			DefaultValue any           `json:"defaultValue"`
+			Schema       *ObjectSchema `json:"schema,omitempty"`
 		}{
 			FlagType:     flag.Type.String(),
 			Description:  flag.Description,
 			DefaultValue: flag.DefaultValue,
+			Schema:       flag.Schema,
 		}
 	}
 

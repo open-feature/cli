@@ -7,6 +7,7 @@ import (
 
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
+	"github.com/open-feature/cli/internal/generators/typescriptgen"
 )
 
 type NodejsGenerator struct {
@@ -45,14 +46,21 @@ func toJSONString(value any) string {
 
 func (g *NodejsGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
-		"OpenFeatureType": openFeatureType,
-		"ToJSONString":    toJSONString,
+		"OpenFeatureType":          openFeatureType,
+		"ToJSONString":             toJSONString,
+		"HasSchema":                generators.HasSchema,
+		"TSInterfaceDef":           typescriptgen.GenerateInterfaceDef,
+		"TSValidationHookDef":      typescriptgen.GenerateValidationHookDef,
+		"TSFlagReturnType":         typescriptgen.FlagReturnType,
+		"TSValidationHookName":     typescriptgen.ValidationHookName,
+		"HasObjectFlagsWithSchema": generators.HasObjectFlagsWithSchema,
 	}
 
 	newParams := &generators.Params[any]{
-		OutputPath:   params.OutputPath,
-		TemplatePath: params.TemplatePath,
-		Custom:       Params{},
+		OutputPath:        params.OutputPath,
+		TemplatePath:      params.TemplatePath,
+		RuntimeValidation: params.RuntimeValidation,
+		Custom:            Params{},
 	}
 
 	return g.GenerateFile(funcs, nodejsTmpl, newParams, "openfeature.ts")

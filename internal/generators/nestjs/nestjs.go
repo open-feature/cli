@@ -7,6 +7,7 @@ import (
 
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
+	"github.com/open-feature/cli/internal/generators/typescriptgen"
 )
 
 type NestJsGenerator struct {
@@ -45,14 +46,18 @@ func toJSONString(value any) string {
 
 func (g *NestJsGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
-		"OpenFeatureType": openFeatureType,
-		"ToJSONString":    toJSONString,
+		"OpenFeatureType":          openFeatureType,
+		"ToJSONString":             toJSONString,
+		"HasSchema":                generators.HasSchema,
+		"TSFlagReturnType":         typescriptgen.FlagReturnType,
+		"HasObjectFlagsWithSchema": generators.HasObjectFlagsWithSchema,
 	}
 
 	newParams := &generators.Params[any]{
-		OutputPath:   params.OutputPath,
-		TemplatePath: params.TemplatePath,
-		Custom:       Params{},
+		OutputPath:        params.OutputPath,
+		TemplatePath:      params.TemplatePath,
+		RuntimeValidation: params.RuntimeValidation,
+		Custom:            Params{},
 	}
 
 	return g.GenerateFile(funcs, nestJsTmpl, newParams, "openfeature-decorators.ts")
