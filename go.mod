@@ -3,7 +3,7 @@ module github.com/open-feature/cli
 go 1.26.4
 
 require (
-	dagger.io/dagger v0.21.9
+	dagger.io/dagger v0.21.10
 	github.com/google/go-cmp v0.7.0
 	github.com/h2non/gock v1.2.0
 	github.com/iancoleman/strcase v0.3.0
