@@ -6,6 +6,7 @@ import {
   type FlagQuery,
   useFlag,
   useSuspenseFlag,
+  useOpenFeatureClient,
   JsonValue
 } from "@openfeature/react-sdk";
 
@@ -45,3 +46,8 @@ export const useSuspense{{ .Key | ToPascal }} = (options?: ReactFlagEvaluationNo
   return useSuspenseFlag({{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue | QuoteString }}{{ end }}, options);
 };
 {{ end}}
+/**
+ * Re-exported hook for accessing the underlying OpenFeature client
+ * for ad-hoc flag evaluations beyond what's defined in the manifest.
+ */
+export { useOpenFeatureClient };

@@ -75,6 +75,11 @@ namespace TestNamespace
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
         }
+
+        /// <summary>
+        /// The underlying OpenFeature client for ad-hoc flag evaluations.
+        /// </summary>
+        public IFeatureClient Client => _client;
         /// <summary>
         /// Discount percentage applied to purchases.
         /// </summary>

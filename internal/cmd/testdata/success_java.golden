@@ -125,6 +125,12 @@ public final class OpenFeature {
          * Returns the evaluation details containing the flag value and metadata
          */
         FlagEvaluationDetails<Integer> usernameMaxLengthDetails(EvaluationContext ctx);
+
+        /**
+         * Returns the underlying OpenFeature client for ad-hoc flag evaluations.
+         * @return The OpenFeature Client instance
+         */
+        Client getOpenFeatureClient();
     }
 
     private static final class OpenFeatureGeneratedClient implements GeneratedClient {
@@ -179,6 +185,11 @@ public final class OpenFeature {
         @Override
         public FlagEvaluationDetails<Integer> usernameMaxLengthDetails(EvaluationContext ctx) {
             return client.getIntegerDetails("usernameMaxLength", 50, ctx);
+        }
+
+        @Override
+        public Client getOpenFeatureClient() {
+            return client;
         }
     }
 

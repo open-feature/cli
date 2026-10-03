@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"text/template"
 
+	"github.com/iancoleman/strcase"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
 )
@@ -43,7 +44,18 @@ func toJSONString(value any) string {
 	return string(bytes)
 }
 
+// reservedNames are symbols exported by the React generator itself. Flag keys
+// whose generated hook name (use + ToPascal) matches one of these will be
+// excluded from the generated output and a warning will be emitted.
+var reservedNames = map[string]bool{
+	"useOpenFeatureClient": true,
+}
+
 func (g *ReactGenerator) Generate(params *generators.Params[Params]) error {
+	g.Flagset = generators.FilterReservedFlags(g.Flagset, "React", reservedNames, func(key string) string {
+		return "use" + strcase.ToCamel(key)
+	})
+
 	funcs := template.FuncMap{
 		"OpenFeatureType": openFeatureType,
 		"ToJSONString":    toJSONString,

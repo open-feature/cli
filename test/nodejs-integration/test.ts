@@ -61,6 +61,12 @@ async function main() {
         const { getGeneratedClient } = await import(clientPath);
         const client = getGeneratedClient();
         
+        // Verify the underlying client is accessible
+        if (!client.client) {
+            throw new Error('Underlying OpenFeature client not exposed');
+        }
+        console.log('✅ Underlying client accessible');
+
         console.log('🧪 Testing flags...');
         
         // Test each flag

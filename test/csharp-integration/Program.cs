@@ -25,6 +25,9 @@ namespace CompileTest
             // Test client retrieval from DI
             var client = serviceProvider.GetRequiredService<GeneratedClient>();
             
+            // Verify the underlying client is accessible
+            var underlyingClient = client.Client;
+
             // Also test the traditional factory method
             var clientFromFactory = GeneratedClient.CreateClient();
             
