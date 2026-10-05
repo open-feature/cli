@@ -34,7 +34,7 @@
     "@babel/core": "^7.29.6",
     "browserslist": "4.28.7",
     "esbuild": "^0.28.1",
-    "fast-uri": "3.1.6",
+    "fast-uri": "3.1.7",
     "minimatch": "^9.0.7",
     "picomatch": "^4.0.4",
     "postcss": "^8.5.18",
