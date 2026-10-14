@@ -3,10 +3,10 @@
 import {
   type ReactFlagEvaluationOptions,
   type ReactFlagEvaluationNoSuspenseOptions,
-  type FlagQuery,
+  type FlagQuery,{{ if .Flagset.HasFlagType "object" }}
+  type JsonValue,{{ end }}
   useFlag,
-  useSuspenseFlag,
-  JsonValue
+  useSuspenseFlag
 } from "@openfeature/react-sdk";
 
 // Flag key constants for programmatic access

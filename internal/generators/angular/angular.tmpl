@@ -24,8 +24,8 @@ import {
   EvaluationDetails,
   FeatureFlagDirective,
   FeatureFlagDirectiveContext,
-  FeatureFlagService,
-  JsonValue,
+  FeatureFlagService,{{ if .Flagset.HasFlagType "object" }}
+  JsonValue,{{ end }}
 } from '@openfeature/angular-sdk';
 import { Observable, map } from 'rxjs';
 

@@ -1,0 +1,101 @@
+'use client';
+
+import {
+  type ReactFlagEvaluationOptions,
+  type ReactFlagEvaluationNoSuspenseOptions,
+  type FlagQuery,
+  useFlag,
+  useSuspenseFlag
+} from "@openfeature/react-sdk";
+
+// Flag key constants for programmatic access
+export const FlagKeys = {
+  /** Flag key for Background color for the application */
+  BACKGROUND_COLOR: "backgroundColor",
+  /** Flag key for Enable dark mode */
+  DARK_MODE: "darkMode",
+  /** Flag key for Maximum number of items to display */
+  MAX_ITEMS: "maxItems",
+} as const;
+
+
+/**
+* Background color for the application
+*
+* **Details:**
+* - flag key: `backgroundColor`
+* - default value: `white`
+* - type: `string`
+*/
+export const useBackgroundColor = (options?: ReactFlagEvaluationOptions): FlagQuery<string> => {
+  return useFlag("backgroundColor", "white", options);
+};
+
+/**
+* Background color for the application
+*
+* **Details:**
+* - flag key: `backgroundColor`
+* - default value: `white`
+* - type: `string`
+*
+* Equivalent to useFlag with options: `{ suspend: true }`
+* @experimental — Suspense is an experimental feature subject to change in future versions.
+*/
+export const useSuspenseBackgroundColor = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<string> => {
+  return useSuspenseFlag("backgroundColor", "white", options);
+};
+
+/**
+* Enable dark mode
+*
+* **Details:**
+* - flag key: `darkMode`
+* - default value: `false`
+* - type: `boolean`
+*/
+export const useDarkMode = (options?: ReactFlagEvaluationOptions): FlagQuery<boolean> => {
+  return useFlag("darkMode", false, options);
+};
+
+/**
+* Enable dark mode
+*
+* **Details:**
+* - flag key: `darkMode`
+* - default value: `false`
+* - type: `boolean`
+*
+* Equivalent to useFlag with options: `{ suspend: true }`
+* @experimental — Suspense is an experimental feature subject to change in future versions.
+*/
+export const useSuspenseDarkMode = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<boolean> => {
+  return useSuspenseFlag("darkMode", false, options);
+};
+
+/**
+* Maximum number of items to display
+*
+* **Details:**
+* - flag key: `maxItems`
+* - default value: `10`
+* - type: `number`
+*/
+export const useMaxItems = (options?: ReactFlagEvaluationOptions): FlagQuery<number> => {
+  return useFlag("maxItems", 10, options);
+};
+
+/**
+* Maximum number of items to display
+*
+* **Details:**
+* - flag key: `maxItems`
+* - default value: `10`
+* - type: `number`
+*
+* Equivalent to useFlag with options: `{ suspend: true }`
+* @experimental — Suspense is an experimental feature subject to change in future versions.
+*/
+export const useSuspenseMaxItems = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<number> => {
+  return useSuspenseFlag("maxItems", 10, options);
+};

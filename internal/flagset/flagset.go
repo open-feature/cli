@@ -47,6 +47,16 @@ type Flagset struct {
 	Flags []Flag
 }
 
+// HasFlagType returns true if any flag in the Flagset has the given type name (e.g. "object", "boolean").
+func (fs *Flagset) HasFlagType(typeName string) bool {
+	for _, f := range fs.Flags {
+		if f.Type.String() == typeName {
+			return true
+		}
+	}
+	return false
+}
+
 // Filter removes flags from the Flagset that are of unsupported types.
 func (fs *Flagset) Filter(unsupportedFlagTypes map[FlagType]bool) *Flagset {
 	var filtered Flagset
