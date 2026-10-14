@@ -44,6 +44,12 @@ public final class OpenFeature {
         FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx);
 
 {{- end }}
+
+        /**
+         * Returns the underlying OpenFeature client for ad-hoc flag evaluations.
+         * @return The OpenFeature Client instance
+         */
+        Client getOpenFeatureClient();
     }
 
     private static final class OpenFeatureGeneratedClient implements GeneratedClient {
@@ -65,6 +71,11 @@ public final class OpenFeature {
         }
 
 {{- end }}
+
+        @Override
+        public Client getOpenFeatureClient() {
+            return client;
+        }
     }
 
     public static GeneratedClient getClient() {

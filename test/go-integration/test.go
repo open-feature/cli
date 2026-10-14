@@ -105,6 +105,9 @@ func run() error {
 	}
 	fmt.Printf("themeCustomization: %v\n", themeCustomization)
 
+	// Verify the underlying client is accessible for ad-hoc evaluations
+	_ = generated.Client
+
 	// Test the String() method functionality for all flags
 	fmt.Printf("enableFeatureA flag key: %s\n", generated.EnableFeatureA.String())
 	fmt.Printf("discountPercentage flag key: %s\n", generated.DiscountPercentage.String())
