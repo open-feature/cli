@@ -1,0 +1,179 @@
+'use client';
+
+import {
+  type ReactFlagEvaluationOptions,
+  type ReactFlagEvaluationNoSuspenseOptions,
+  type FlagQuery,
+  useFlag,
+  useSuspenseFlag,
+  JsonValue
+} from "@openfeature/react-sdk";
+import type {
+  EvaluationDetails,
+  Hook,
+  HookContext,
+} from "@openfeature/react-sdk";
+
+export interface ThemeCustomization {
+  header?: {
+  fontSize: number;
+  visible?: boolean;
+};
+  primaryColor: string;
+  secondaryColor?: string;
+  tags?: string[];
+}
+
+
+function createThemeCustomizationHook(): Hook {
+  return {
+    after: (_hookContext: Readonly<HookContext>, evaluationDetails: EvaluationDetails<JsonValue>) => {
+      const value = evaluationDetails.value;
+      if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+        throw new Error('themeCustomization: expected object');
+      }
+      const themeCustomizationObj = value as Record<string, unknown>;
+      if (themeCustomizationObj["primaryColor"] === undefined) {
+        throw new Error('themeCustomization: missing required property "primaryColor"');
+      }
+      if (themeCustomizationObj["header"] !== undefined) {
+        if (typeof themeCustomizationObj["header"] !== 'object' || themeCustomizationObj["header"] === null || Array.isArray(themeCustomizationObj["header"])) {
+          throw new Error('themeCustomization.header: expected object');
+        }
+        const themeCustomization_headerObj = themeCustomizationObj["header"] as Record<string, unknown>;
+        if (themeCustomization_headerObj["fontSize"] === undefined) {
+          throw new Error('themeCustomization.header: missing required property "fontSize"');
+        }
+        if (themeCustomization_headerObj["fontSize"] !== undefined) {
+          if (typeof themeCustomization_headerObj["fontSize"] !== 'number' || !Number.isInteger(themeCustomization_headerObj["fontSize"])) {
+            throw new Error('themeCustomization.header.fontSize: expected integer');
+          }
+        }
+        if (themeCustomization_headerObj["visible"] !== undefined) {
+          if (typeof themeCustomization_headerObj["visible"] !== 'boolean') {
+            throw new Error('themeCustomization.header.visible: expected boolean');
+          }
+        }
+        const themeCustomization_headerAllowed = new Set(["fontSize", "visible"]);
+        for (const key of Object.keys(themeCustomization_headerObj)) {
+          if (!themeCustomization_headerAllowed.has(key)) {
+            throw new Error(`themeCustomization.header: unexpected property "${key}"`);
+          }
+        }
+      }
+      if (themeCustomizationObj["primaryColor"] !== undefined) {
+        if (typeof themeCustomizationObj["primaryColor"] !== 'string') {
+          throw new Error('themeCustomization.primaryColor: expected string');
+        }
+      }
+      if (themeCustomizationObj["secondaryColor"] !== undefined) {
+        if (typeof themeCustomizationObj["secondaryColor"] !== 'string') {
+          throw new Error('themeCustomization.secondaryColor: expected string');
+        }
+      }
+      if (themeCustomizationObj["tags"] !== undefined) {
+        if (!Array.isArray(themeCustomizationObj["tags"])) {
+          throw new Error('themeCustomization.tags: expected array');
+        }
+        for (let themeCustomization_tagsIdx = 0; themeCustomization_tagsIdx < themeCustomizationObj["tags"].length; themeCustomization_tagsIdx++) {
+          if (typeof themeCustomizationObj["tags"][themeCustomization_tagsIdx] !== 'string') {
+            throw new Error(`themeCustomization.tags[${themeCustomization_tagsIdx}]: expected string`);
+          }
+        }
+      }
+    },
+  };
+}
+
+
+// Flag key constants for programmatic access
+export const FlagKeys = {
+  /** Flag key for Controls whether Feature A is enabled. */
+  ENABLE_FEATURE_A: "enableFeatureA",
+  /** Flag key for The message to use for greeting users. */
+  GREETING_MESSAGE: "greetingMessage",
+  /** Flag key for Allows customization of theme colors. */
+  THEME_CUSTOMIZATION: "themeCustomization",
+} as const;
+
+
+/**
+* Controls whether Feature A is enabled.
+* 
+* **Details:**
+* - flag key: `enableFeatureA`
+* - default value: `false`
+* - type: `boolean`
+*/
+export const useEnableFeatureA = (options?: ReactFlagEvaluationOptions): FlagQuery<boolean> => {
+  return useFlag("enableFeatureA", false, options);
+};
+
+/**
+* Controls whether Feature A is enabled.
+* 
+* **Details:**
+* - flag key: `enableFeatureA`
+* - default value: `false`
+* - type: `boolean`
+*
+* Equivalent to useFlag with options: `{ suspend: true }`
+* @experimental — Suspense is an experimental feature subject to change in future versions.
+*/
+export const useSuspenseEnableFeatureA = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<boolean> => {
+  return useSuspenseFlag("enableFeatureA", false, options);
+};
+
+/**
+* The message to use for greeting users.
+* 
+* **Details:**
+* - flag key: `greetingMessage`
+* - default value: `Hello there!`
+* - type: `string`
+*/
+export const useGreetingMessage = (options?: ReactFlagEvaluationOptions): FlagQuery<string> => {
+  return useFlag("greetingMessage", "Hello there!", options);
+};
+
+/**
+* The message to use for greeting users.
+* 
+* **Details:**
+* - flag key: `greetingMessage`
+* - default value: `Hello there!`
+* - type: `string`
+*
+* Equivalent to useFlag with options: `{ suspend: true }`
+* @experimental — Suspense is an experimental feature subject to change in future versions.
+*/
+export const useSuspenseGreetingMessage = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<string> => {
+  return useSuspenseFlag("greetingMessage", "Hello there!", options);
+};
+
+/**
+* Allows customization of theme colors.
+* 
+* **Details:**
+* - flag key: `themeCustomization`
+* - default value: `{"header":{"fontSize":16,"visible":true},"primaryColor":"#007bff","secondaryColor":"#6c757d","tags":["light"]}`
+* - type: `ThemeCustomization`
+*/
+export const useThemeCustomization = (options?: ReactFlagEvaluationOptions): FlagQuery<ThemeCustomization> => {
+  return useFlag("themeCustomization", {"header":{"fontSize":16,"visible":true},"primaryColor":"#007bff","secondaryColor":"#6c757d","tags":["light"]}, { ...options, hooks: [...(options?.hooks ?? []), createThemeCustomizationHook()] }) as FlagQuery<ThemeCustomization>;
+};
+
+/**
+* Allows customization of theme colors.
+* 
+* **Details:**
+* - flag key: `themeCustomization`
+* - default value: `{"header":{"fontSize":16,"visible":true},"primaryColor":"#007bff","secondaryColor":"#6c757d","tags":["light"]}`
+* - type: `ThemeCustomization`
+*
+* Equivalent to useFlag with options: `{ suspend: true }`
+* @experimental — Suspense is an experimental feature subject to change in future versions.
+*/
+export const useSuspenseThemeCustomization = (options?: ReactFlagEvaluationNoSuspenseOptions): FlagQuery<ThemeCustomization> => {
+  return useSuspenseFlag("themeCustomization", {"header":{"fontSize":16,"visible":true},"primaryColor":"#007bff","secondaryColor":"#6c757d","tags":["light"]}, { ...options, hooks: [...(options?.hooks ?? []), createThemeCustomizationHook()] }) as FlagQuery<ThemeCustomization>;
+};

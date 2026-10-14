@@ -3,6 +3,8 @@ package manifest
 import (
 	"strings"
 	"testing"
+
+	"github.com/open-feature/cli/internal/flagset"
 )
 
 func TestValidate_DuplicateFlagKeys(t *testing.T) {
@@ -183,6 +185,290 @@ func TestFindDuplicateFlagKeys_EdgeCases(t *testing.T) {
 			result := findDuplicateFlagKeys([]byte(tt.input))
 			if len(result) != len(tt.expected) {
 				t.Errorf("got %v, want %v", result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestValidateDefaultValues(t *testing.T) {
+	boolTrue := true
+	boolFalse := false
+
+	tests := []struct {
+		name       string
+		flags      []flagset.Flag
+		wantErrors int
+	}{
+		{
+			name: "no schema - no validation",
+			flags: []flagset.Flag{
+				{Key: "obj", Type: flagset.ObjectType, DefaultValue: map[string]any{"a": 1}, Schema: nil},
+			},
+			wantErrors: 0,
+		},
+		{
+			name: "valid object matches schema",
+			flags: []flagset.Flag{
+				{
+					Key:          "theme",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"color": "#fff"},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"color": {Type: "string"},
+						},
+						Required: []string{"color"},
+					},
+				},
+			},
+			wantErrors: 0,
+		},
+		{
+			name: "missing required property",
+			flags: []flagset.Flag{
+				{
+					Key:          "theme",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"other": "val"},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"color": {Type: "string"},
+						},
+						Required: []string{"color"},
+					},
+				},
+			},
+			wantErrors: 1,
+		},
+		{
+			name: "wrong property type",
+			flags: []flagset.Flag{
+				{
+					Key:          "theme",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"color": 123},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"color": {Type: "string"},
+						},
+					},
+				},
+			},
+			wantErrors: 1,
+		},
+		{
+			name: "additional properties disallowed",
+			flags: []flagset.Flag{
+				{
+					Key:          "theme",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"color": "#fff", "extra": "bad"},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"color": {Type: "string"},
+						},
+						AdditionalProperties: &boolFalse,
+					},
+				},
+			},
+			wantErrors: 1,
+		},
+		{
+			name: "additional properties allowed explicitly",
+			flags: []flagset.Flag{
+				{
+					Key:          "theme",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"color": "#fff", "extra": "ok"},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"color": {Type: "string"},
+						},
+						AdditionalProperties: &boolTrue,
+					},
+				},
+			},
+			wantErrors: 0,
+		},
+		{
+			name: "nested object validation",
+			flags: []flagset.Flag{
+				{
+					Key:  "config",
+					Type: flagset.ObjectType,
+					DefaultValue: map[string]any{
+						"layout": map[string]any{"fontSize": 12.0},
+					},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"layout": {
+								Type: "object",
+								Properties: map[string]*flagset.ObjectSchema{
+									"fontSize": {Type: "integer"},
+								},
+							},
+						},
+					},
+				},
+			},
+			wantErrors: 0,
+		},
+		{
+			name: "nested object wrong type",
+			flags: []flagset.Flag{
+				{
+					Key:  "config",
+					Type: flagset.ObjectType,
+					DefaultValue: map[string]any{
+						"layout": map[string]any{"fontSize": "not-a-number"},
+					},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"layout": {
+								Type: "object",
+								Properties: map[string]*flagset.ObjectSchema{
+									"fontSize": {Type: "integer"},
+								},
+							},
+						},
+					},
+				},
+			},
+			wantErrors: 1,
+		},
+		{
+			name: "array validation passes",
+			flags: []flagset.Flag{
+				{
+					Key:          "tags",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"items": []any{"a", "b"}},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"items": {Type: "array", Items: &flagset.ObjectSchema{Type: "string"}},
+						},
+					},
+				},
+			},
+			wantErrors: 0,
+		},
+		{
+			name: "array element wrong type",
+			flags: []flagset.Flag{
+				{
+					Key:          "tags",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"items": []any{"a", 123}},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"items": {Type: "array", Items: &flagset.ObjectSchema{Type: "string"}},
+						},
+					},
+				},
+			},
+			wantErrors: 1,
+		},
+		{
+			name: "defaultValue is not an object when schema expects object",
+			flags: []flagset.Flag{
+				{
+					Key:          "bad",
+					Type:         flagset.ObjectType,
+					DefaultValue: "not-an-object",
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"a": {Type: "string"},
+						},
+					},
+				},
+			},
+			wantErrors: 1,
+		},
+		{
+			name: "float passes as number",
+			flags: []flagset.Flag{
+				{
+					Key:          "config",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"ratio": 0.5},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"ratio": {Type: "number"},
+						},
+					},
+				},
+			},
+			wantErrors: 0,
+		},
+		{
+			name: "integer as float64 with no fraction passes integer check",
+			flags: []flagset.Flag{
+				{
+					Key:          "config",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"count": float64(10)},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"count": {Type: "integer"},
+						},
+					},
+				},
+			},
+			wantErrors: 0,
+		},
+		{
+			name: "float64 with fraction fails integer check",
+			flags: []flagset.Flag{
+				{
+					Key:          "config",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"count": 10.5},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"count": {Type: "integer"},
+						},
+					},
+				},
+			},
+			wantErrors: 1,
+		},
+		{
+			name: "boolean validation",
+			flags: []flagset.Flag{
+				{
+					Key:          "config",
+					Type:         flagset.ObjectType,
+					DefaultValue: map[string]any{"enabled": true},
+					Schema: &flagset.ObjectSchema{
+						Type: "object",
+						Properties: map[string]*flagset.ObjectSchema{
+							"enabled": {Type: "boolean"},
+						},
+					},
+				},
+			},
+			wantErrors: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			issues := ValidateDefaultValues(tt.flags)
+			if len(issues) != tt.wantErrors {
+				t.Errorf("got %d validation errors, want %d: %v", len(issues), tt.wantErrors, issues)
 			}
 		})
 	}

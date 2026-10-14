@@ -7,6 +7,7 @@ import (
 
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
+	"github.com/open-feature/cli/internal/generators/typescriptgen"
 )
 
 // AngularGenerator generates typesafe Angular services and directives.
@@ -68,15 +69,20 @@ func toJSONString(value any) string {
 // Generate creates the Angular typesafe client file.
 func (g *AngularGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
-		"OpenFeatureType":  openFeatureType,
-		"SdkServiceMethod": sdkServiceMethod,
-		"ToJSONString":     toJSONString,
+		"OpenFeatureType":          openFeatureType,
+		"SdkServiceMethod":         sdkServiceMethod,
+		"ToJSONString":             toJSONString,
+		"HasSchema":                generators.HasSchema,
+		"TSInterfaceDef":           typescriptgen.GenerateInterfaceDef,
+		"TSFlagReturnType":         typescriptgen.FlagReturnType,
+		"HasObjectFlagsWithSchema": generators.HasObjectFlagsWithSchema,
 	}
 
 	newParams := &generators.Params[any]{
-		OutputPath:   params.OutputPath,
-		TemplatePath: params.TemplatePath,
-		Custom:       Params{},
+		OutputPath:        params.OutputPath,
+		TemplatePath:      params.TemplatePath,
+		RuntimeValidation: params.RuntimeValidation,
+		Custom:            Params{},
 	}
 
 	return g.GenerateFile(funcs, angularTmpl, newParams, "openfeature.generated.ts")

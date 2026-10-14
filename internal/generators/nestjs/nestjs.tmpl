@@ -14,6 +14,15 @@ import { OpenFeatureModule, BooleanFeatureFlag, StringFeatureFlag, NumberFeature
 
 import type { GeneratedClient } from "./openfeature";
 import { getGeneratedClient, FlagKeys } from "./openfeature";
+{{- if HasObjectFlagsWithSchema .Flagset.Flags }}
+import type {
+{{- range .Flagset.Flags }}
+{{- if HasSchema . }}
+  {{ TSFlagReturnType . }},
+{{- end }}
+{{- end }}
+} from "./openfeature";
+{{- end }}
 
 // Re-export flag keys for convenience
 export { FlagKeys };
@@ -105,14 +114,14 @@ interface TypedFeatureProps {
  * - flag key: `{{ .Key }}`
  * - description: `{{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}`
  * - default value: `{{ if eq (.Type | OpenFeatureType) "object"}}{{ .DefaultValue | ToJSONString }}{{ else }}{{ .DefaultValue }}{{ end }}`
- * - type: `{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
+ * - type: `{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}`
  *
  * Usage:
  * ```typescript
  * @Get("/")
  * public async handleRequest(
  *     @{{ .Key | ToPascal }}()
- *     {{ .Key | ToCamel }}: Observable<EvaluationDetails<{{ if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>>,
+ *     {{ .Key | ToCamel }}: Observable<EvaluationDetails<{{ if HasSchema . }}{{ TSFlagReturnType . }}{{ else if eq (.Type | OpenFeatureType) "object" }}JsonValue{{ else }}{{ .Type | OpenFeatureType }}{{ end }}>>,
  * )
  * ```
  * @param {TypedFeatureProps} props The options for injecting the feature flag.

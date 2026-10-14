@@ -1,0 +1,13 @@
+{
+  "$schema": "../../flag-manifest.json",
+  "flags": {
+    "legacyConfig": {
+      "flagType": "object",
+      "defaultValue": {
+        "anything": "goes",
+        "nested": { "is": "fine" }
+      },
+      "description": "An object flag without a schema remains valid for backward compatibility."
+    }
+  }
+}

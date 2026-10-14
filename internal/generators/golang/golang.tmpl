@@ -24,7 +24,15 @@ type (
 )
 
 var client = openfeature.NewDefaultClient()
+{{- range .Flagset.Flags }}
+{{- if HasSchema . }}
 
+{{ GoTypeDef . }}
+{{- if $.Params.RuntimeValidation }}
+{{ GoHookDef . }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- range .Flagset.Flags }}
 // {{ .Key | ToPascal }} returns the value of the "{{ .Key }}" feature flag.
 // {{ if .Description }}{{ .Description }}{{ end }}
@@ -33,18 +41,43 @@ var client = openfeature.NewDefaultClient()
 var {{ .Key | ToPascal }} = struct {
 	fmt.Stringer
 	// Value returns the value of the [{{ .Key | ToPascal }}] flag.
-	Value evaluationValue[{{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}]
+	Value evaluationValue[{{ GoFlagReturnType . }}]
 
 	// ValueWithDetails returns the evaluation details of the [{{ .Key | ToPascal }}] flag
   // and the evaluation error, if any.
-	ValueWithDetails evaluationDetails[{{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}]
+	ValueWithDetails evaluationDetails[{{ GoFlagReturnType . }}]
 }{
 		Stringer: stringer({{ .Key | Quote }}),
-	 Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) {{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}} {
+{{- if HasSchema . }}
+	 Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) {{ GoFlagReturnType . }} {
+{{- if $.Params.RuntimeValidation }}
+	     raw := client.Object(ctx, {{ .Key | Quote }}, {{.DefaultValue | ToMapLiteral }}, evalCtx, openfeature.WithHooks({{ GoHookName . }}{}))
+{{- else }}
+	     raw := client.Object(ctx, {{ .Key | Quote }}, {{.DefaultValue | ToMapLiteral }}, evalCtx)
+{{- end }}
+	     var result {{ GoFlagReturnType . }}
+	     b, _ := json.Marshal(raw)
+	     json.Unmarshal(b, &result)
+	     return result
+	 },
+	 ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[{{ GoFlagReturnType . }}], error) {
+{{- if $.Params.RuntimeValidation }}
+	     details, err := client.ObjectValueDetails(ctx, {{ .Key | Quote }}, {{.DefaultValue | ToMapLiteral }}, evalCtx, openfeature.WithHooks({{ GoHookName . }}{}))
+{{- else }}
+	     details, err := client.ObjectValueDetails(ctx, {{ .Key | Quote }}, {{.DefaultValue | ToMapLiteral }}, evalCtx)
+{{- end }}
+	     var result {{ GoFlagReturnType . }}
+	     b, _ := json.Marshal(details.Value)
+	     json.Unmarshal(b, &result)
+	     return openfeature.GenericEvaluationDetails[{{ GoFlagReturnType . }}]{Value: result, EvaluationDetails: details.EvaluationDetails}, err
+	 },
+{{- else }}
+	 Value: func(ctx context.Context, evalCtx openfeature.EvaluationContext) {{- if eq (.Type | OpenFeatureType)  "Object"}} any{{- else}} {{ .Type | TypeString }}{{- end}} {
 	     return client.{{ .Type | OpenFeatureType }}(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
 	 },
 	 ValueWithDetails: func(ctx context.Context, evalCtx openfeature.EvaluationContext) (openfeature.GenericEvaluationDetails[{{- if eq (.Type | OpenFeatureType)  "Object"}}any{{- else}}{{ .Type | TypeString }}{{- end}}], error){
 	     return client.{{ .Type | OpenFeatureType }}ValueDetails(ctx, {{ .Key | Quote }}, {{ if eq (.Type | OpenFeatureType)  "Object" }}{{.DefaultValue | ToMapLiteral }}{{- else }}{{ .DefaultValue | QuoteString }}{{- end}}, evalCtx)
 	 },
+{{- end }}
 }
 {{- end}}

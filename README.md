@@ -294,8 +294,9 @@ The flag manifest file should follow the [JSON schema](https://raw.githubusercon
 - `flags` - An object containing the feature flags
   - `flagKey` - A unique key for the flag
     - `description` - A description of what the flag does
-    - `type` - The type of the flag (`boolean`, `string`, `number`, `object`)
+    - `flagType` - The type of the flag (`boolean`, `string`, `integer`, `float`, `object`)
     - `defaultValue` - The default value of the flag
+    - `schema` - *(Optional, object flags only)* A [JSON Schema subset](./docs/object-flag-schemas.md) describing the object shape for type-safe code generation
 
 ### Example Flag Manifest
 
@@ -303,14 +304,34 @@ The flag manifest file should follow the [JSON schema](https://raw.githubusercon
 {
   "$schema": "https://raw.githubusercontent.com/open-feature/cli/refs/heads/main/schema/v0/flag-manifest.json",
   "flags": {
-    "uniqueFlagKey": {
-      "description": "Description of what this flag does",
-      "type": "boolean|string|number|object",
-      "defaultValue": "default-value",
+    "enableFeatureA": {
+      "flagType": "boolean",
+      "defaultValue": false,
+      "description": "Controls whether Feature A is enabled."
+    },
+    "themeCustomization": {
+      "flagType": "object",
+      "defaultValue": {
+        "primaryColor": "#007bff",
+        "secondaryColor": "#6c757d"
+      },
+      "description": "Allows customization of theme colors.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "primaryColor": { "type": "string" },
+          "secondaryColor": { "type": "string" }
+        },
+        "required": ["primaryColor"]
+      }
     }
   }
 }
 ```
+
+> **_NOTE:_**
+> The `schema` field is optional. Object flags without a `schema` continue to generate generic types.
+> See the [Object Flag Schemas](./docs/object-flag-schemas.md) documentation for details on supported JSON Schema keywords, runtime validation hooks, per-language behavior, and limitations.
 
 ## Remote Flag Management
 

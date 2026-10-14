@@ -48,16 +48,26 @@ type TemplateData struct {
         Flags []Flag
     }
     Params struct {
-        OutputPath string
-        Custom     any  // Language-specific parameters
+        OutputPath        string
+        RuntimeValidation bool // Whether to generate runtime validation hooks (--runtime-validation flag)
+        Custom            any  // Language-specific parameters
     }
 }
 
 type Flag struct {
-    Key          string   // The flag key (e.g., "enable-feature")
-    Type         FlagType // The flag type (boolean, string, integer, float, object)
-    Description  string   // Optional description of the flag
-    DefaultValue any      // The default value for the flag
+    Key          string        // The flag key (e.g., "enable-feature")
+    Type         FlagType      // The flag type (boolean, string, integer, float, object)
+    Description  string        // Optional description of the flag
+    DefaultValue any           // The default value for the flag
+    Schema       *ObjectSchema // Optional JSON Schema subset for object flags (nil if not provided)
+}
+
+type ObjectSchema struct {
+    Type                 string                    // JSON Schema type: "object", "array", "string", "number", "integer", "boolean"
+    Properties           map[string]*ObjectSchema  // Object properties (only for type "object")
+    Required             []string                  // Required property names (only for type "object")
+    Items                *ObjectSchema             // Array element schema (only for type "array")
+    AdditionalProperties *bool                     // Whether extra properties are allowed (only for type "object")
 }
 ```
 
@@ -94,6 +104,15 @@ These functions are available in all templates:
 | `Quote` | Add double quotes | `{{ .Key \| Quote }}` → `"enable-feature"` |
 | `QuoteString` | Quote if string type | `{{ .DefaultValue \| QuoteString }}` |
 
+### Schema-Related Functions (Available in All Templates)
+
+These functions are available in all language templates for working with [object flag schemas](./object-flag-schemas.md):
+
+| Function | Description |
+|----------|-------------|
+| `HasSchema` | Returns `true` if a flag has an object schema defined. Usage: `{{ if HasSchema . }}` |
+| `HasObjectFlagsWithSchema` | Returns `true` if any flag in the list has a schema. Usage: `{{ if HasObjectFlagsWithSchema .Flagset.Flags }}` |
+
 ### Go-Specific Functions
 
 | Function | Description |
@@ -102,13 +121,21 @@ These functions are available in all templates:
 | `TypeString` | Convert flag type to Go type (`bool`, `string`, `int64`, `float64`, `map[string]any`) |
 | `SupportImports` | Generate required imports based on flags |
 | `ToMapLiteral` | Convert object value to Go map literal |
+| `GoTypeDef` | Generate a Go struct type definition from a flag's object schema |
+| `GoHookDef` | Generate a Go validation hook struct with `After` method for a flag's object schema |
+| `GoFlagReturnType` | Return the Go type for a flag (typed struct name if schema exists, generic type otherwise) |
+| `GoHookName` | Return the hook variable name for a typed object flag |
 
-### React/Node.js/NestJS-Specific Functions
+### React/Node.js/Angular/NestJS-Specific Functions
 
 | Function | Description |
 |----------|-------------|
 | `OpenFeatureType` | Convert flag type to TypeScript type (`boolean`, `string`, `number`, `object`) |
 | `ToJSONString` | Convert value to JSON string |
+| `TSInterfaceDef` | Generate a TypeScript interface definition from a flag's object schema |
+| `TSValidationHookDef` | Generate a TypeScript validation hook function for a flag's object schema |
+| `TSFlagReturnType` | Return the TypeScript type for a flag (interface name if schema exists, generic type otherwise) |
+| `TSValidationHookName` | Return the hook function name for a typed object flag |
 
 ### Python-Specific Functions
 
@@ -121,6 +148,10 @@ These functions are available in all templates:
 | `TypedDetailsMethodAsync` | Get async details method name |
 | `PythonBoolLiteral` | Convert boolean to Python literal (`True`/`False`) |
 | `ToPythonDict` | Convert object value to Python dict literal |
+| `PythonTypedDictDef` | Generate Python TypedDict class definitions from a flag's object schema |
+| `PythonHookDef` | Generate a Python Hook class for runtime validation of a flag's object schema |
+| `PythonFlagReturnType` | Return the Python type for a flag (TypedDict name if schema exists, generic type otherwise) |
+| `PythonHookName` | Return the hook class name for a typed object flag |
 
 ### C#-Specific Functions
 
@@ -129,6 +160,10 @@ These functions are available in all templates:
 | `OpenFeatureType` | Convert flag type to C# type (`bool`, `string`, `int`, `double`, `object`) |
 | `FormatDefaultValue` | Format default value for C# |
 | `ToCSharpDict` | Convert object value to C# dictionary literal |
+| `CSharpRecordDef` | Generate C# record definitions from a flag's object schema |
+| `CSharpHookDef` | Generate a C# Hook class for runtime validation of a flag's object schema |
+| `CSharpFlagReturnType` | Return the C# type for a flag (record name if schema exists, generic type otherwise) |
+| `CSharpHookName` | Return the hook class name for a typed object flag |
 
 ### Java-Specific Functions
 
@@ -137,6 +172,10 @@ These functions are available in all templates:
 | `OpenFeatureType` | Convert flag type to Java type (`Boolean`, `String`, `Integer`, `Double`, `Object`) |
 | `FormatDefaultValue` | Format default value for Java |
 | `ToMapLiteral` | Convert object value to Java Map literal |
+| `JavaRecordDef` | Generate Java record definitions from a flag's object schema |
+| `JavaHookDef` | Generate a Java Hook class for runtime validation of a flag's object schema |
+| `JavaFlagReturnType` | Return the Java type for a flag (record name if schema exists, generic type otherwise) |
+| `JavaHookName` | Return the hook class name for a typed object flag |
 
 ## Example: Simple Go Template
 
