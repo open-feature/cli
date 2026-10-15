@@ -16,7 +16,7 @@ jobs:
       pull-requests: write # for googleapis/release-please-action to create release PR
     # Release-please creates a PR that tracks all changes
     steps:
-      - uses: googleapis/release-please-action@v3
+      - uses: googleapis/release-please-action@db8f2c60ee802b3748b512940dde88eabd7b7e01 # v3
         id: release
         with:
           command: manifest
@@ -68,7 +68,7 @@ jobs:
           go-version-file: 'go.mod'
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
         with:
           distribution: goreleaser
           version: "~> v2"
