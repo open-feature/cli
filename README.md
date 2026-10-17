@@ -49,6 +49,22 @@ This method is suitable for most Unix-like operating systems.
 curl -fsSL https://openfeature.dev/scripts/install_cli.sh | sh
 ```
 
+### via mise
+
+[mise](https://mise.jdx.dev) is a developer tool version manager that allows you to pin and share tool versions across your team.
+
+Install the latest version globally:
+
+```bash
+mise use --global "github:open-feature/cli"
+```
+
+Or pin a specific version for your project (adds it to `.mise.toml` in your project root):
+
+```bash
+mise use "github:open-feature/cli@latest"
+```
+
 ### via Docker
 
 The OpenFeature CLI is available as a Docker image in the [GitHub Container Registry](https://github.com/open-feature/cli/pkgs/container/cli).
