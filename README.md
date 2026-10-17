@@ -40,16 +40,7 @@ The CLI bridges the gap between feature flag management systems and your applica
 
 ## Installation
 
-### via curl
-
-The OpenFeature CLI can be installed using a shell command.
-This method is suitable for most Unix-like operating systems.
-
-```bash
-curl -fsSL https://openfeature.dev/scripts/install_cli.sh | sh
-```
-
-### via mise
+### via mise (recommended)
 
 [mise](https://mise.jdx.dev) is a developer tool version manager that allows you to pin and share tool versions across your team.
 
@@ -62,7 +53,16 @@ mise use --global "github:open-feature/cli"
 Or pin a specific version for your project (adds it to `.mise.toml` in your project root):
 
 ```bash
-mise use "github:open-feature/cli@latest"
+mise use "github:open-feature/cli@0.4.1"
+```
+
+### via curl
+
+The OpenFeature CLI can be installed using a shell command.
+This method is suitable for most Unix-like operating systems.
+
+```bash
+curl -fsSL https://openfeature.dev/scripts/install_cli.sh | sh
 ```
 
 ### via Docker
