@@ -72,7 +72,7 @@ func getKnownFlagProperties() map[string]bool {
 		jsonTag := field.Tag.Get("json")
 		if jsonTag != "" {
 			// Extract field name from json tag (e.g., "flagType,omitempty" -> "flagType")
-			fieldName := strings.Split(jsonTag, ",")[0]
+			fieldName, _, _ := strings.Cut(jsonTag, ",")
 			if fieldName != "" && fieldName != "-" {
 				props[fieldName] = true
 			}

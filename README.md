@@ -40,6 +40,14 @@ The CLI bridges the gap between feature flag management systems and your applica
 
 ## Installation
 
+### via mise
+
+[mise](https://mise.jdx.dev) is a developer tool version manager that supports pinning and sharing tool versions across your team.
+
+```bash
+mise use --global "github:open-feature/cli"
+```
+
 ### via curl
 
 The OpenFeature CLI can be installed using a shell command.

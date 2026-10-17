@@ -44,8 +44,7 @@ func isTransientHTTPError(err error) bool {
 	}
 
 	// Check if it's an HTTP error with a status code
-	var httpErr *httpError
-	if errors.As(err, &httpErr) {
+	if httpErr, ok := errors.AsType[*httpError](err); ok {
 		// Retry on 5xx server errors
 		if httpErr.statusCode >= 500 && httpErr.statusCode < 600 {
 			return true
