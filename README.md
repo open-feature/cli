@@ -56,6 +56,16 @@ Or pin a specific version for your project (adds it to `.mise.toml` in your proj
 mise use "github:open-feature/cli@0.4.1"
 ```
 
+This generates a `.mise.toml` entry that ensures everyone on your team uses the same version:
+
+```toml
+[tools]
+"github:open-feature/cli" = "0.4.1"
+```
+
+> [!NOTE]
+> The `github:` backend installs prebuilt binaries directly from GitHub Releases — no compilation required.
+
 ### via curl
 
 The OpenFeature CLI can be installed using a shell command.
