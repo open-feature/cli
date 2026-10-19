@@ -2,7 +2,7 @@
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
 ## openfeature generate python
 
-Generate typesafe Python client.
+Generate type-safe OpenFeature Python accessors.
 
 
 > **Stability**: alpha
@@ -33,5 +33,5 @@ openfeature generate python [flags]
 
 ### SEE ALSO
 
-* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
+* [openfeature generate](openfeature_generate.md)	 - Generate type-safe OpenFeature accessors.
 

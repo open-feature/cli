@@ -2,7 +2,7 @@
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
 ## openfeature generate go
 
-Generate typesafe accessors for OpenFeature.
+Generate type-safe OpenFeature Go accessors.
 
 
 > **Stability**: alpha
@@ -34,5 +34,5 @@ openfeature generate go [flags]
 
 ### SEE ALSO
 
-* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
+* [openfeature generate](openfeature_generate.md)	 - Generate type-safe OpenFeature accessors.
 

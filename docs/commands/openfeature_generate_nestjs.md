@@ -2,7 +2,7 @@
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
 ## openfeature generate nestjs
 
-Generate typesafe NestJS decorators.
+Generate type-safe OpenFeature NestJS accessors.
 
 
 > **Stability**: alpha
@@ -33,5 +33,5 @@ openfeature generate nestjs [flags]
 
 ### SEE ALSO
 
-* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
+* [openfeature generate](openfeature_generate.md)	 - Generate type-safe OpenFeature accessors.
 

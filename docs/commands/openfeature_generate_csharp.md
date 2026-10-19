@@ -2,7 +2,7 @@
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
 ## openfeature generate csharp
 
-Generate typesafe C# client.
+Generate type-safe OpenFeature C# accessors.
 
 
 > **Stability**: alpha
@@ -34,5 +34,5 @@ openfeature generate csharp [flags]
 
 ### SEE ALSO
 
-* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
+* [openfeature generate](openfeature_generate.md)	 - Generate type-safe OpenFeature accessors.
 
