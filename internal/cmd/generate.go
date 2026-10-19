@@ -21,7 +21,7 @@ import (
 func GetGenerateCmd() *cobra.Command {
 	generateCmd := &cobra.Command{
 		Use:   "generate",
-		Short: "Generate typesafe OpenFeature accessors.",
+		Short: "Generate type-safe OpenFeature accessors.",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return initializeConfig(cmd, "generate")
 		},
@@ -70,7 +70,7 @@ func addStabilityInfo(cmd *cobra.Command) {
 func getGenerateNodeJSCmd() *cobra.Command {
 	nodeJSCmd := &cobra.Command{
 		Use:   "nodejs",
-		Short: "Generate typesafe Node.js client.",
+		Short: "Generate type-safe OpenFeature Node.js accessors.",
 		Long:  `Generate typesafe Node.js client compatible with the OpenFeature JavaScript Server SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),
@@ -116,7 +116,7 @@ func getGenerateNodeJSCmd() *cobra.Command {
 func getGenerateReactCmd() *cobra.Command {
 	reactCmd := &cobra.Command{
 		Use:   "react",
-		Short: "Generate typesafe React Hooks.",
+		Short: "Generate type-safe OpenFeature React accessors.",
 		Long:  `Generate typesafe React Hooks compatible with the OpenFeature React SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),
@@ -162,7 +162,7 @@ func getGenerateReactCmd() *cobra.Command {
 func GetGenerateNestJsCmd() *cobra.Command {
 	nestJsCmd := &cobra.Command{
 		Use:   "nestjs",
-		Short: "Generate typesafe NestJS decorators.",
+		Short: "Generate type-safe OpenFeature NestJS accessors.",
 		Long:  `Generate typesafe NestJS decorators compatible with the OpenFeature NestJS SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),
@@ -218,7 +218,7 @@ func GetGenerateNestJsCmd() *cobra.Command {
 func getGenerateCSharpCmd() *cobra.Command {
 	csharpCmd := &cobra.Command{
 		Use:   "csharp",
-		Short: "Generate typesafe C# client.",
+		Short: "Generate type-safe OpenFeature C# accessors.",
 		Long:  `Generate typesafe C# client compatible with the OpenFeature .NET SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),
@@ -270,7 +270,7 @@ func getGenerateCSharpCmd() *cobra.Command {
 func getGenerateJavaCmd() *cobra.Command {
 	javaCmd := &cobra.Command{
 		Use:   "java",
-		Short: "Generate typesafe Java client.",
+		Short: "Generate type-safe OpenFeature Java accessors.",
 		Long:  `Generate typesafe Java client compatible with the OpenFeature Java SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),
@@ -323,7 +323,7 @@ func getGenerateJavaCmd() *cobra.Command {
 func getGenerateGoCmd() *cobra.Command {
 	goCmd := &cobra.Command{
 		Use:   "go",
-		Short: "Generate typesafe accessors for OpenFeature.",
+		Short: "Generate type-safe OpenFeature Go accessors.",
 		Long:  `Generate typesafe accessors compatible with the OpenFeature Go SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),
@@ -377,7 +377,7 @@ func getGenerateGoCmd() *cobra.Command {
 func getGeneratePythonCmd() *cobra.Command {
 	pythonCmd := &cobra.Command{
 		Use:   "python",
-		Short: "Generate typesafe Python client.",
+		Short: "Generate type-safe OpenFeature Python accessors.",
 		Long:  `Generate typesafe Python client compatible with the OpenFeature Python SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),
@@ -420,7 +420,7 @@ func getGeneratePythonCmd() *cobra.Command {
 func getGenerateAngularCmd() *cobra.Command {
 	angularCmd := &cobra.Command{
 		Use:   "angular",
-		Short: "Generate typesafe Angular services and directives.",
+		Short: "Generate type-safe OpenFeature Angular accessors.",
 		Long:  `Generate typesafe Angular services and directives compatible with the OpenFeature Angular SDK.`,
 		Annotations: map[string]string{
 			"stability": string(generators.Alpha),

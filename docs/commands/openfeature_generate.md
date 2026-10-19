@@ -2,7 +2,7 @@
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
 ## openfeature generate
 
-Generate typesafe OpenFeature accessors.
+Generate type-safe OpenFeature accessors.
 
 ```
 openfeature generate [flags]
@@ -27,12 +27,12 @@ openfeature generate [flags]
 ### SEE ALSO
 
 * [openfeature](openfeature.md)	 - CLI for OpenFeature.
-* [openfeature generate angular](openfeature_generate_angular.md)	 - Generate typesafe Angular services and directives.
-* [openfeature generate csharp](openfeature_generate_csharp.md)	 - Generate typesafe C# client.
-* [openfeature generate go](openfeature_generate_go.md)	 - Generate typesafe accessors for OpenFeature.
-* [openfeature generate java](openfeature_generate_java.md)	 - Generate typesafe Java client.
-* [openfeature generate nestjs](openfeature_generate_nestjs.md)	 - Generate typesafe NestJS decorators.
-* [openfeature generate nodejs](openfeature_generate_nodejs.md)	 - Generate typesafe Node.js client.
-* [openfeature generate python](openfeature_generate_python.md)	 - Generate typesafe Python client.
-* [openfeature generate react](openfeature_generate_react.md)	 - Generate typesafe React Hooks.
+* [openfeature generate angular](openfeature_generate_angular.md)	 - Generate type-safe OpenFeature Angular accessors.
+* [openfeature generate csharp](openfeature_generate_csharp.md)	 - Generate type-safe OpenFeature C# accessors.
+* [openfeature generate go](openfeature_generate_go.md)	 - Generate type-safe OpenFeature Go accessors.
+* [openfeature generate java](openfeature_generate_java.md)	 - Generate type-safe OpenFeature Java accessors.
+* [openfeature generate nestjs](openfeature_generate_nestjs.md)	 - Generate type-safe OpenFeature NestJS accessors.
+* [openfeature generate nodejs](openfeature_generate_nodejs.md)	 - Generate type-safe OpenFeature Node.js accessors.
+* [openfeature generate python](openfeature_generate_python.md)	 - Generate type-safe OpenFeature Python accessors.
+* [openfeature generate react](openfeature_generate_react.md)	 - Generate type-safe OpenFeature React accessors.
 

@@ -2,7 +2,7 @@
 <!-- WARNING: THIS DOC IS AUTO-GENERATED. DO NOT EDIT! -->
 ## openfeature generate nodejs
 
-Generate typesafe Node.js client.
+Generate type-safe OpenFeature Node.js accessors.
 
 
 > **Stability**: alpha
@@ -33,5 +33,5 @@ openfeature generate nodejs [flags]
 
 ### SEE ALSO
 
-* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
+* [openfeature generate](openfeature_generate.md)	 - Generate type-safe OpenFeature accessors.
 

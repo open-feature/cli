@@ -24,7 +24,7 @@ openfeature [flags]
 ### SEE ALSO
 
 * [openfeature compare](openfeature_compare.md)	 - Compare two feature flag manifests
-* [openfeature generate](openfeature_generate.md)	 - Generate typesafe OpenFeature accessors.
+* [openfeature generate](openfeature_generate.md)	 - Generate type-safe OpenFeature accessors.
 * [openfeature init](openfeature_init.md)	 - Initialize a new project
 * [openfeature manifest](openfeature_manifest.md)	 - Manage flag manifest files
 * [openfeature pull](openfeature_pull.md)	 - Pull a flag manifest from a remote source
