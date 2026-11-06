@@ -4,7 +4,10 @@ package com.example.openfeature;
 import dev.openfeature.sdk.Client;
 import dev.openfeature.sdk.EvaluationContext;
 import dev.openfeature.sdk.FlagEvaluationDetails;
+import dev.openfeature.sdk.MutableStructure;
 import dev.openfeature.sdk.OpenFeatureAPI;
+import dev.openfeature.sdk.Value;
+import java.util.List;
 
 public final class OpenFeature {
 
@@ -92,20 +95,20 @@ public final class OpenFeature {
          * Details:
          * - Flag key: themeCustomization
          * - Type: Object
-         * - Default value: Map.of("primaryColor", "#007bff", "secondaryColor", "#6c757d")
+         * - Default value: {"primaryColor":"#007bff","secondaryColor":"#6c757d"}
          * Returns the flag value
          */
-        Object themeCustomization(EvaluationContext ctx);
+        Value themeCustomization(EvaluationContext ctx);
 
         /**
          * Allows customization of theme colors.
          * Details:
          * - Flag key: themeCustomization
          * - Type: Object
-         * - Default value: Map.of("primaryColor", "#007bff", "secondaryColor", "#6c757d")
+         * - Default value: {"primaryColor":"#007bff","secondaryColor":"#6c757d"}
          * Returns the evaluation details containing the flag value and metadata
          */
-        FlagEvaluationDetails<Object> themeCustomizationDetails(EvaluationContext ctx);
+        FlagEvaluationDetails<Value> themeCustomizationDetails(EvaluationContext ctx);
         /**
          * Maximum allowed length for usernames.
          * Details:
@@ -163,13 +166,13 @@ public final class OpenFeature {
             return client.getStringDetails("greetingMessage", "Hello there!", ctx);
         }
         @Override
-        public Object themeCustomization(EvaluationContext ctx) {
-            return client.getObjectValue("themeCustomization", Map.of("primaryColor", "#007bff", "secondaryColor", "#6c757d"), ctx);
+        public Value themeCustomization(EvaluationContext ctx) {
+            return client.getObjectValue("themeCustomization", new Value(new MutableStructure().add("primaryColor", new Value("#007bff")).add("secondaryColor", new Value("#6c757d"))), ctx);
         }
 
         @Override
-        public FlagEvaluationDetails<Object> themeCustomizationDetails(EvaluationContext ctx) {
-            return client.getObjectDetails("themeCustomization", Map.of("primaryColor", "#007bff", "secondaryColor", "#6c757d"), ctx);
+        public FlagEvaluationDetails<Value> themeCustomizationDetails(EvaluationContext ctx) {
+            return client.getObjectDetails("themeCustomization", new Value(new MutableStructure().add("primaryColor", new Value("#007bff")).add("secondaryColor", new Value("#6c757d"))), ctx);
         }
         @Override
         public Integer usernameMaxLength(EvaluationContext ctx) {
