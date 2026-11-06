@@ -4,7 +4,10 @@ package {{ .Params.Custom.JavaPackage }};
 import dev.openfeature.sdk.Client;
 import dev.openfeature.sdk.EvaluationContext;
 import dev.openfeature.sdk.FlagEvaluationDetails;
+import dev.openfeature.sdk.MutableStructure;
 import dev.openfeature.sdk.OpenFeatureAPI;
+import dev.openfeature.sdk.Value;
+import java.util.List;
 
 public final class OpenFeature {
 
@@ -28,20 +31,20 @@ public final class OpenFeature {
          * Details:
          * - Flag key: {{ .Key }}
          * - Type: {{ .Type | OpenFeatureType }}
-         * - Default value: {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ .DefaultValue }}{{ end }}
+         * - Default value: {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToJavadocJSON }}{{ else }}{{ .DefaultValue }}{{ end }}
          * Returns the flag value
          */
-        {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx);
+        {{ .Type | JavaReturnType }} {{ .Key | ToCamel }}(EvaluationContext ctx);
 
         /**
          * {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
          * Details:
          * - Flag key: {{ .Key }}
          * - Type: {{ .Type | OpenFeatureType }}
-         * - Default value: {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ .DefaultValue }}{{ end }}
+         * - Default value: {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToJavadocJSON }}{{ else }}{{ .DefaultValue }}{{ end }}
          * Returns the evaluation details containing the flag value and metadata
          */
-        FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx);
+        FlagEvaluationDetails<{{ .Type | JavaReturnType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx);
 
 {{- end }}
     }
@@ -55,13 +58,13 @@ public final class OpenFeature {
 
         {{ range .Flagset.Flags }}
         @Override
-        public {{ .Type | OpenFeatureType }} {{ .Key | ToCamel }}(EvaluationContext ctx) {
-            return client.get{{ .Type | OpenFeatureType | ToPascal }}Value("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
+        public {{ .Type | JavaReturnType }} {{ .Key | ToCamel }}(EvaluationContext ctx) {
+            return client.get{{ .Type | OpenFeatureType | ToPascal }}Value("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToValueLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
         }
 
         @Override
-        public FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
-            return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToMapLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
+        public FlagEvaluationDetails<{{ .Type | JavaReturnType }}> {{ .Key | ToCamel }}Details(EvaluationContext ctx) {
+            return client.get{{ .Type | OpenFeatureType | ToPascal }}Details("{{ .Key }}", {{ if eq (.Type | OpenFeatureType) "Object" }}{{ .DefaultValue | ToValueLiteral }}{{ else }}{{ . | FormatDefaultValue }}{{ end }}, ctx);
         }
 
 {{- end }}
