@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/open-feature/cli/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
@@ -85,6 +86,29 @@ generate:
 		"Go command should get generate.go.output, not generate.output")
 	assert.Equal(t, "fromconfig", goCmd.Flag("package-name").Value.String(),
 		"Go command should get generate.go.package-name")
+}
+
+func TestCppSubcommandGetsSpecificConfig(t *testing.T) {
+	configContent := `
+generate:
+  output: output-from-generate
+  cpp:
+    output: output-from-cpp
+    namespace: fromcppconfig
+`
+	setupConfigFileForTest(t, configContent)
+
+	cppCmd := &cobra.Command{Use: "cpp"}
+	cppCmd.Flags().String("output", "", "output path")
+	config.AddCppGenerateFlags(cppCmd)
+
+	err := initializeConfig(cppCmd, "generate.cpp")
+
+	assert.NoError(t, err)
+	assert.Equal(t, "output-from-cpp", cppCmd.Flag("output").Value.String(),
+		"Cpp command should get generate.cpp.output, not generate.output")
+	assert.Equal(t, "fromcppconfig", cppCmd.Flag("namespace").Value.String(),
+		"Cpp command should get generate.cpp.namespace")
 }
 
 func TestSubcommandInheritsFromParent(t *testing.T) {
