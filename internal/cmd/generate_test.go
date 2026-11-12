@@ -86,6 +86,14 @@ func TestGenerate(t *testing.T) {
 			packageName:    "com.example.openfeature",
 		},
 		{
+			name:           "C++ generation success",
+			command:        "cpp",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/success_cpp.golden",
+			outputFile:     "openfeature.h",
+			packageName:    "testnamespace",
+		},
+		{
 			name:           "Angular generation with custom template",
 			command:        "angular",
 			manifestGolden: "testdata/success_manifest.golden",
@@ -152,6 +160,15 @@ func TestGenerate(t *testing.T) {
 			outputFile:     "openfeature-decorators.ts",
 			templateFile:   "testdata/custom_template/custom_nestjs.tmpl",
 		},
+		{
+			name:           "C++ generation with custom template",
+			command:        "cpp",
+			manifestGolden: "testdata/success_manifest.golden",
+			outputGolden:   "testdata/custom_template/custom_cpp.golden",
+			outputFile:     "openfeature.h",
+			packageName:    "testnamespace",
+			templateFile:   "testdata/custom_template/custom_cpp.tmpl",
+		},
 		// Add more test cases here as needed
 	}
 
@@ -190,6 +207,8 @@ func TestGenerate(t *testing.T) {
 			// Add parameters specific to each generator
 			if tc.packageName != "" {
 				switch tc.command {
+				case "cpp":
+					args = append(args, "--namespace", tc.packageName)
 				case "csharp":
 					args = append(args, "--namespace", tc.packageName)
 				case "go":

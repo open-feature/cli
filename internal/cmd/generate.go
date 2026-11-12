@@ -6,6 +6,7 @@ import (
 	"github.com/open-feature/cli/internal/config"
 	"github.com/open-feature/cli/internal/generators"
 	"github.com/open-feature/cli/internal/generators/angular"
+	"github.com/open-feature/cli/internal/generators/cpp"
 	"github.com/open-feature/cli/internal/generators/csharp"
 	"github.com/open-feature/cli/internal/generators/golang"
 	"github.com/open-feature/cli/internal/generators/java"
@@ -463,6 +464,59 @@ func getGenerateAngularCmd() *cobra.Command {
 	return angularCmd
 }
 
+func getGenerateCppCmd() *cobra.Command {
+	cppCmd := &cobra.Command{
+		Use:   "cpp",
+		Short: "Generate typesafe C++ client.",
+		Long:  `Generate typesafe C++ client compatible with the OpenFeature C++ SDK.`,
+		Annotations: map[string]string{
+			"stability": string(generators.Alpha),
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return initializeConfig(cmd, "generate.cpp")
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			namespace := config.GetCppNamespace(cmd)
+			manifestPath := config.GetManifestPath(cmd)
+			outputPath := config.GetOutputPath(cmd)
+			templatePath := config.GetTemplatePath(cmd)
+
+			logger.Default.GenerationStarted("C++")
+
+			params := generators.Params[cpp.Params]{
+				OutputPath:   outputPath,
+				TemplatePath: templatePath,
+				Custom: cpp.Params{
+					Namespace:    namespace,
+					CppNamespace: namespace,
+				},
+			}
+			flagset, err := manifest.LoadFlagSet(manifestPath)
+			if err != nil {
+				return err
+			}
+
+			generator := cpp.NewGenerator(flagset)
+			logger.Default.Debug("Executing C++ generator")
+			err = generator.Generate(&params)
+			if err != nil {
+				return err
+			}
+
+			logger.Default.GenerationComplete("C++")
+
+			return nil
+		},
+	}
+
+	// Add C++-specific flags
+	config.AddCppGenerateFlags(cppCmd)
+
+	addStabilityInfo(cppCmd)
+
+	return cppCmd
+}
+
 func init() {
 	// Register generators with the manager
 	generators.DefaultManager.Register(getGenerateAngularCmd)
@@ -473,4 +527,5 @@ func init() {
 	generators.DefaultManager.Register(getGenerateCSharpCmd)
 	generators.DefaultManager.Register(GetGenerateNestJsCmd)
 	generators.DefaultManager.Register(getGenerateJavaCmd)
+	generators.DefaultManager.Register(getGenerateCppCmd)
 }
