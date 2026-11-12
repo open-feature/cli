@@ -126,7 +126,7 @@ func mapToValueLiteral(m map[string]any) string {
 		if i > 0 {
 			builder.WriteString(", ")
 		}
-		builder.WriteString(fmt.Sprintf("{%s, %s}", strconv.Quote(k), ToValueLiteral(m[k])))
+		fmt.Fprintf(&builder, "{%s, %s}", strconv.Quote(k), ToValueLiteral(m[k]))
 	}
 	builder.WriteString("})")
 	return builder.String()
