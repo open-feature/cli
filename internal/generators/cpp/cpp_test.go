@@ -2,6 +2,7 @@ package cpp
 
 import (
 	"encoding/json"
+	"math"
 	"strings"
 	"testing"
 
@@ -327,5 +328,70 @@ func TestGenerate_MultilineDescription(t *testing.T) {
 	}
 	if !strings.Contains(content, "  // Enable checkout\n  // Used by production") {
 		t.Fatalf("GeneratedClient comment not properly prefixed per line:\n%s", content)
+	}
+}
+
+func TestNonFiniteFloats(t *testing.T) {
+	testCases := []struct {
+		name             string
+		input            float64
+		expectedDefault  string
+		expectedValueLit string
+	}{
+		{
+			name:             "NaN",
+			input:            math.NaN(),
+			expectedDefault:  "std::numeric_limits<double>::quiet_NaN()",
+			expectedValueLit: "openfeature::Value(std::numeric_limits<double>::quiet_NaN())",
+		},
+		{
+			name:             "positive Inf",
+			input:            math.Inf(1),
+			expectedDefault:  "std::numeric_limits<double>::infinity()",
+			expectedValueLit: "openfeature::Value(std::numeric_limits<double>::infinity())",
+		},
+		{
+			name:             "negative Inf",
+			input:            math.Inf(-1),
+			expectedDefault:  "-std::numeric_limits<double>::infinity()",
+			expectedValueLit: "openfeature::Value(-std::numeric_limits<double>::infinity())",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			flag := flagset.Flag{Type: flagset.FloatType, DefaultValue: tc.input}
+			if got := FormatDefaultValue(flag); got != tc.expectedDefault {
+				t.Fatalf("FormatDefaultValue(%v) = %q; want %q", tc.input, got, tc.expectedDefault)
+			}
+			if got := ToValueLiteral(tc.input); got != tc.expectedValueLit {
+				t.Fatalf("ToValueLiteral(%v) = %q; want %q", tc.input, got, tc.expectedValueLit)
+			}
+		})
+	}
+}
+
+func TestGenerate_UnsupportedFlagType(t *testing.T) {
+	fs := afero.NewMemMapFs()
+	filesystem.SetFileSystem(fs)
+
+	flagSet := &flagset.Flagset{
+		Flags: []flagset.Flag{
+			{
+				Key:          "badFlag",
+				Type:         flagset.UnknownFlagType,
+				DefaultValue: nil,
+			},
+		},
+	}
+
+	generator := NewGenerator(flagSet)
+	params := &generators.Params[Params]{
+		OutputPath: "output",
+		Custom:     Params{Namespace: "ns"},
+	}
+
+	if err := generator.Generate(params); err == nil {
+		t.Fatal("expected Generate to return an error for UnknownFlagType, got nil")
 	}
 }

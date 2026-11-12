@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"maps"
+	"math"
 	"slices"
 	"strings"
 	"text/template"
@@ -124,6 +125,12 @@ func FormatDefaultValue(flag flagset.Flag) string {
 			return fmt.Sprintf("%v", flag.DefaultValue)
 		}
 	case flagset.FloatType:
+		if f, ok := flag.DefaultValue.(float64); ok && (math.IsNaN(f) || math.IsInf(f, 0)) {
+			return formatNonFiniteDouble(f)
+		}
+		if f, ok := flag.DefaultValue.(float32); ok && (math.IsNaN(float64(f)) || math.IsInf(float64(f), 0)) {
+			return formatNonFiniteDouble(float64(f))
+		}
 		valStr := fmt.Sprintf("%v", flag.DefaultValue)
 		if !strings.Contains(valStr, ".") && !strings.ContainsAny(valStr, "eE") {
 			valStr += ".0"
@@ -133,6 +140,17 @@ func FormatDefaultValue(flag flagset.Flag) string {
 		return ToValueLiteral(flag.DefaultValue)
 	default:
 		return fmt.Sprintf("%v", flag.DefaultValue)
+	}
+}
+
+func formatNonFiniteDouble(f float64) string {
+	switch {
+	case math.IsNaN(f):
+		return "std::numeric_limits<double>::quiet_NaN()"
+	case math.IsInf(f, 1):
+		return "std::numeric_limits<double>::infinity()"
+	default:
+		return "-std::numeric_limits<double>::infinity()"
 	}
 }
 
@@ -147,11 +165,10 @@ func ToValueLiteral(value any) string {
 		return fmt.Sprintf("openfeature::Value(std::string(%s))", QuoteCppString(val))
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return fmt.Sprintf("openfeature::Value(static_cast<int64_t>(%v))", val)
-	case float32, float64:
-		if fmt.Sprintf("%.17g", val) == fmt.Sprintf("%.0f", val) {
-			return fmt.Sprintf("openfeature::Value(static_cast<int64_t>(%.0f))", val)
-		}
-		return fmt.Sprintf("openfeature::Value(static_cast<double>(%v))", val)
+	case float32:
+		return floatToValueLiteral(float64(val))
+	case float64:
+		return floatToValueLiteral(val)
 	case map[string]any:
 		return mapToValueLiteral(val)
 	case []any:
@@ -159,6 +176,16 @@ func ToValueLiteral(value any) string {
 	default:
 		return "openfeature::Value()"
 	}
+}
+
+func floatToValueLiteral(f float64) string {
+	if math.IsNaN(f) || math.IsInf(f, 0) {
+		return fmt.Sprintf("openfeature::Value(%s)", formatNonFiniteDouble(f))
+	}
+	if fmt.Sprintf("%.17g", f) == fmt.Sprintf("%.0f", f) {
+		return fmt.Sprintf("openfeature::Value(static_cast<int64_t>(%.0f))", f)
+	}
+	return fmt.Sprintf("openfeature::Value(static_cast<double>(%v))", f)
 }
 
 func mapToValueLiteral(m map[string]any) string {
@@ -190,12 +217,24 @@ func sliceToValueLiteral(s []any) string {
 
 func (g *CppGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
-		"CppQuote":              QuoteCppString,
-		"FormatComment":         FormatComment,
-		"OpenFeatureType":       OpenFeatureType,
-		"OpenFeatureMethodType": OpenFeatureMethodType,
-		"FormatDefaultValue":    FormatDefaultValue,
-		"ToValueLiteral":        ToValueLiteral,
+		"CppQuote":      QuoteCppString,
+		"FormatComment": FormatComment,
+		"OpenFeatureType": func(t flagset.FlagType) (string, error) {
+			mapped := OpenFeatureType(t)
+			if mapped == "" {
+				return "", fmt.Errorf("unsupported flag type: %v", t)
+			}
+			return mapped, nil
+		},
+		"OpenFeatureMethodType": func(t flagset.FlagType) (string, error) {
+			mapped := OpenFeatureMethodType(t)
+			if mapped == "" {
+				return "", fmt.Errorf("unsupported flag type: %v", t)
+			}
+			return mapped, nil
+		},
+		"FormatDefaultValue": FormatDefaultValue,
+		"ToValueLiteral":     ToValueLiteral,
 	}
 
 	custom := params.Custom
