@@ -20,8 +20,8 @@ namespace {{ if .Params.Custom.Namespace }}{{ .Params.Custom.Namespace }}{{ else
 // Flag key constants for programmatic access
 namespace FlagKeys {
 {{- range .Flagset.Flags }}
-// Flag key for {{ if .Description }}{{ .Description }}{{ else }}this flag{{ end }}
-inline constexpr std::string_view {{ .Key | ToScreamingSnake }} = {{ .Key | Quote }};
+{{ if .Description }}{{ FormatComment "// " (printf "Flag key for %s" .Description) }}{{ else }}// Flag key for this flag{{ end }}
+inline constexpr std::string_view {{ .Key | ToScreamingSnake }} = {{ .Key | CppQuote }};
 {{- end }}
 }  // namespace FlagKeys
 
@@ -30,29 +30,29 @@ class GeneratedClient {
   explicit GeneratedClient(std::shared_ptr<openfeature::Client> client)
       : client_(std::move(client)) {}
 {{ range .Flagset.Flags }}
-  // {{ if .Description }}{{ .Description }}{{ else }}Feature flag{{ end }}
+{{ if .Description }}{{ FormatComment "  // " .Description }}{{ else }}  // Feature flag{{ end }}
   {{ .Type | OpenFeatureType }} {{ .Key | ToPascal }}() const {
     return client_->Get{{ .Type | OpenFeatureMethodType }}Value(
-        {{ .Key | Quote }},
+        {{ .Key | CppQuote }},
         {{ . | FormatDefaultValue }});
   }
 
   {{ .Type | OpenFeatureType }} {{ .Key | ToPascal }}(const openfeature::EvaluationContext& ctx) const {
     return client_->Get{{ .Type | OpenFeatureMethodType }}Value(
-        {{ .Key | Quote }},
+        {{ .Key | CppQuote }},
         {{ . | FormatDefaultValue }},
         ctx);
   }
 
   openfeature::FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToPascal }}Details() const {
     return client_->Get{{ .Type | OpenFeatureMethodType }}Details(
-        {{ .Key | Quote }},
+        {{ .Key | CppQuote }},
         {{ . | FormatDefaultValue }});
   }
 
   openfeature::FlagEvaluationDetails<{{ .Type | OpenFeatureType }}> {{ .Key | ToPascal }}Details(const openfeature::EvaluationContext& ctx) const {
     return client_->Get{{ .Type | OpenFeatureMethodType }}Details(
-        {{ .Key | Quote }},
+        {{ .Key | CppQuote }},
         {{ . | FormatDefaultValue }},
         ctx);
   }

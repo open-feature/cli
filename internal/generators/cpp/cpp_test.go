@@ -2,6 +2,7 @@ package cpp
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/open-feature/cli/internal/filesystem"
@@ -256,5 +257,75 @@ func TestGenerate_Execution(t *testing.T) {
 
 	if len(data) == 0 {
 		t.Fatal("Generated file is empty")
+	}
+}
+
+func TestQuoteCppString(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "plain", input: "hello", expected: `"hello"`},
+		{name: "quotes and backslash", input: `a\"b`, expected: `"a\\\"b"`},
+		{name: "newline tab cr", input: "a\nb\tc\rd", expected: `"a\nb\tc\rd"`},
+		{name: "control char before hex digit", input: "\x01A", expected: `"\001A"`},
+		{name: "del char", input: "\x7fB", expected: `"\177B"`},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := QuoteCppString(tc.input)
+			if got != tc.expected {
+				t.Fatalf("QuoteCppString(%q) = %q; want %q", tc.input, got, tc.expected)
+			}
+		})
+	}
+}
+
+func TestFormatComment(t *testing.T) {
+	got := FormatComment("  // ", "Line 1\nLine 2\r\nLine 3")
+	expected := "  // Line 1\n  // Line 2\n  // Line 3"
+	if got != expected {
+		t.Fatalf("FormatComment = %q; want %q", got, expected)
+	}
+}
+
+func TestGenerate_MultilineDescription(t *testing.T) {
+	fs := afero.NewMemMapFs()
+	filesystem.SetFileSystem(fs)
+
+	flagSet := &flagset.Flagset{
+		Flags: []flagset.Flag{
+			{
+				Key:          "checkoutFlag",
+				Type:         flagset.BoolType,
+				DefaultValue: false,
+				Description:  "Enable checkout\nUsed by production",
+			},
+		},
+	}
+
+	generator := NewGenerator(flagSet)
+	params := &generators.Params[Params]{
+		OutputPath: "output",
+		Custom:     Params{Namespace: "ns"},
+	}
+
+	if err := generator.Generate(params); err != nil {
+		t.Fatalf("Generate returned error: %v", err)
+	}
+
+	data, err := afero.ReadFile(fs, "output/openfeature.h")
+	if err != nil {
+		t.Fatalf("Failed to read generated output: %v", err)
+	}
+
+	content := string(data)
+	if !strings.Contains(content, "// Flag key for Enable checkout\n// Used by production") {
+		t.Fatalf("FlagKeys comment not properly prefixed per line:\n%s", content)
+	}
+	if !strings.Contains(content, "  // Enable checkout\n  // Used by production") {
+		t.Fatalf("GeneratedClient comment not properly prefixed per line:\n%s", content)
 	}
 }

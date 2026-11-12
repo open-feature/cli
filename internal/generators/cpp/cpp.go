@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"maps"
 	"slices"
-	"strconv"
 	"strings"
 	"text/template"
 
@@ -61,11 +60,55 @@ func OpenFeatureMethodType(t flagset.FlagType) string {
 	}
 }
 
+// QuoteCppString formats s as a C++ string literal using fixed-width octal
+// escapes for non-printable bytes so following characters cannot be consumed by
+// greedy hexadecimal escapes.
+func QuoteCppString(s string) string {
+	var builder strings.Builder
+	builder.Grow(len(s) + 2)
+	builder.WriteByte('"')
+	for i := range len(s) {
+		b := s[i]
+		switch b {
+		case '"':
+			builder.WriteString(`\"`)
+		case '\\':
+			builder.WriteString(`\\`)
+		case '\n':
+			builder.WriteString(`\n`)
+		case '\r':
+			builder.WriteString(`\r`)
+		case '\t':
+			builder.WriteString(`\t`)
+		default:
+			if b >= 0x20 && b <= 0x7e {
+				builder.WriteByte(b)
+			} else {
+				fmt.Fprintf(&builder, "\\%03o", b)
+			}
+		}
+	}
+	builder.WriteByte('"')
+	return builder.String()
+}
+
+// FormatComment prefixes every line of text with prefix so multiline strings
+// remain safely inside C++ line comments.
+func FormatComment(prefix, text string) string {
+	normalized := strings.ReplaceAll(text, "\r\n", "\n")
+	normalized = strings.ReplaceAll(normalized, "\r", "\n")
+	lines := strings.Split(normalized, "\n")
+	for i, line := range lines {
+		lines[i] = prefix + line
+	}
+	return strings.Join(lines, "\n")
+}
+
 // FormatDefaultValue formats flag default values into valid C++ literals.
 func FormatDefaultValue(flag flagset.Flag) string {
 	switch flag.Type {
 	case flagset.StringType:
-		return strconv.Quote(fmt.Sprintf("%v", flag.DefaultValue))
+		return QuoteCppString(fmt.Sprintf("%v", flag.DefaultValue))
 	case flagset.BoolType:
 		if flag.DefaultValue == true {
 			return "true"
@@ -101,7 +144,7 @@ func ToValueLiteral(value any) string {
 	case bool:
 		return fmt.Sprintf("openfeature::Value(%t)", val)
 	case string:
-		return fmt.Sprintf("openfeature::Value(std::string(%s))", strconv.Quote(val))
+		return fmt.Sprintf("openfeature::Value(std::string(%s))", QuoteCppString(val))
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return fmt.Sprintf("openfeature::Value(static_cast<int64_t>(%v))", val)
 	case float32, float64:
@@ -126,7 +169,7 @@ func mapToValueLiteral(m map[string]any) string {
 		if i > 0 {
 			builder.WriteString(", ")
 		}
-		fmt.Fprintf(&builder, "{%s, %s}", strconv.Quote(k), ToValueLiteral(m[k]))
+		fmt.Fprintf(&builder, "{%s, %s}", QuoteCppString(k), ToValueLiteral(m[k]))
 	}
 	builder.WriteString("})")
 	return builder.String()
@@ -147,6 +190,8 @@ func sliceToValueLiteral(s []any) string {
 
 func (g *CppGenerator) Generate(params *generators.Params[Params]) error {
 	funcs := template.FuncMap{
+		"CppQuote":              QuoteCppString,
+		"FormatComment":         FormatComment,
 		"OpenFeatureType":       OpenFeatureType,
 		"OpenFeatureMethodType": OpenFeatureMethodType,
 		"FormatDefaultValue":    FormatDefaultValue,
