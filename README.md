@@ -44,8 +44,23 @@ The CLI bridges the gap between feature flag management systems and your applica
 
 [mise](https://mise.jdx.dev) is a developer tool version manager that supports pinning and sharing tool versions across your team.
 
+To install the CLI globally:
+
 ```bash
 mise use --global "github:open-feature/cli"
+```
+
+To install a pinned version for a single project, run this from the project root:
+
+```bash
+mise use "github:open-feature/cli@0.4.1"
+```
+
+This adds the CLI to the project's `mise.toml`, so everyone working on the project uses the same version:
+
+```toml
+[tools]
+"github:open-feature/cli" = "0.4.1"
 ```
 
 ### via curl
