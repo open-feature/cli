@@ -52,6 +52,7 @@ mise use --global "github:open-feature/cli"
 
 To install a pinned version for a single project, run this from the project root:
 
+<!-- x-release-please-start-version -->
 ```bash
 mise use "github:open-feature/cli@0.4.1"
 ```
@@ -62,6 +63,7 @@ This adds the CLI to the project's `mise.toml`, so everyone working on the proje
 [tools]
 "github:open-feature/cli" = "0.4.1"
 ```
+<!-- x-release-please-end -->
 
 ### via curl
 
