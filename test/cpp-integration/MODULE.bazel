@@ -1,0 +1,10 @@
+module(name = "openfeature_cli_cpp_integration")
+
+bazel_dep(name = "rules_cc", version = "0.2.25")
+bazel_dep(name = "abseil-cpp", version = "20250814.2")
+bazel_dep(name = "openfeature_cpp_sdk")
+git_override(
+    module_name = "openfeature_cpp_sdk",
+    remote = "https://github.com/open-feature/cpp-sdk.git",
+    tag = "v0.1.5",
+)

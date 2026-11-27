@@ -16,6 +16,7 @@ const (
 	NoInputFlagName       = "no-input"
 	GoPackageFlagName     = "package-name"
 	CSharpNamespaceName   = "namespace"
+	CppNamespaceName      = "namespace"
 	OverrideFlagName      = "override"
 	JavaPackageFlagName   = "package-name"
 	ProviderURLFlagName   = "provider-url"
@@ -35,6 +36,7 @@ const (
 	DefaultOutputPath      = ""
 	DefaultGoPackageName   = "openfeature"
 	DefaultCSharpNamespace = "OpenFeature"
+	DefaultCppNamespace    = "openfeature"
 	DefaultJavaPackageName = "com.example.openfeature"
 )
 
@@ -59,6 +61,11 @@ func AddGoGenerateFlags(cmd *cobra.Command) {
 // AddCSharpGenerateFlags adds the C# generator specific flags to the given command
 func AddCSharpGenerateFlags(cmd *cobra.Command) {
 	cmd.Flags().String(CSharpNamespaceName, DefaultCSharpNamespace, "Namespace for the generated C# code")
+}
+
+// AddCppGenerateFlags adds the C++ generator specific flags to the given command
+func AddCppGenerateFlags(cmd *cobra.Command) {
+	cmd.Flags().String(CppNamespaceName, DefaultCppNamespace, "Namespace for the generated C++ code")
 }
 
 // AddJavaGenerateFlags adds the Java generator specific flags to the given command
@@ -113,6 +120,15 @@ func GetGoPackageName(cmd *cobra.Command) string {
 // GetCSharpNamespace gets the C# namespace from the given command
 func GetCSharpNamespace(cmd *cobra.Command) string {
 	namespace, _ := cmd.Flags().GetString(CSharpNamespaceName)
+	return namespace
+}
+
+// GetCppNamespace gets the C++ namespace from the given command
+func GetCppNamespace(cmd *cobra.Command) string {
+	namespace, err := cmd.Flags().GetString(CppNamespaceName)
+	if err != nil {
+		return DefaultCppNamespace
+	}
 	return namespace
 }
 

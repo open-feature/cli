@@ -28,6 +28,7 @@ openfeature generate [flags]
 
 * [openfeature](openfeature.md)	 - CLI for OpenFeature.
 * [openfeature generate angular](openfeature_generate_angular.md)	 - Generate typesafe Angular services and directives.
+* [openfeature generate cpp](openfeature_generate_cpp.md)	 - Generate typesafe C++ client.
 * [openfeature generate csharp](openfeature_generate_csharp.md)	 - Generate typesafe C# client.
 * [openfeature generate go](openfeature_generate_go.md)	 - Generate typesafe accessors for OpenFeature.
 * [openfeature generate java](openfeature_generate_java.md)	 - Generate typesafe Java client.
