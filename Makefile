@@ -9,6 +9,7 @@ help:
 	@echo "  test                     - Run unit tests"
 	@echo "  test-integration         - Run all integration tests"
 	@echo "  test-integration-csharp  - Run C# integration tests"
+	@echo "  test-integration-cpp     - Run C++ integration tests"
 	@echo "  test-integration-go      - Run Go integration tests"
 	@echo "  test-integration-nodejs  - Run NodeJS integration tests"
 	@echo "  generate                 - Generate all code (API clients, docs, schema)"
@@ -69,6 +70,11 @@ test-integration-nodejs:
 test-integration-angular:
 	@echo "Running Angular integration test with Dagger..."
 	@go run ./test/integration/cmd/angular/run.go
+
+.PHONY: test-integration-cpp
+test-integration-cpp:
+	@echo "Running C++ integration test with Dagger..."
+	@go run ./test/integration/cmd/cpp/run.go
 
 .PHONY: test-integration
 test-integration:

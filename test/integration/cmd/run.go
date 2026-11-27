@@ -45,6 +45,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Run the C++ integration test
+	cppCmd := exec.Command("go", "run", "github.com/open-feature/cli/test/integration/cmd/cpp")
+	cppCmd.Stdout = os.Stdout
+	cppCmd.Stderr = os.Stderr
+	if err := cppCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running C++ integration test: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Add more tests here as they are available
 
 	fmt.Println("=== All integration tests passed successfully ===")

@@ -1,0 +1,3 @@
+build --cxxopt=-std=c++17
+build --copt=-fno-asynchronous-unwind-tables
+build --linkopt=-Wl,--gc-sections
