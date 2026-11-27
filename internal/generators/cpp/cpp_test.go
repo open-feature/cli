@@ -292,6 +292,37 @@ func TestFormatComment(t *testing.T) {
 	}
 }
 
+func TestFormatComment_TrailingBackslash(t *testing.T) {
+	testCases := []struct {
+		name     string
+		prefix   string
+		text     string
+		expected string
+	}{
+		{
+			name:     "single line ending in backslash",
+			prefix:   "// ",
+			text:     `Ends with \`,
+			expected: "// Ends with \\\n//",
+		},
+		{
+			name:     "trailing backslash with spaces before newline",
+			prefix:   "  // ",
+			text:     "Line 1\\  \nLine 2\\",
+			expected: "  // Line 1\\  \n  //\n  // Line 2\\\n  //",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := FormatComment(tc.prefix, tc.text)
+			if got != tc.expected {
+				t.Fatalf("FormatComment(%q, %q) = %q; want %q", tc.prefix, tc.text, got, tc.expected)
+			}
+		})
+	}
+}
+
 func TestGenerate_MultilineDescription(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	filesystem.SetFileSystem(fs)
@@ -302,7 +333,7 @@ func TestGenerate_MultilineDescription(t *testing.T) {
 				Key:          "checkoutFlag",
 				Type:         flagset.BoolType,
 				DefaultValue: false,
-				Description:  "Enable checkout\nUsed by production",
+				Description:  "Enable checkout\nUsed by production\\",
 			},
 		},
 	}
@@ -323,11 +354,11 @@ func TestGenerate_MultilineDescription(t *testing.T) {
 	}
 
 	content := string(data)
-	if !strings.Contains(content, "// Flag key for Enable checkout\n// Used by production") {
-		t.Fatalf("FlagKeys comment not properly prefixed per line:\n%s", content)
+	if !strings.Contains(content, "// Flag key for Enable checkout\n// Used by production\\\n//\ninline constexpr std::string_view CHECKOUT_FLAG") {
+		t.Fatalf("FlagKeys comment not properly guarded against line splicing:\n%s", content)
 	}
-	if !strings.Contains(content, "  // Enable checkout\n  // Used by production") {
-		t.Fatalf("GeneratedClient comment not properly prefixed per line:\n%s", content)
+	if !strings.Contains(content, "  // Enable checkout\n  // Used by production\\\n  //\n  bool CheckoutFlag() const") {
+		t.Fatalf("GeneratedClient comment not properly guarded against line splicing:\n%s", content)
 	}
 }
 
@@ -393,5 +424,110 @@ func TestGenerate_UnsupportedFlagType(t *testing.T) {
 
 	if err := generator.Generate(params); err == nil {
 		t.Fatal("expected Generate to return an error for UnknownFlagType, got nil")
+	}
+}
+
+func TestGenerate_InvalidCppIdentifierKeys(t *testing.T) {
+	testCases := []struct {
+		name string
+		key  string
+	}{
+		{name: "leading digit", key: "1feature"},
+		{name: "digits only", key: "123"},
+		{name: "empty key", key: ""},
+		{name: "punctuation only", key: "---"},
+		{name: "invalid character", key: "foo@bar"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			fs := afero.NewMemMapFs()
+			filesystem.SetFileSystem(fs)
+
+			flagSet := &flagset.Flagset{
+				Flags: []flagset.Flag{
+					{
+						Key:          tc.key,
+						Type:         flagset.BoolType,
+						DefaultValue: true,
+					},
+				},
+			}
+
+			generator := NewGenerator(flagSet)
+			params := &generators.Params[Params]{
+				OutputPath: "output",
+				Custom:     Params{Namespace: "ns"},
+			}
+
+			if err := generator.Generate(params); err == nil {
+				t.Fatalf("expected Generate to reject invalid C++ identifier key %q, got nil", tc.key)
+			}
+		})
+	}
+}
+
+func TestGenerate_EmbeddedNulBytes(t *testing.T) {
+	testCases := []struct {
+		name string
+		flag flagset.Flag
+	}{
+		{
+			name: "nul in flag key",
+			flag: flagset.Flag{
+				Key:          "flag\x00name",
+				Type:         flagset.BoolType,
+				DefaultValue: true,
+			},
+		},
+		{
+			name: "nul in string default",
+			flag: flagset.Flag{
+				Key:          "greeting",
+				Type:         flagset.StringType,
+				DefaultValue: "hello\x00world",
+			},
+		},
+		{
+			name: "nul in object map key",
+			flag: flagset.Flag{
+				Key:  "config",
+				Type: flagset.ObjectType,
+				DefaultValue: map[string]any{
+					"bad\x00key": "value",
+				},
+			},
+		},
+		{
+			name: "nul in nested object string value",
+			flag: flagset.Flag{
+				Key:  "config",
+				Type: flagset.ObjectType,
+				DefaultValue: map[string]any{
+					"items": []any{"ok", "bad\x00val"},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			fs := afero.NewMemMapFs()
+			filesystem.SetFileSystem(fs)
+
+			flagSet := &flagset.Flagset{
+				Flags: []flagset.Flag{tc.flag},
+			}
+
+			generator := NewGenerator(flagSet)
+			params := &generators.Params[Params]{
+				OutputPath: "output",
+				Custom:     Params{Namespace: "ns"},
+			}
+
+			if err := generator.Generate(params); err == nil {
+				t.Fatalf("expected Generate to reject embedded NUL byte for %s, got nil", tc.name)
+			}
+		})
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/iancoleman/strcase"
 	"github.com/open-feature/cli/internal/flagset"
 	"github.com/open-feature/cli/internal/generators"
 )
@@ -94,15 +95,93 @@ func QuoteCppString(s string) string {
 }
 
 // FormatComment prefixes every line of text with prefix so multiline strings
-// remain safely inside C++ line comments.
+// remain safely inside C++ line comments, and inserts a guard comment line
+// after any line ending in a backslash to prevent C++ phase-2 line splicing.
 func FormatComment(prefix, text string) string {
 	normalized := strings.ReplaceAll(text, "\r\n", "\n")
 	normalized = strings.ReplaceAll(normalized, "\r", "\n")
 	lines := strings.Split(normalized, "\n")
-	for i, line := range lines {
-		lines[i] = prefix + line
+	guard := strings.TrimRight(prefix, " \t")
+	out := make([]string, 0, len(lines))
+	for _, line := range lines {
+		out = append(out, prefix+line)
+		if strings.HasSuffix(strings.TrimRight(line, " \t"), `\`) {
+			out = append(out, guard)
+		}
 	}
-	return strings.Join(lines, "\n")
+	return strings.Join(out, "\n")
+}
+
+func isValidCppIdentifier(name string) bool {
+	if name == "" {
+		return false
+	}
+	for i := range len(name) {
+		c := name[i]
+		isLetter := (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+		isDigit := c >= '0' && c <= '9'
+		if i == 0 {
+			if !isLetter && c != '_' {
+				return false
+			}
+		} else if !isLetter && !isDigit && c != '_' {
+			return false
+		}
+	}
+	if strings.Contains(name, "__") {
+		return false
+	}
+	if len(name) >= 2 && name[0] == '_' && name[1] >= 'A' && name[1] <= 'Z' {
+		return false
+	}
+	return true
+}
+
+func containsNulByte(value any) bool {
+	switch val := value.(type) {
+	case string:
+		return strings.ContainsRune(val, 0)
+	case map[string]any:
+		for k, v := range val {
+			if strings.ContainsRune(k, 0) || containsNulByte(v) {
+				return true
+			}
+		}
+	case []any:
+		for _, elem := range val {
+			if containsNulByte(elem) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func validateFlagset(fs *flagset.Flagset) error {
+	if fs == nil {
+		return nil
+	}
+	for _, flag := range fs.Flags {
+		if strings.ContainsRune(flag.Key, 0) {
+			return fmt.Errorf("flag key %q contains an embedded NUL byte", flag.Key)
+		}
+		constName := strcase.ToScreamingSnake(flag.Key)
+		methodName := strcase.ToCamel(flag.Key)
+		if !isValidCppIdentifier(constName) || !isValidCppIdentifier(methodName) {
+			return fmt.Errorf("flag key %q does not produce valid C++ identifiers (constant %q, method %q)", flag.Key, constName, methodName)
+		}
+		switch flag.Type {
+		case flagset.StringType:
+			if strings.ContainsRune(fmt.Sprintf("%v", flag.DefaultValue), 0) {
+				return fmt.Errorf("flag %q default value contains an embedded NUL byte", flag.Key)
+			}
+		case flagset.ObjectType:
+			if containsNulByte(flag.DefaultValue) {
+				return fmt.Errorf("flag %q default value contains an embedded NUL byte", flag.Key)
+			}
+		}
+	}
+	return nil
 }
 
 // FormatDefaultValue formats flag default values into valid C++ literals.
@@ -216,6 +295,10 @@ func sliceToValueLiteral(s []any) string {
 }
 
 func (g *CppGenerator) Generate(params *generators.Params[Params]) error {
+	if err := validateFlagset(g.Flagset); err != nil {
+		return err
+	}
+
 	funcs := template.FuncMap{
 		"CppQuote":      QuoteCppString,
 		"FormatComment": FormatComment,
